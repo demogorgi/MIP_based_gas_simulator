@@ -1,0 +1,33 @@
+# hint:
+# use param name[S] := <> 0; if S is the empty set.
+#
+# Decisions of the trader agent
+exit_nom:
+    X:
+        XN: -400
+        XH: -0
+
+entry_nom:
+    S:
+        EH_aux1^EH: 0
+        EN_aux1^EN: 200
+
+# Decisions of the dispatcher agent
+va:
+    VA:
+        N23^N23_1: 0
+
+zeta:
+    RE:
+        N25^N26_aux: 100000
+
+gas:
+    CS:
+        N22^N23: 0
+
+compressor:
+    CS:
+        N22^N23: 0
+
+#test:
+#    emptySet:

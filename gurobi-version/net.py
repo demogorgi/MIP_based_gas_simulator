@@ -100,7 +100,7 @@ pipes, length, diameter, roughness = gp.multidict({
 connections = pipes + valves + resistors + flap_traps + compressors
 
 nodes = entries + exits + innodes
-pipen_pipes = [x for x in connections if x not in pipes]
+non_pipes = [x for x in connections if x not in pipes]
 
 special = gp.tuplelist([
   ("EN_aux1", "EN"),

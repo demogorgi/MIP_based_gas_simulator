@@ -10,7 +10,7 @@ require "./agents2zpl.rb"
 require "./sol2state.rb"
 require 'fileutils'
 
-# generate static_data.zpl - this is manly topology information in zompl format
+# generate static_data.zpl - this is manly topology information in zimpl format
 puts netstate2zpl = "ruby netstate2zpl.rb #{ARGV[2]}"
 system(netstate2zpl)
 

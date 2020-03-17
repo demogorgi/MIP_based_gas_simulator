@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # this file contains the simulator core
+# it works for example with python3, gurobi 8.0.1, yaml 5.3
+# >python3 urmel.py (or ./urmel.py)
 
 from constants import *
 from functions import *
@@ -37,11 +39,12 @@ var_non_pipe_Qo = m.addVars(non_pipes, lb=-10000, ub=10000, name="var_non_pipe_Q
 flaptrap = m.addVars(flap_traps, vtype=GRB.BINARY, name="flaptrap")
 
 ## Auxilary variables
-# v * Q for pressure drop (for pipes and resistors)
+# v * Q for pressure drop for pipes ...
 vQp = m.addVars(pipes, lb=-GRB.INFINITY, name="vQp") #:= ( vi(l,r) * var_pipe_Qo_in[l,r] + vo(l,r) * var_pipe_Qo_out[l,r] ) * rho / 3.6;
+# ... and resistors
 vQr = m.addVars(resistors, lb=-GRB.INFINITY, name="vQr") #:= vm(l,r) * var_non_pipe_Qo[l,r] * rho / 3.6;
 
-# pressure difference p_out minus p_in
+# Pressure difference p_out minus p_in
 delta_p = m.addVars(connections, lb=-Mp, ub=Mp, name="delta_p") #:= var_node_p[l] - var_node_p[r];
 
 ## Auxiliary variables to track dispatcher agent decisions
@@ -54,34 +57,18 @@ compressor_DA = m.addVars(compressors, name="compressor_DA");
 exit_nom_TA = m.addVars(exits, lb=-GRB.INFINITY, name="exit_nom_TA")
 entry_nom_TA = m.addVars(special, name="entry_nom_TA")
 
-## Auxiliary variable to track deviation from nominations
-#m.addVars(nom_entry_slack_DA[S] >= -infinity;
-#m.addVars(nom_exit_slack_DA[X] >= - infinity;
+## Auxiliary variable to track deviations from entry nominations ...
+nom_entry_slack_DA = m.addVars(special, lb=-GRB.INFINITY, name="nom_entry_slack_DA")
+# ... and from exit nominations
+nom_exit_slack_DA = m.addVars(exits, lb=-GRB.INFINITY, name="nom_exit_slack_DA")
 
 ## Auxiliary variable to track balances
-#m.addVars(scenario_balance_TA >= - infinity;
+scenario_balance_TA = m.addVar(lb=-GRB.INFINITY, name="scenario_balance_TA")
 
 ## Auxiliary variable to track pressure violations
-#m.addVars(ub_pressure_violation_DA[NO] >= - infinity;
-#m.addVars(lb_pressure_violation_DA[NO] >= - infinity;
+ub_pressure_violation_DA = m.addVars(nodes, lb=-GRB.INFINITY, name="ub_pressure_violation_DA")
+lb_pressure_violation_DA = m.addVars(nodes, lb=-GRB.INFINITY, name="lb_pressure_violation_DA")
 
 m.write("urmel.lp")
 
-#
-## Create decision variables for the foods to buy
-## buy = m.addVars(foods, name="buy")
-#
-## You could use Python looping constructs and m.addVar() to create
-## these decision variables instead.  The following would be equivalent
-##
-## buy = {}
-## for f in foods:
-##   buy[f] = m.addVar(name=f)
-#
-## The objective is to minimize the costs
-#m.setObjective(buy.prod(cost), GRB.MINIMIZE)
-#
-## Using looping constructs, the preceding statement would be:
-##
-## m.setObjective(sum(buy[f]*cost[f] for f in foods), GRB.MINIMIZE)
-
+# From here on the constraints have to be added.

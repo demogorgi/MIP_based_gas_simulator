@@ -6,13 +6,13 @@
 import yaml
 # manual file with compressor data is read
 # the dictionary does not change during the process
-with open(r'compressors.yml') as file:
+with open(r'input_data/compressors.yml') as file:
     compressors = yaml.load(file, Loader=yaml.FullLoader)
     print(compressors)
 
 # manual file with initial gas network control is read
 # the dictionary changes with every new control
-with open(r'init_decisions.yml') as file:
+with open(r'input_data/init_decisions.yml') as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     print(agent_decisions)
 
@@ -22,6 +22,9 @@ from net import *
 from init_scenario import *
 import gurobipy as gp
 from gurobipy import GRB
+from network.nodes import *
+from network.connections import *
+
 
 # Model
 m = gp.Model("urmel")

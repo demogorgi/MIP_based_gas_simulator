@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 *.lp
 *.log
+
+node_modules/*
+*.js
+nodemon.json

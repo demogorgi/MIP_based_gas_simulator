@@ -5,20 +5,6 @@
 
 import gurobipy as gp
 from gurobipy import GRB
-
-# class Parameter:
-#     def __init__(self, name, old, old_old):
-#         self.name = name
-#         self.old = old
-#         self.old_old = old_old
-# 
-# class Node:
-#     def __init__(self):
-#         self.__dict__ = {}
-#     def __setitem__(self, k, v):
-#         self.__dict__[k] = v
-#     def __getitem__(self, k):
-#         return self.__dict__[k]
     
 # Pressure old_old and pressure old in bar
 nodes, var_node_p_old_old, var_node_p_old = gp.multidict({

@@ -5,6 +5,19 @@
 
 import gurobipy as gp
 from gurobipy import GRB
+
+import yaml
+# manual file with compressor data is read
+# the dictionary does not change during the process
+with open(r'input_data/compressors.yml') as file:
+    compressors = yaml.load(file, Loader=yaml.FullLoader)
+    print(compressors)
+
+# manual file with initial gas network control is read
+# the dictionary changes with every new control
+with open(r'input_data/init_decisions.yml') as file:
+    agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
+    print(agent_decisions)
     
 # Pressure old_old and pressure old in bar
 nodes, var_node_p_old_old, var_node_p_old = gp.multidict({

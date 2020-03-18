@@ -69,6 +69,6 @@ def simulator_model(name):
     lb_pressure_violation_DA = m.addVars(nodes, lb=-GRB.INFINITY, name="lb_pressure_violation_DA")
     
     # From here on the constraints have to be added.
-    m.addConstr("va_DA[N23,N23_1]" == -1, "test")
+    m.addConstr(va_DA[("N23","N23_1")] == -1, "test")
 
     return m

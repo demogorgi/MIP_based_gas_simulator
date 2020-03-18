@@ -18,6 +18,13 @@ name = "urmel"
 m = simulator_model(name + ".py")
 m.optimize()
 m.write(name + ".lp")
+
+print("-------------------------------------")
+print(m.getVarByName("va_DA[N23,N23_1]"))
+print("-------------------------------------")
+print(m.getAttr('VarName', m.getVars()))
+print("-------------------------------------")
+
 if m.status == 3:
     print("Model is infeasible. %s.ilp written." % name)
     m.computeIIS()

@@ -14,4 +14,5 @@ from network.nodes import *
 from network.connections import *
 from model import *
 
+m = simulator_model("urmel.py")
 m.write("urmel.lp")

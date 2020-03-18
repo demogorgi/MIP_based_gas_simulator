@@ -4,6 +4,9 @@
 
 from constants import *
 from init_scenario import *
+from network.nodes import *
+from network.connections import *
+from math import *
 
 # Mean values are used to stabilize simulation
 def stabilizer(a, b):
@@ -57,19 +60,19 @@ def lamb(diam, rough):
     
 # Rs * Tm * zm / A
 def rtza(i,o):
-    return Rs * Tm * zm(p_old(i),p_old(o)) / A(D[i,o])
+    return Rs * Tm * zm(p_old(i),p_old(o)) / A(diameter[(i,o)])
     
 # Inflow velocity
 def vi(i,o):
-    return rtza(i,o) * rho / 3.6 * q_in_old(i,o) / ( b2p * p_old(i) )
+    return rtza(i,o) * rho / 3.6 * q_in_old((i,o)) / ( b2p * p_old(i) )
     
 # Outflow velocity
 def vo(i,o):
-    return rtza(i,o) * rho / 3.6 * q_out_old(i,o) / ( b2p * p_old(o) )
+    return rtza(i,o) * rho / 3.6 * q_out_old((i,o)) / ( b2p * p_old(o) )
 
 # Function for resistor model
 def vm(i,o):
-    return rho / 3.6 * ( rtza(i,o) * q_old(i,o) ) / 2 * 1 / b2p * ( 1 / p_old(i) + 1 / p_old(o) )
+    return rho / 3.6 * ( rtza(i,o) * q_old((i,o)) ) / 2 * 1 / b2p * ( 1 / p_old(i) + 1 / p_old(o) )
 
 # Functions for compressor model
 #

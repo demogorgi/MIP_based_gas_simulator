@@ -69,6 +69,4 @@ scenario_balance_TA = m.addVar(lb=-GRB.INFINITY, name="scenario_balance_TA")
 ub_pressure_violation_DA = m.addVars(nodes, lb=-GRB.INFINITY, name="ub_pressure_violation_DA")
 lb_pressure_violation_DA = m.addVars(nodes, lb=-GRB.INFINITY, name="lb_pressure_violation_DA")
 
-m.write("urmel.lp")
-
 # From here on the constraints have to be added.

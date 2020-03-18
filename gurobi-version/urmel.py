@@ -14,5 +14,11 @@ from network.nodes import *
 from network.connections import *
 from model import *
 
-m = simulator_model("urmel.py")
-m.write("urmel.lp")
+name = "urmel"
+m = simulator_model(name + ".py")
+m.optimize()
+m.write(name + ".lp")
+if m.status == 3:
+    print("Model is infeasible. %s.ilp written." % name)
+    m.computeIIS()
+    m.write(name + ".ilp")

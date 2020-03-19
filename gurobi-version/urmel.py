@@ -10,14 +10,6 @@ import sys
 from os import path
 import re
 
-wd = sys.argv[1].replace("/",".")
-wd = re.sub(r'\.$', '', wd)
-print(wd + ".init_scenario")
-
-init_s = importlib.import_module(wd + ".init_scenario")
-no = importlib.import_module(wd + ".nodes")
-co = importlib.import_module(wd + ".connections")
-
 import os
 output = path.join(sys.argv[1],'output')
 if not os.path.exists(output):

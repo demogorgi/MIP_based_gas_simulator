@@ -120,8 +120,9 @@ def phi_new(phi,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_min_phi,p_i_min,p_i_max,L_m
 
 # factors for pressure drop for pipes ...
 def xip(i):
-    return lamb(diameter[i], k[i]) * L[i] / ( 4 * diameter[i] * A(D[i]) )
+    return lamb(co.diameter[i], co.roughness[i]) * co.length[i] / ( 4 * co.diameter[i] * A(co.diameter[i]) )
 
 # ... and resistors
-def xir(i):
-    return zeta[i] / ( 2 * A(D[i]) );
+def xir(i,zeta):
+    return zeta / ( 2 * A(co.diameter[i]) );
+    #return agent_decisions["zeta"]["RE"][joiner(i)] / ( 2 * A(co.diameter[i]) );

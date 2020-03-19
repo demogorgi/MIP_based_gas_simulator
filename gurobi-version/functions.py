@@ -2,10 +2,17 @@
 
 # this file contains helper functions to model gas physics
 
+import importlib
+import sys
+import re
+wd = sys.argv[1].replace("/",".")
+wd = re.sub(r'\.$', '', wd)
+
+sc = importlib.import_module(wd + ".init_scenario")
+no = importlib.import_module(wd + ".nodes")
+co = importlib.import_module(wd + ".connections")
+
 from constants import *
-from init_scenario import *
-from network.nodes import *
-from network.connections import *
 from math import *
 
 # Mean values are used to stabilize simulation
@@ -20,19 +27,19 @@ def stabilizer(a, b):
 
 # pressure stabilizer
 def p_old(n):
-    return stabilizer(var_node_p_old[n], var_node_p_old_old[n])
+    return stabilizer(sc.var_node_p_old[n], sc.var_node_p_old_old[n])
     
 # flow stabilizer (non-pipes)
 def q_old(non_pipe):
-    return stabilizer(abs(var_non_pipe_Qo_old[non_pipe]), abs(var_non_pipe_Qo_old_old[non_pipe]))
+    return stabilizer(abs(sc.var_non_pipe_Qo_old[non_pipe]), abs(sc.var_non_pipe_Qo_old_old[non_pipe]))
     
 # pipe inflow stabilizer
 def q_in_old(pipe):
-    return stabilizer(abs(var_pipe_Qo_in_old[pipe]), abs(var_pipe_Qo_in_old_old[pipe]))
+    return stabilizer(abs(sc.var_pipe_Qo_in_old[pipe]), abs(sc.var_pipe_Qo_in_old_old[pipe]))
     
 # pipe outflow stabilizer
 def q_out_old(pipe):
-    return stabilizer(abs(var_pipe_Qo_out_old[pipe]), abs(var_pipe_Qo_out_old_old[pipe]))
+    return stabilizer(abs(sc.var_pipe_Qo_out_old[pipe]), abs(sc.var_pipe_Qo_out_old_old[pipe]))
 
 # reduced pressure (2.4 Forne)
 def pr(p):
@@ -60,7 +67,7 @@ def lamb(diam, rough):
     
 # Rs * Tm * zm / A
 def rtza(i,o):
-    return Rs * Tm * zm(p_old(i),p_old(o)) / A(diameter[(i,o)])
+    return Rs * Tm * zm(p_old(i),p_old(o)) / A(co.diameter[(i,o)])
     
 # Inflow velocity
 def vi(i,o):

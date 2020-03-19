@@ -74,6 +74,12 @@ diameter = {
   ('N25', 'N26_aux'):     0.9
   }
 
+# special pipes
+special = gp.tuplelist([
+  ("EN_aux1", "EN"),
+  ("EH_aux1", "EH")
+])
+
 connections = pipes + resistors + valves + flap_traps + compressors
 
 non_pipes = [x for x in connections if x not in pipes]

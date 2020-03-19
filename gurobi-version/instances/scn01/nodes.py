@@ -48,11 +48,5 @@ nodes, heights, pressure_limits_lower, pressure_limits_upper = gp.multidict({
   "N23_aux":  [0.0, 1.01325, 105.01325]
   })
 
-# special innodes
-special = gp.tuplelist([
-  ("EN_aux1", "EN"),
-  ("EH_aux1", "EH")
-])
-
 # all nodes
 nodes = entries + exits + innodes

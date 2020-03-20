@@ -23,7 +23,7 @@ def joiner(s):
     return '^'.join(map(str,s))
 
 
-def simulator_model(name,agent_decisions,dt=900):
+def simulator_model(name,agent_decisions,compressors,dt):
     # Model
     m = gp.Model(name)
     
@@ -218,27 +218,35 @@ def simulator_model(name,agent_decisions,dt=900):
     #### compressor model ###
     #subto compressor_eq_one: forall <l,r> in CS:
     #      var_non_pipe_Qo[l,r] >= 0;
+    m.addConstrs((var_non_pipe_Qo[cs] >= 0 for cs in co.compressors), name='compressor_eq_one')
     #
     #subto compressor_eq_two: forall <l,r> in CS:
     #      var_non_pipe_Qo[l,r] == compressor[l,r] * 3.6 * p_old(l) * phi_new(q_old(l,r) / ( 3.6 * p_old(l) ),phi_min[l,r],phi_max[l,r],pi_1[l,r],pi_2[l,r],L_min_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max(L_min_pi[l,r],L_min_phi[l,r],L_max_pi[l,r],eta[l,r],p_i_min[l,r],p_i_max[l,r],q_old(l,r)  / ( 3.6 * p_old(l) ),L_min_pi[l,r]),eta[l,r],gas[l,r],p_old(l),p_old(r));
+    m.addConstrs((var_non_pipe_Qo[cs] == agent_decisions["compressor"]["CS"][joiner(cs)] * 3.6 * p_old(cs[0]) * phi_new(q_old(cs) / ( 3.6 * p_old(cs[0]) ),compressors[joiner(cs)]["phi_min"],compressors[joiner(cs)]["phi_max"],compressors[joiner(cs)]["pi_1"],compressors[joiner(cs)]["pi_2"],compressors[joiner(cs)]["L_min_pi"],compressors[joiner(cs)]["L_min_phi"],compressors[joiner(cs)]["p_i_min"],compressors[joiner(cs)]["p_i_max"],L_max(compressors[joiner(cs)]["L_min_pi"],compressors[joiner(cs)]["L_min_phi"],compressors[joiner(cs)]["L_max_pi"],compressors[joiner(cs)]["eta"],compressors[joiner(cs)]["p_i_min"],compressors[joiner(cs)]["p_i_max"],q_old(cs)  / ( 3.6 * p_old(cs[0]) ),compressors[joiner(cs)]["L_min_pi"]),compressors[joiner(cs)]["eta"],agent_decisions["gas"]["CS"][joiner(cs)],p_old(cs[0]),p_old(cs[1])) for cs in co.compressors), name='compressor_eq_two')
     #
     #### Entrymodellierung ###
     #subto entry_flow_model:
     #      forall <e> in E: var_node_Qo_in[e] <= entry_flow_bound[e];
+    m.addConstrs((var_node_Qo_in[e] <= no.entry_flow_bound[e] for e in no.entries), name='entry_flow_model')
     #
     #subto nomination_check:
     #      forall <l,r> in S: var_pipe_Qo_out[l,r] + nom_entry_slack_DA[l,r] == entry_nom[l,r];
+    m.addConstrs((var_pipe_Qo_out[s] + nom_entry_slack_DA[s] == agent_decisions["entry_nom"]["S"][joiner(s)] for s in co.special), name='nomination_check')
     #
     #subto track_scenario_balance:
     #      sum <l,r> in S: entry_nom[l,r] + sum <x> in X: exit_nom[x] == scenario_balance_TA;
+    m.addConstr((sum(agent_decisions["entry_nom"]["S"].values()) + sum(agent_decisions["exit_nom"]["X"].values()) == scenario_balance_TA), name='track_scenario_balance')
     #
     #subto track_exit_nomination_slack:
     #      forall <x> in X: nom_exit_slack_DA[x] == var_boundary_node_flow_slack_positive[x] - var_boundary_node_flow_slack_negative[x];
+    m.addConstrs((nom_exit_slack_DA[x] == var_boundary_node_flow_slack_positive[x] - var_boundary_node_flow_slack_negative[x] for x in no.exits), name='track_exit_nomination_slack')
     #
     #subto track_ub_pressure_violation:
     #      forall <n> in NO: var_node_p[n] - pressureLimitsUpper[n] == ub_pressure_violation_DA[n];
+    m.addConstrs((var_node_p[n] - no.pressure_limits_upper[n] == ub_pressure_violation_DA[n] for n in no.nodes), name='track_ub_pressure_violation')
     #
     #subto track_lb_pressure_violation:
     #      forall <n> in NO: pressureLimitsLower[n] - var_node_p[n] == lb_pressure_violation_DA[n];
+    m.addConstrs((no.pressure_limits_lower[n] - var_node_p[n] == lb_pressure_violation_DA[n] for n in no.nodes), name='track_lb_pressure_violation')
     
     return m

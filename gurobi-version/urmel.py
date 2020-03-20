@@ -35,7 +35,7 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     #print(agent_decisions)
     
 name = "urmel"
-m = simulator_model(name + ".py",agent_decisions)
+m = simulator_model(name + ".py",agent_decisions,compressors,900)
 m.optimize()
 m.write(output + "/" + name + ".lp")
 

@@ -34,10 +34,30 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
     
+# used for output file name
 name = "urmel"
-m = simulator_model(name + ".py",agent_decisions,compressors,900)
+# m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
+m = simulator_model(agent_decisions,compressors,900)
+# optimize the model ( = do a simulation step)
 m.optimize()
-m.write(output + "/" + name + ".lp")
+# get the model status
+status = m.status
+# if solved to optimallity store solution in dictionary
+if status == 2:
+    m.write(output + "/" + name + ".lp")
+    sol = {}
+    for v in m.getVars():
+        sol[v.varName] = v.x
+        #print('%s %g' % (v.varName, v.x))
+    print(sol)
+# if infeasible write IIS for analysis and debugging
+elif status == 3:
+    print("Model is infeasible. %s.ilp written." % name)
+    m.computeIIS()
+    m.write(output + "/" + name + ".ilp")
+# don't know yet, what else
+else:
+    print("Solution status is %d, don't know what to do." % status)
 
 #print("-------------------------------------")
 #print(m.getVarByName("va_DA[N23,N23_1]"))
@@ -45,7 +65,3 @@ m.write(output + "/" + name + ".lp")
 #print(m.getAttr('VarName', m.getVars()))
 #print("-------------------------------------")
 
-if m.status == 3:
-    print("Model is infeasible. %s.ilp written." % name)
-    m.computeIIS()
-    m.write(output + "/" + name + ".ilp")

@@ -23,9 +23,9 @@ def joiner(s):
     return '^'.join(map(str,s))
 
 
-def simulator_model(name,agent_decisions,compressors,dt):
+def simulator_model(agent_decisions,compressors,dt):
     # Model
-    m = gp.Model(name)
+    m = gp.Model()
     
     ## Node variables
     # pressure for every node

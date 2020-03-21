@@ -3,7 +3,7 @@
 
 # this file manages the iterative process
 # it works for example with python3, gurobi 8.0.1, yaml 5.3
-# >python3 urmel.py path (or ./urmel.py path)
+# >python3 urmel.py numIterations lengthTimestep path (or ./urmel.py path numIterations lengthTimestep)
 
 import importlib
 import sys
@@ -36,32 +36,40 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     
 # used for output file name
 name = "urmel"
-# m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
-m = simulator_model(agent_decisions,compressors,900)
-# optimize the model ( = do a simulation step)
-m.optimize()
-# get the model status
-status = m.status
-# if solved to optimallity store solution in dictionary
-if status == 2:
-    m.write(output + "/" + name + ".lp")
-    sol = {}
-    for v in m.getVars():
-        sol[v.varName] = v.x
-        #print('%s %g' % (v.varName, v.x))
-    print(sol)
-# if infeasible write IIS for analysis and debugging
-elif status == 3:
-    print("Model is infeasible. %s.ilp written." % name)
-    m.computeIIS()
-    m.write(output + "/" + name + ".ilp")
-# don't know yet, what else
-else:
-    print("Solution status is %d, don't know what to do." % status)
 
-#print("-------------------------------------")
-#print(m.getVarByName("va_DA[N23,N23_1]"))
-#print("-------------------------------------")
-#print(m.getAttr('VarName', m.getVars()))
-#print("-------------------------------------")
-
+for i in range(int(sys.argv[2])):
+    # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
+    m = simulate(agent_decisions,compressors,int(sys.argv[3]))
+    # optimize the model ( = do a simulation step)
+    m.optimize()
+    # get the model status
+    status = m.status
+    # if solved to optimallity
+    if status == 2:
+        #m.write(output + "/" + name + str(i) + ".lp")
+        # store solution in dictionary
+        sol = {}
+        for v in m.getVars():
+            sol[v.varName] = v.x
+            #print('%s %g' % (v.varName, v.x))
+        #print(sol)
+        # set old to old_old and current value to old for flows and pressures
+        for node in no.nodes:
+            sc.var_node_p_old_old[node], sc.var_node_p_old[node]
+            sc.var_node_p_old[node], sol["var_node_p[%s]" % node]
+        for non_pipe in co.non_pipes:
+            sc.var_non_pipe_Qo_old_old[non_pipe] = sc.var_non_pipe_Qo_old[non_pipe]
+            sc.var_non_pipe_Qo_old[non_pipe] = sol["var_non_pipe_Qo[%s,%s]" % non_pipe]
+        for pipe in co.pipes:
+            sc.var_pipe_Qo_in_old_old[pipe] = sc.var_pipe_Qo_in_old[pipe]
+            sc.var_pipe_Qo_in_old[pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
+            sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
+            sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
+    # if infeasible write IIS for analysis and debugging
+    elif status == 3:
+        print("Model is infeasible. %s.ilp written." % name)
+        m.computeIIS()
+        m.write(output + "/" + name + str(i) + ".ilp")
+    # don't know yet, what else
+    else:
+        print("Solution status is %d, don't know what to do." % status)

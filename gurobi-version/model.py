@@ -23,7 +23,7 @@ def joiner(s):
     return '^'.join(map(str,s))
 
 
-def simulator_model(agent_decisions,compressors,dt):
+def simulate(agent_decisions,compressors,dt):
     # Model
     m = gp.Model()
     

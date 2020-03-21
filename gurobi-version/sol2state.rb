@@ -192,10 +192,10 @@ end
 
 scenarioPath = ARGV[0]
 stateTemplate = File.open(File.join(scenarioPath, "state_sim.xml"), "r")
-solFiles = Dir.glob(File.join(scenarioPath, "output/*.sol"))
+solFiles = Dir.glob(File.join(scenarioPath, "output/*.sol")).sort()
 contourInput = File.join(scenarioPath, "/output/contour")
-FileUtils.cp(File.join(scenarioPath,"net_sim.xml"), contourInput)
 Dir.mkdir(contourInput) unless File.exists?(contourInput)
+FileUtils.cp(File.join(scenarioPath,"net_sim.xml"), contourInput)
 timestamp = Time.now()
 solFiles.each_with_index{ |f,i|
     puts("process #{f}")

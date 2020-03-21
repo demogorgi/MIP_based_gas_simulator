@@ -46,8 +46,8 @@ for i in range(int(sys.argv[2])):
     status = m.status
     # if solved to optimallity
     if status == 2:
-        #m.write(output + "/" + name + str(i) + ".lp")
-        m.write(output + "/" + name + str(i) + ".sol")
+        #m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".lp")
+        m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".sol")
         # store solution in dictionary
         sol = {}
         for v in m.getVars():

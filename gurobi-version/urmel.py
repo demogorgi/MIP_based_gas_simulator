@@ -70,7 +70,7 @@ for i in range(int(sys.argv[2])):
     elif status == 3:
         print("Model is infeasible. %s.ilp written." % name)
         m.computeIIS()
-        m.write(output + "/" + name + str(i) + ".ilp")
+        m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".ilp")
     # don't know yet, what else
     else:
         print("Solution status is %d, don't know what to do." % status)

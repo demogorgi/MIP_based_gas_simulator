@@ -5,6 +5,7 @@ __pycache__/
 *.lp
 *.log
 *.ilp
+output/
 
 node_modules/*
 *.js

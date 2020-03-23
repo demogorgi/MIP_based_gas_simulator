@@ -44,7 +44,7 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     #print(agent_decisions)
     
 # used for output file name
-name = "urmel"
+name = config['name']
 
 for i in range(int(sys.argv[2])):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated

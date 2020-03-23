@@ -39,7 +39,7 @@ name = "urmel"
 
 for i in range(int(sys.argv[2])):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
-    m = simulate(agent_decisions,compressors,int(sys.argv[3]))
+    m = simulate(agent_decisions, compressors, int(sys.argv[3]))
     # optimize the model ( = do a simulation step)
     m.optimize()
     # get the model status

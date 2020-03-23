@@ -1,0 +1,4 @@
+write_lp: False
+write_sol: False
+write_ilp: False
+gnuplot: False

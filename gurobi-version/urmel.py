@@ -9,18 +9,27 @@ import importlib
 import sys
 from os import path
 import re
-
+import glob
 import os
-output = path.join(sys.argv[1],'output')
-if not os.path.exists(output):
-    os.makedirs(output)
-
 import gurobipy as gp
 from gurobipy import GRB
 from constants import *
 from functions import *
 from model import *
 import yaml
+
+output = path.join(sys.argv[1],'output')
+if not os.path.exists(output):
+    os.makedirs(output)
+else:
+    files = glob.glob(path.join(output,"*"))
+    for f in files:
+        os.remove(f)
+
+# manual file with configs
+with open(path.join(sys.argv[1], 'config.yml')) as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
+    #print(config)
 
 # manual file with compressor data is read
 # the dictionary does not change during the process
@@ -35,7 +44,7 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     #print(agent_decisions)
     
 # used for output file name
-name = "urmel"
+name = config['name']
 
 for i in range(int(sys.argv[2])):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
@@ -46,8 +55,8 @@ for i in range(int(sys.argv[2])):
     status = m.status
     # if solved to optimallity
     if status == 2:
-        #m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".lp")
-        m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".sol")
+        if config['write_lp']: m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".lp")
+        if config['write_sol']: m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".sol")
         # store solution in dictionary
         sol = {}
         for v in m.getVars():
@@ -67,7 +76,7 @@ for i in range(int(sys.argv[2])):
             sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
             sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
     # if infeasible write IIS for analysis and debugging
-    elif status == 3:
+    elif status == 3 and config['write_ilp']:
         print("Model is infeasible. %s.ilp written." % name)
         m.computeIIS()
         m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".ilp")

@@ -22,14 +22,6 @@ co = importlib.import_module(wd + ".connections")
 def joiner(s):
     return '^'.join(map(str,s))
 
-# initialize data
-# from readers.instance_reader import read_instance_folder
-# read_instance_folder(sys.argv[1])
-from network.net import Net
-net = Net()
-net.read_instance_folder(sys.argv[1])
-print("\n" * 2)
-foo()
 
 def simulate(agent_decisions,compressors,dt):
     # Model

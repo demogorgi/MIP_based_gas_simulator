@@ -43,7 +43,7 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
     
-def simulator_step(config, agent_decisions, compressors, dt):
+def simulator_step(config, agent_decisions, compressors, step, dt):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)
     # optimize the model ( = do a simulation step)
@@ -52,8 +52,8 @@ def simulator_step(config, agent_decisions, compressors, dt):
     status = m.status
     # if solved to optimallity
     if status == 2:
-        if config['write_lp']: m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".lp")
-        if config['write_sol']: m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".sol")
+        if config['write_lp']: m.write(output + "/" + config['name'] + "_" + str(step).rjust(5, '0') + ".lp")
+        if config['write_sol']: m.write(output + "/" + config['name'] + "_" + str(step).rjust(5, '0') + ".sol")
         # store solution in dictionary
         sol = {}
         for v in m.getVars():
@@ -77,12 +77,7 @@ def simulator_step(config, agent_decisions, compressors, dt):
     elif status == 3 and config['write_ilp']:
         print("Model is infeasible. %s.ilp written." % config['name'])
         m.computeIIS()
-        m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".ilp")
+        m.write(output + "/" + config['name'] + "_" + str(step).rjust(5, '0') + ".ilp")
     # don't know yet, what else
     else:
         print("Solution status is %d, don't know what to do." % status)
-
-#--------------------------------------------------------------------------------
-
-for i in range(int(sys.argv[2])):
-    simulator_step(config, agent_decisions, compressors, sys.argv[3])

@@ -43,20 +43,17 @@ with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
     
-# used for output file name
-name = config['name']
-
-for i in range(int(sys.argv[2])):
+def simulator_step(config, agent_decisions, compressors, dt):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
-    m = simulate(agent_decisions, compressors, int(sys.argv[3]))
+    m = simulate(agent_decisions, compressors, dt)
     # optimize the model ( = do a simulation step)
     m.optimize()
     # get the model status
     status = m.status
     # if solved to optimallity
     if status == 2:
-        if config['write_lp']: m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".lp")
-        if config['write_sol']: m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".sol")
+        if config['write_lp']: m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".lp")
+        if config['write_sol']: m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".sol")
         # store solution in dictionary
         sol = {}
         for v in m.getVars():
@@ -75,11 +72,17 @@ for i in range(int(sys.argv[2])):
             sc.var_pipe_Qo_in_old[pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
             sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
             sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
+        return sol
     # if infeasible write IIS for analysis and debugging
     elif status == 3 and config['write_ilp']:
-        print("Model is infeasible. %s.ilp written." % name)
+        print("Model is infeasible. %s.ilp written." % config['name'])
         m.computeIIS()
-        m.write(output + "/" + name + "_" + str(i).rjust(5, '0') + ".ilp")
+        m.write(output + "/" + config['name'] + "_" + str(i).rjust(5, '0') + ".ilp")
     # don't know yet, what else
     else:
         print("Solution status is %d, don't know what to do." % status)
+
+#--------------------------------------------------------------------------------
+
+for i in range(int(sys.argv[2])):
+    simulator_step(config, agent_decisions, compressors, sys.argv[3])

@@ -37,7 +37,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
     # if solved to optimallity
     if status == GRB.OPTIMAL: # == 2
         # plot data with gnuplot
-        plot(_step, agent_decisions, compressors)
+        if config['gnuplot']: plot(_step, agent_decisions, compressors)
         if config['write_lp']: m.write(step_files_path + ".lp")
         if config['write_sol']: m.write(step_files_path + ".sol")
         # store solution in dictionary

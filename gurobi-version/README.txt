@@ -6,7 +6,7 @@ config.yml
 
 connections.py and nodes.py
   contains the data for all elements in the network under consideration
-  file is generated externally by create_netstate
+  files are generated externally by create_netstate
 
 constants.py
   contains relevant constants for physics model
@@ -24,10 +24,10 @@ main.py
   manages the iterative process
   
 model.py
-  contains the gurobi simulator model
+  contains the gurobi simulator model (pyhsics model)
   
 net_sim.xml and state_sim.xml
-  generated externally by create netstate
+  generated externally by create_netstate
   used to generate further state-xmls to be displayed in contour
   
 urmel.py

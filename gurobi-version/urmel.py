@@ -64,7 +64,6 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         print("Model is infeasible. %s.ilp written." % config['name'])
         m.computeIIS()
         m.write(step_files_path + ".ilp")
-        # m.write(output + "/" + config['name'] + "_" + _step + ".ilp")
     # don't know yet, what else
     else:
         print("Solution status is %d, don't know what to do." % status)

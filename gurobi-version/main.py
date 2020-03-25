@@ -7,20 +7,22 @@
 
 from urmel import *
 
+data_path = sys.argv[1]
+
 # manual file with configs
-with open(path.join(sys.argv[1], 'config.yml')) as file:
+with open(path.join(data_path, 'config.yml')) as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
     #print(config)
 
 # manual file with compressor data is read
 # the dictionary does not change during the process
-with open(path.join(sys.argv[1], 'compressors.yml')) as file:
+with open(path.join(data_path, 'compressors.yml')) as file:
     compressors = yaml.load(file, Loader=yaml.FullLoader)
     #print(compressors)
 
 # manual file with initial gas network control is read
 # the dictionary changes with every new control
-with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
+with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 

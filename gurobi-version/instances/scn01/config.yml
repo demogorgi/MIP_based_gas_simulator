@@ -1,3 +1,5 @@
+# this file controls the amount of output
+
 # prefix for output filenames
 name: urmel
 # write problem files in the lp-format?

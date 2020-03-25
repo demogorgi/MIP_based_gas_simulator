@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# this file manages the iterative process
-# it works for example with python3, gurobi 8.0.1, yaml 5.3
-# >python3 urmel.py numIterations lengthTimestep path (or ./urmel.py path numIterations lengthTimestep)
+# this file contains the simulator_step-method to perform a single simulator step
 
 import importlib
 import sys

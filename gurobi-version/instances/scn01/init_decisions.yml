@@ -1,6 +1,3 @@
-# hint:
-# use param name[S] := <> 0; if S is the empty set.
-#
 # Decisions of the trader agent
 exit_nom:
     X:
@@ -28,6 +25,3 @@ gas:
 compressor:
     CS:
         N22^N23: 0
-
-#test:
-#    emptySet:

@@ -10,3 +10,5 @@ output/
 node_modules/*
 *.js
 nodemon.json
+start_nodemon.cmd
+instances/create_netstate

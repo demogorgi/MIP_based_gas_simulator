@@ -35,4 +35,8 @@ urmel.py
 
 invocation:
   python3 main.py scenarioPath numIterations lengthTimestep
+  
+  helper script sol2state.rb generates data that can be viewed in contour:
+  ruby sol2stat sceanrioPath
+  
 

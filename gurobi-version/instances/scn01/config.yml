@@ -3,7 +3,7 @@ name: urmel
 # write problem files in the lp-format?
 write_lp: False
 # write solution files in the sol-format?
-write_sol:  False
+write_sol: False
 # write irreducible infeasibility set if problem is infeasible? 
 write_ilp: False
 # write wheel maps with gnuplot?

@@ -26,23 +26,6 @@ else:
     for f in files:
         os.remove(f)
 
-# manual file with configs
-with open(path.join(sys.argv[1], 'config.yml')) as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
-    #print(config)
-
-# manual file with compressor data is read
-# the dictionary does not change during the process
-with open(path.join(sys.argv[1], 'compressors.yml')) as file:
-    compressors = yaml.load(file, Loader=yaml.FullLoader)
-    #print(compressors)
-
-# manual file with initial gas network control is read
-# the dictionary changes with every new control
-with open(path.join(sys.argv[1], 'init_decisions.yml')) as file:
-    agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
-    #print(agent_decisions)
-    
 def simulator_step(config, agent_decisions, compressors, step, dt):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)

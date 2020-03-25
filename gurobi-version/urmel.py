@@ -44,12 +44,12 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         sol = {}
         for v in m.getVars():
             sol[v.varName] = v.x
-            #print('%s %g' % (v.varName, v.x))
+            print('%s %g' % (v.varName, v.x))
         #print(sol)
         # set old to old_old and current value to old for flows and pressures
         for node in no.nodes:
-            sc.var_node_p_old_old[node], sc.var_node_p_old[node]
-            sc.var_node_p_old[node], sol["var_node_p[%s]" % node]
+            sc.var_node_p_old_old[node] = sc.var_node_p_old[node]
+            sc.var_node_p_old[node] = sol["var_node_p[%s]" % node]
         for non_pipe in co.non_pipes:
             sc.var_non_pipe_Qo_old_old[non_pipe] = sc.var_non_pipe_Qo_old[non_pipe]
             sc.var_non_pipe_Qo_old[non_pipe] = sol["var_non_pipe_Qo[%s,%s]" % non_pipe]

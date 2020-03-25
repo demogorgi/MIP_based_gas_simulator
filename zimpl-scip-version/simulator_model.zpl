@@ -236,6 +236,11 @@ var lb_pressure_violation_DA[NO] >= - infinity;
 # PRINT #
 #########
 #do forall <v> in NO do print "var_node_p_old[", v, "] = ", var_node_p_old[v];
+#do forall <l,r> in P do print "rtza[", l, ",", r, "] = ", rtza(l,r);
+#do forall <l,r> in P do print "L[", l, ",", r, "] = ", L[l,r];
+#do forall <l,r> in P do print "xip(", l, ",", r, ") = ", xip(l,r);
+#do forall <l,r> in P do print "lamb(", l, ",", r, ") = ", lambda(D[l,r],k[l,r]);
+#do forall <l,r> in P do print "k[", l, ",", r, "]) = ", k[l,r];
 #do forall <l,r> in P do print "z[", l, ",", r, "] = ", zm(var_node_p_old[l],var_node_p_old[r]), " ", z(var_node_p_old[l],Tm), " ", z(var_node_p_old[r],Tm), " ", abs((z(var_node_p_old[l],Tm) - z(var_node_p_old[r],Tm))/zm(var_node_p_old[l],var_node_p_old[r]) * 100), " %";
 #do forall <l,r> in P do print "A(D[", l, ",", r, "]) = ", A(D[l,r]);
 #do forall <l,r> in P do print "2 Rs Tm zm = ", 2 * Rs * Tm * zm(var_node_p_old[l],var_node_p_old[r]), ", dt = ", dt, ", 2 Rs Tm zm dt / ( A(D[", l, ",", r, "]) * L[", l, ",", r, "] ) = ", 2 * Rs * Tm * zm(var_node_p_old[l],var_node_p_old[r]) * dt / ( A(D[l,r]) * L[l,r] );

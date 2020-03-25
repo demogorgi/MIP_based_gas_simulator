@@ -63,10 +63,11 @@ def zm(pi,po):
     
 # Nikuradze (2.19 Forne), diameter diam in m, integral roughness rough in m
 def lamb(diam, rough):
-    return ( 2 * log(diam/rough) + 1.138 ) ** -2
+    return ( 2 * log(diam/rough,10) + 1.138 ) ** -2
     
 # Rs * Tm * zm / A
 def rtza(i,o):
+    #print("rtza(%s,%s) = %f" %(i,o,Rs * Tm * zm(p_old(i),p_old(o)) / A(co.diameter[(i,o)])))
     return Rs * Tm * zm(p_old(i),p_old(o)) / A(co.diameter[(i,o)])
     
 # Inflow velocity
@@ -120,6 +121,10 @@ def phi_new(phi,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_min_phi,p_i_min,p_i_max,L_m
 
 # factors for pressure drop for pipes ...
 def xip(i):
+    #print("length[%s,%s]" % (i,co.length[i]))
+    #print("xip[%s,%s]" % (i,lamb(co.diameter[i], co.roughness[i]) * co.length[i] / ( 4 * co.diameter[i] * A(co.diameter[i]) )))
+    #print("lamb[%s,%s]" % (i,lamb(co.diameter[i], co.roughness[i])))
+    #print("rough[%s,%s])" % (i,co.roughness[i]))
     return lamb(co.diameter[i], co.roughness[i]) * co.length[i] / ( 4 * co.diameter[i] * A(co.diameter[i]) )
 
 # ... and resistors

@@ -57,10 +57,13 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
             sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
         return sol
     # if infeasible write IIS for analysis and debugging
-    elif status == GRB.INFEASIBLE and config['write_ilp']:
-        print("Model is infeasible. %s.ilp written." % config['name'])
-        m.computeIIS()
-        m.write(step_files_path + ".ilp")
+    elif status == GRB.INFEASIBLE:
+        if config['write_ilp']:
+            print("Model is infeasible. %s.ilp written." % config['name'])
+            m.computeIIS()
+            m.write(step_files_path + ".ilp")
+        else:
+            print("Model is infeasible.")
     # don't know yet, what else
     else:
         print("Solution status is %d, don't know what to do." % status)

@@ -235,11 +235,3 @@ def plot(_step, agent_decisions, compressors):
         ])
         
         os.system(cmd)
-    # gnuplot_file_path = step_files_path + ".gnuplot"
-    # cmd = ";".join([
-    # "gnuplot -e \"",
-    # "set term pdfcairo enhanced font 'Calibri Light,10'",
-    # "set output %s.pdf" % (step_files_path),
-    # "\""
-    # ])
-    # os.system(cmd)

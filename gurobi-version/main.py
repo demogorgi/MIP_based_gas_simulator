@@ -7,7 +7,35 @@
 
 from urmel import *
 
-for i in range(int(sys.argv[2])):
+data_path = sys.argv[1]
+
+# read manual file with configs
+# the dictionary does not change during the process
+with open(path.join(data_path, 'config.yml')) as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
+    #print(config)
+
+# read manual file with compressor data
+# the dictionary does not change during the process
+with open(path.join(data_path, 'compressors.yml')) as file:
+    compressors = yaml.load(file, Loader=yaml.FullLoader)
+    #print(compressors)
+
+# read manual file with initial gas network control
+# the dictionary changes with every new control
+with open(path.join(data_path, 'init_decisions.yml')) as file:
+    agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
+    #print(agent_decisions)
+
+numSteps = int(sys.argv[2])
+dt = int(sys.argv[3])
+for i in range(numSteps):
     print("step %d" % i)
-    simulator_step(config, agent_decisions, compressors, i, int(sys.argv[3]))
+    # for every i in numSteps a simulator step is performed.
+    # config (config.yml in scenario folder) controls the amount of output.
+    # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
+    # compressors (compressors.yml in scenario folder) specifies the compressors in the network unde consideration.
+    # i is the step number (neccessary for naming output files).
+    # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
+    simulator_step(config, agent_decisions, compressors, i, dt)
 

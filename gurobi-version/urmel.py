@@ -7,7 +7,7 @@ import importlib
 import sys
 from os import path
 import re
-import glob
+import shutil
 import os
 import gurobipy as gp
 from gurobipy import GRB
@@ -17,12 +17,9 @@ from model import *
 import yaml
 
 output = path.join(sys.argv[1],'output')
+shutil.rmtree(output)
 if not os.path.exists(output):
     os.makedirs(output)
-else:
-    files = glob.glob(path.join(output,"*"))
-    for f in files:
-        os.remove(f)
 
 def simulator_step(config, agent_decisions, compressors, step, dt):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated

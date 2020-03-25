@@ -3,10 +3,10 @@
 # prefix for output filenames
 name: urmel
 # write problem files in the lp-format?
-write_lp: False
+write_lp: True
 # write solution files in the sol-format?
-write_sol: False
+write_sol: True
 # write irreducible infeasibility set if problem is infeasible? 
-write_ilp: False
+write_ilp: True
 # write wheel maps with gnuplot?
 gnuplot: True

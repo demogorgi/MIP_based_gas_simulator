@@ -25,6 +25,9 @@ if not os.path.exists(output):
 def simulator_step(config, agent_decisions, compressors, step, dt):
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)
+    # control output
+    m.params.logToConsole = config['grb_console']
+    m.params.logfile = config['grb_logfile']
     # optimize the model ( = do a simulation step)
     m.optimize()
     # get the model status
@@ -42,7 +45,8 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         sol = {}
         for v in m.getVars():
             sol[v.varName] = v.x
-            print('%s %g' % (v.varName, v.x))
+            if config['urmel_console_output']:
+                print('%s %g' % (v.varName, v.x))
         #print(sol)
         # set old to old_old and current value to old for flows and pressures
         for node in no.nodes:
@@ -60,14 +64,17 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
     # if infeasible write IIS for analysis and debugging
     elif status == GRB.INFEASIBLE:
         if config['write_ilp']:
-            print("Model is infeasible. %s.ilp written." % config['name'])
+            if config['urmel_console_output']:
+                print("Model is infeasible. %s.ilp written." % config['name'])
             m.computeIIS()
             m.write(step_files_path + ".ilp")
         else:
-            print("Model is infeasible.")
+            if config['urmel_console_output']:
+                print("Model is infeasible.")
     # don't know yet, what else
     else:
-        print("Solution status is %d, don't know what to do." % status)
+        if config['urmel_console_output']:
+            print("Solution status is %d, don't know what to do." % status)
 
 
 def plot(_step, agent_decisions, compressors):

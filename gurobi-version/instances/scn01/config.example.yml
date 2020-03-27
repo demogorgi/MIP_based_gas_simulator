@@ -1,5 +1,5 @@
 # this file controls the amount of output
-# rename to config.yml to make it effective
+# copy file to config.yml to make it effective
 
 # prefix for output filenames
 name: urmel

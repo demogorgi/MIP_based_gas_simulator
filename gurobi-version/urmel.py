@@ -3,6 +3,25 @@
 
 # this file contains the simulator_step-method to perform a single simulator step
 
+# example config file:
+# # this file controls the amount of output
+# # prefix for output filenames
+# name: urmel
+# # write problem files in the lp-format?
+# write_lp: False
+# # write solution files in the sol-format?
+# write_sol: False
+# # write irreducible infeasibility set if problem is infeasible? 
+# write_ilp: False
+# # write wheel maps with gnuplot?
+# gnuplot: False
+# # console output?
+# urmel_console_output: True
+# # gurobi logfile
+# grb_logfile: gurobi.log
+# # gurobi console output 
+# grb_console: True
+
 import importlib
 import sys
 from os import path

@@ -5,6 +5,25 @@
 # it works for example with python3, gurobi 8.0.1, yaml 5.3
 # >python3 main.py path numIterations lengthTimestep
 
+# example config file:
+# # this file controls the amount of output
+# # prefix for output filenames
+# name: urmel
+# # write problem files in the lp-format?
+# write_lp: False
+# # write solution files in the sol-format?
+# write_sol: False
+# # write irreducible infeasibility set if problem is infeasible? 
+# write_ilp: False
+# # write wheel maps with gnuplot?
+# gnuplot: False
+# # console output?
+# urmel_console_output: True
+# # gurobi logfile
+# grb_logfile: gurobi.log
+# # gurobi console output 
+# grb_console: True
+
 from urmel import *
 
 data_path = sys.argv[1]

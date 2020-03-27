@@ -17,7 +17,8 @@ from model import *
 import yaml
 
 output = path.join(sys.argv[1],'output')
-shutil.rmtree(output)
+if os.path.exists(output):
+    shutil.rmtree(output)
 if not os.path.exists(output):
     os.makedirs(output)
 

@@ -1,0 +1,570 @@
+<?xml version="1.0"?>
+<network interfaceVersion="2.0.1">
+	<information>
+		<title>
+			create_netstate_Eingabedatei
+		</title>
+		<documentation>
+			automatically generated network file from G:\TEAM\Netzplanung\N5003\Navi\Simonenetze\6.1\TESTNETZ_BITTY\create_netstate\create_netstate_eingabedatei.txt
+		</documentation>
+	</information>
+	<units>
+		<nodeHeight unit="m"/>
+		<boundaryNodeInflowLimits unit="1000m_cube_per_hour"/>
+		<boundaryNodeInflowPressureLimits unit="barg"/>
+		<NodePressureLimits unit="barg"/>
+		<pipeLength unit="km"/>
+		<pipeDiameter unit="mm"/>
+		<pipeRoughness unit="mm"/>
+		<resistorDiameter unit="mm"/>
+		<controlValveTargetMaxFlowLimits unit="1000m_cube_per_hour"/>
+		<controlValveTargetMinPressureInLimits unit="barg"/>
+		<controlValveTargetMinPressureOutLimits unit="barg"/>
+		<controlValveTargetMaxPressureOutLimits unit="barg"/>
+		<controlValveDiameter unit="mm"/>
+		<compressorStationTargetFlowLimits unit="1000m_cube_per_hour"/>
+		<compressorStationTargetMinPressureInLimits unit="barg"/>
+		<compressorStationTargetMaxPressureOutLimits unit="barg"/>
+		<compressorStationDiameter unit="mm"/>
+		<networkFlowLimits unit="m_cube_per_hour"/>
+		<networkVelocityLimits unit="m_per_s"/>
+	</units>
+	<nodes>
+		<innode id="M1212066149" alias="N63_1" x="-316" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3588854236" alias="N64_1" x="-294" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3795280366" alias="N61_1" x="-361" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4035104256" alias="N62_1" x="-338" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1612919761" alias="N59_1" x="-405" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1519060619" alias="N60_1" x="-383" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1969127637" alias="N73_1" x="-93" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3901339756" alias="N74_1" x="-71" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3747039326" alias="N71_1" x="-138" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3454199728" alias="N72_1" x="-116" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M662915329" alias="N69_1" x="-182" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1743466299" alias="N70_1" x="-160" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3344711218" alias="N67_1" x="-227" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2671717988" alias="N68_1" x="-205" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1471743501" alias="N94_1" x="375" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4010107240" alias="N95_1" x="397" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4256222854" alias="N96_1" x="419" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1158457827" alias="N97_1" x="441" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M493861301" alias="N98_1" x="464" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2164016354" alias="N57_1" x="-450" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3634320564" alias="N58_1" x="-428" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M720735337" alias="N55_1" x="-494" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M943727495" alias="N56_1" x="-472" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M262067125" alias="N53_1" x="-539" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2454317836" alias="N54_1" x="-517" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3072505040" alias="N52_1" x="-561" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2145409367" alias="N66_1" x="-249" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1834350265" alias="N65_1" x="-272" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1115713767" alias="N76_1" x="-27" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2561931104" alias="N89_1" x="263" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3638268250" alias="N90_1" x="285" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2020376659" alias="N87_1" x="219" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3854285034" alias="N80_1" x="63" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4198242178" alias="N77_1" x="-4" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2724136916" alias="N78_1" x="18" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1345707785" alias="N75_1" x="-49" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2782125776" alias="N99_1" x="486" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1560797071" alias="N81_1" x="85" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1337094241" alias="N82_1" x="107" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M451109041" alias="N79_1" x="40" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3396222644" alias="N93_1" x="352" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1926388177" alias="N92_1" x="330" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1617425983" alias="N91_1" x="308" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M548671378" alias="N100_1" x="508" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1792618429" alias="N84_1" x="152" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3529853144" alias="N85_1" x="174" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M537890821" alias="N88_1" x="241" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4144895748" alias="N83_1" x="129" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M3234916150" alias="N86_1" x="196" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M4032329030" alias="START_1" x="-558" y="342" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1035205405" behaviour="" alias="START_1_aux1" x="-555" y="176" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="50.00"/>
+		</innode>
+		<innode id="M379496670" behaviour="" alias="START_1_aux2" x="-552" y="10" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="50.00"/>
+		</innode>
+		<innode id="M260413855" behaviour="" alias="START_1_aux3" x="-549" y="-156" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="50.00"/>
+		</innode>
+		<innode id="M4123985516" alias="N94_1_aux" x="363.5" y="508" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M1727929557" alias="N80_1_aux" x="63" y="497" geoWGS84Lat="51.4685" geoWGS84Long="7.0055">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<innode id="M2857638987" alias="N81_1_aux" x="85" y="497" geoWGS84Lat="51.4685" geoWGS84Long="7.0055">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
+		<boundaryNode behaviour="exit" id="M498297485" alias="END_1" x="507" y="342" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+			<inflowLimits lower="0" upper="10000"/>
+		</boundaryNode>
+		<boundaryNode id="M3890352652" behaviour="entry" alias="START_1_auxMin" x="-721" y="173" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="50.00"/>
+			<inflowLimits lower="0" upper="1000"/>
+		</boundaryNode>
+		<boundaryNode id="M4117362275" behaviour="entry" alias="START_1_auxMax" x="-715" y="-159" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="50.00"/>
+			<inflowLimits lower="0" upper="1000"/>
+		</boundaryNode>
+	</nodes>
+	<connections>
+		<resistor id="M2762160957" alias="N93_1^N94_1_aux" from="M3396222644" to="M4123985516">
+			<diameter value="900.000"/>
+		</resistor>
+		<pipe id="M530338270" alias="N53_1^N54_1" from="M262067125" to="M2454317836">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1837695577" alias="N52_1^N53_1" from="M3072505040" to="M262067125">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3139996340" alias="START_1^N52_1" from="M4032329030" to="M3072505040">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2724429215" alias="N92_1^N93_1" from="M1926388177" to="M3396222644">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M4058554873" alias="N91_1^N92_1" from="M1617425983" to="M1926388177">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M619334322" alias="N96_1^N97_1" from="M4256222854" to="M1158457827">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2471178714" alias="N97_1^N98_1" from="M1158457827" to="M493861301">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2316718596" alias="N94_1^N95_1" from="M1471743501" to="M4010107240">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2002884308" alias="N95_1^N96_1" from="M4010107240" to="M4256222854">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M978598158" alias="N100_1^END_1" from="M548671378" to="M498297485">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3673951538" alias="N98_1^N99_1" from="M493861301" to="M2782125776">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2940304597" alias="N99_1^N100_1" from="M2782125776" to="M548671378">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M656419632" alias="N79_1^N80_1" from="M451109041" to="M3854285034">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M934975573" alias="N78_1^N79_1" from="M2724136916" to="M451109041">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M218519433" alias="N81_1^N82_1" from="M1560797071" to="M1337094241">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M211772713" alias="N90_1^N91_1" from="M3638268250" to="M1617425983">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M490145342" alias="N60_1^N61_1" from="M1519060619" to="M3795280366">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3762340590" alias="N61_1^N62_1" from="M3795280366" to="M4035104256">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M353792756" alias="N58_1^N59_1" from="M3634320564" to="M1612919761">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3229363344" alias="N59_1^N60_1" from="M1612919761" to="M1519060619">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1327884536" alias="N72_1^N73_1" from="M3454199728" to="M1969127637">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3789156430" alias="N70_1^N71_1" from="M1743466299" to="M3747039326">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M481178782" alias="N71_1^N72_1" from="M3747039326" to="M3454199728">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3411308069" alias="N68_1^N69_1" from="M2671717988" to="M662915329">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1694393121" alias="N69_1^N70_1" from="M662915329" to="M1743466299">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M893528485" alias="N66_1^N67_1" from="M2145409367" to="M3344711218">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2195935949" alias="N67_1^N68_1" from="M3344711218" to="M2671717988">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3096176914" alias="N55_1^N56_1" from="M720735337" to="M943727495">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1174154690" alias="N54_1^N55_1" from="M2454317836" to="M720735337">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1554075164" alias="N57_1^N58_1" from="M2164016354" to="M3634320564">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3942659444" alias="N56_1^N57_1" from="M943727495" to="M2164016354">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3383549909" alias="N76_1^N77_1" from="M1115713767" to="M4198242178">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2114823357" alias="N77_1^N78_1" from="M4198242178" to="M2724136916">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1733347171" alias="N74_1^N75_1" from="M3901339756" to="M1345707785">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2586248115" alias="N75_1^N76_1" from="M1345707785" to="M1115713767">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M638778178" alias="N88_1^N89_1" from="M537890821" to="M2561931104">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2310600262" alias="N89_1^N90_1" from="M2561931104" to="M3638268250">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3624189122" alias="N86_1^N87_1" from="M3234916150" to="M2020376659">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1873135530" alias="N87_1^N88_1" from="M2020376659" to="M537890821">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1996006516" alias="N84_1^N85_1" from="M1792618429" to="M3529853144">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2341429412" alias="N85_1^N86_1" from="M3529853144" to="M3234916150">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1586334703" alias="N82_1^N83_1" from="M1337094241" to="M4144895748">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M748214376" alias="N83_1^N84_1" from="M4144895748" to="M1792618429">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1724511683" alias="N65_1^N66_1" from="M1834350265" to="M2145409367">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2612932883" alias="N64_1^N65_1" from="M3588854236" to="M1834350265">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3252571407" alias="N63_1^N64_1" from="M1212066149" to="M3588854236">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3016433288" alias="N62_1^N63_1" from="M4035104256" to="M1212066149">
+			<length value="10.000"/>
+			<diameter value="900.000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2086425135" alias="START_1_aux1^START_1" to="M4032329030" from="M1035205405">
+			<length value="10"/>
+			<diameter value="900"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3113325618" alias="START_1_aux2^START_1_aux1" to="M1035205405" from="M379496670">
+			<length value="10"/>
+			<diameter value="3000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M2985807626" alias="START_1_aux3^START_1_aux2" to="M379496670" from="M260413855">
+			<length value="10"/>
+			<diameter value="3000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M3443756817" alias="N80_1^N80_1_aux" from="M3854285034" to="M1727929557">
+			<length value="0.001"/>
+			<diameter value="1000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<pipe id="M1380774871" alias="N81_1_aux^N81_1" from="M2857638987" to="M1560797071">
+			<length value="0.001"/>
+			<diameter value="1000"/>
+			<roughness value="0.012"/>
+		</pipe>
+		<compressorStation id="M2303044117" alias="N80_1^N81_1" from="M3854285034" to="M1560797071">
+			<targetFlowLimits lower="0.000" upper="6000.000"/>
+			<targetMinPressureInLimits lower="0.000" upper="104.000"/>
+			<targetMaxPressureOutLimits lower="0.000" upper="104.000"/>
+			<diameter value="900.000"/>
+			<dragFactorIn value="0.000"/>
+			<dragFactorOut value="0.000"/>
+			<compressorUnitsList>
+				<none/>
+			</compressorUnitsList>
+		</compressorStation>
+		<checkValve id="M1594645643" alias="START_1_auxMin^START_1_aux1" to="M1035205405" from="M3890352652">
+			<dragFactorIn value="0"/>
+			<dragFactorOut value="0"/>
+		</checkValve>
+		<checkValve id="M2466326404" alias="START_1_auxMax^START_1_aux3" to="M260413855" from="M4117362275">
+			<dragFactorIn value="0"/>
+			<dragFactorOut value="0"/>
+		</checkValve>
+		<checkValve id="M4144261187" alias="N94_1_aux^N94_1" from="M4123985516" to="M1471743501">
+			<dragFactorIn value="0"/>
+			<dragFactorOut value="0"/>
+		</checkValve>
+		<checkValve id="M2770586399" alias="N80_1_aux^N81_1_aux" from="M1727929557" to="M2857638987">
+			<dragFactorIn value="0"/>
+			<dragFactorOut value="0"/>
+		</checkValve>
+		<valve id="M1382422254" alias="N73_1^N74_1" from="M1969127637" to="M3901339756"/>
+	</connections>
+	<flowLimits lower="-10000" upper="10000"/>
+	<velicityLimits lower="-100" upper="100"/>
+	
+
+</network>

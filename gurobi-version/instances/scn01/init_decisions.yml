@@ -1,0 +1,25 @@
+# Decisions of the trader agent
+exit_nom:
+    X:
+        END_1: -798
+
+entry_nom:
+    S:
+        START_1_aux1^START_1: 798
+
+# Decisions of the dispatcher agent
+va:
+    VA:
+        N73_1^N74_1: 1
+
+zeta:
+    RE:
+        N93_1^N94_1_aux: 100
+
+gas:
+    CS:
+        N80_1^N81_1: 0.44
+
+compressor:
+    CS:
+        N80_1^N81_1: 1

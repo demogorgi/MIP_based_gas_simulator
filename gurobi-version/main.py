@@ -64,3 +64,5 @@ for i in range(numSteps):
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
 
+if config["contour_output"]:
+    os.system("ruby sol2state.rb " + sys.argv[1])

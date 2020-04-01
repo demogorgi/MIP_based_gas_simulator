@@ -64,5 +64,14 @@ for i in range(numSteps):
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
 
-if config["contour_output"]:
+# generate contour output
+if not config["write_sol"] and config["contour_output"]:
+    print("WARNING: Config parameter \"write_sol\" needs to be True if contour_output is True.")
+if config["write_sol"] and config["contour_output"]:
     os.system("ruby sol2state.rb " + sys.argv[1])
+
+# concat all compressor pdfs to a single one
+if config["gnuplot"]:
+    p = path.join(sys.argv[1], "output/")
+    os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
+    print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")

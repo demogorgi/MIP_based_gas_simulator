@@ -30,10 +30,32 @@ data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
 dt        = int(sys.argv[3])
 
+# default configs which are merged with instance configuration
+config = {
+    # prefix for output filenames
+    "name": "urmel",
+    # write problem files in the lp-format?
+    "write_lp": False,
+    # write solution files in the sol-format?
+    "write_sol": False,
+    # write irreducible infeasibility set if problem is infeasible? 
+    "write_ilp": False,
+    # write wheel maps with gnuplot?
+    "gnuplot": False,
+    # console output?
+    "urmel_console_output": True,
+    # gurobi logfile
+    "grb_logfile": "gurobi.log",
+    # gurobi console output 
+    "grb_console": True
+}
+
 # read manual file with configs
 # the dictionary does not change during the process
 with open(path.join(data_path, 'config.yml')) as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
+    ymlConfig = yaml.load(file, Loader=yaml.FullLoader)
+    merged = {**config, **ymlConfig}
+    config = merged
     #print(config)
 
 # read manual file with compressor data

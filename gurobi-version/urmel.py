@@ -222,7 +222,7 @@ def plot(_step, agent_decisions, compressors):
 
 # POINTS
 # add interception point
-"set label at %f '' point pointtype 7 pointsize 1" % (
+"set label at %f, %f '' point pointtype 7 pointsize 1" % (
     intercept(
         L_min_pi, 
         L_min_phi, 
@@ -233,9 +233,9 @@ def plot(_step, agent_decisions, compressors):
         gas,
         p_old(_from),
         p_old(_to)
-    )
+    ),
+    (p_old(_to) / p_old(_from))
 ),
-
 
 # FINILIZE
 "set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),
@@ -243,3 +243,4 @@ def plot(_step, agent_decisions, compressors):
         ])
         
         os.system(cmd)
+print(output)

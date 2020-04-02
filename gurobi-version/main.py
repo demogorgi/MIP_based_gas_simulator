@@ -30,11 +30,36 @@ data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
 dt        = int(sys.argv[3])
 
+# default configs which are merged with instance configuration
+config = {
+    # prefix for output filenames
+    "name": "urmel",
+    # write problem files in the lp-format?
+    "write_lp": False,
+    # write solution files in the sol-format?
+    "write_sol": False,
+    # write irreducible infeasibility set if problem is infeasible? 
+    "write_ilp": False,
+    # write wheel maps with gnuplot?
+    "gnuplot": True,
+    # console output?
+    "urmel_console_output": False,
+    # gurobi logfile
+    "grb_logfile": "gurobi.log",
+    # gurobi console output 
+    "grb_console": False,
+    # 
+    "contour_output": False
+}
+
 # read manual file with configs
 # the dictionary does not change during the process
-with open(path.join(data_path, 'config.yml')) as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
-    #print(config)
+if os.path.exists(path.join(data_path, "config.yml")):
+    with open(path.join(data_path, 'config.yml')) as file:
+        ymlConfig = yaml.load(file, Loader=yaml.FullLoader)
+        merged = {**config, **ymlConfig}
+        config = merged
+        #print(config)
 
 # read manual file with compressor data
 # the dictionary does not change during the process
@@ -73,5 +98,12 @@ if config["write_sol"] and config["contour_output"]:
 # concat all compressor pdfs to a single one
 if config["gnuplot"]:
     p = path.join(sys.argv[1], "output/")
-    os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
-    print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
+    pdfs = list(filter(lambda path: path.endswith(".pdf") , os.listdir(p)))
+    if len(pdfs) > 0:
+        command = "pdftk %s cat output %s" % (" ".join(pdfs), p + "/all.pdf")
+        os.system(command)
+        print(command)
+    #os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
+    #print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
+
+print("\n\n>> finished")

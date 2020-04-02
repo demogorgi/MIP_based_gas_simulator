@@ -47,7 +47,9 @@ config = {
     # gurobi logfile
     "grb_logfile": "gurobi.log",
     # gurobi console output 
-    "grb_console": True
+    "grb_console": True,
+    # 
+    "contour_output": False
 }
 
 # read manual file with configs
@@ -97,3 +99,5 @@ if config["gnuplot"]:
     p = path.join(sys.argv[1], "output/")
     os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
     print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
+
+print("\n\n>> finished")

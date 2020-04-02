@@ -1,4 +1,6 @@
-def plot(_step, agent_decisions, compressors):
+from urmel import *
+
+def plot(_step, agent_decisions, compressors, output):
     for k in compressors:
         cs = compressors[k]
         _from, _to = k.split("^")
@@ -164,4 +166,4 @@ def plot(_step, agent_decisions, compressors):
 "replot; \""
         ])
 
-        os.system(cmd)
+        return cmd

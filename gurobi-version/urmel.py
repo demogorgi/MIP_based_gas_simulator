@@ -15,7 +15,7 @@ from constants import *
 from functions import *
 from model import *
 import yaml
-import plotter
+from plotter import *
 
 output = path.join(sys.argv[1],'output')
 if os.path.exists(output):
@@ -37,10 +37,10 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
     _step = str(step).rjust(5, "0")
     step_files_path = "".join([output, "/", config["name"], "_", _step]).replace("\\", "/")
     # if solved to optimallity
-    print ("status: ", status == GRB.INFEASIBLE)
+    print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2
         # plot data with gnuplot
-        if config['gnuplot']: plot(_step, agent_decisions, compressors)
+        if config['gnuplot']: os.system(plot(_step, agent_decisions, compressors, output))
         if config['write_lp']: m.write(step_files_path + ".lp")
         if config['write_sol']: m.write(step_files_path + ".sol")
         # store solution in dictionary

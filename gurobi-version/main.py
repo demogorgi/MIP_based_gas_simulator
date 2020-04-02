@@ -13,7 +13,7 @@
 # write_lp: False
 # # write solution files in the sol-format?
 # write_sol: False
-# # write irreducible infeasibility set if problem is infeasible? 
+# # write irreducible infeasibility set if problem is infeasible?
 # write_ilp: False
 # # write wheel maps with gnuplot?
 # gnuplot: False
@@ -21,7 +21,7 @@
 # urmel_console_output: True
 # # gurobi logfile
 # grb_logfile: gurobi.log
-# # gurobi console output 
+# # gurobi console output
 # grb_console: True
 
 from urmel import *
@@ -38,7 +38,7 @@ config = {
     "write_lp": False,
     # write solution files in the sol-format?
     "write_sol": False,
-    # write irreducible infeasibility set if problem is infeasible? 
+    # write irreducible infeasibility set if problem is infeasible?
     "write_ilp": False,
     # write wheel maps with gnuplot?
     "gnuplot": True,
@@ -46,9 +46,9 @@ config = {
     "urmel_console_output": False,
     # gurobi logfile
     "grb_logfile": "gurobi.log",
-    # gurobi console output 
+    # gurobi console output
     "grb_console": False,
-    # 
+    #
     "contour_output": False
 }
 
@@ -85,25 +85,26 @@ for i in range(numSteps):
 
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
-    # The solution should contain all information you need to compute penalties.     
+    # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
 
 # generate contour output
-if not config["write_sol"] and config["contour_output"]:
-    print("WARNING: Config parameter \"write_sol\" needs to be True if contour_output is True.")
-if config["write_sol"] and config["contour_output"]:
-    os.system("ruby sol2state.rb " + sys.argv[1])
+if config["contour_output"]:
+    if not config["write_sol"]:
+        print("WARNING: Config parameter \"write_sol\" needs to be True if contour_output is True.")
+    else:
+        os.system("ruby sol2state.rb " + sys.argv[1])
 
 # concat all compressor pdfs to a single one
 if config["gnuplot"]:
     p = path.join(sys.argv[1], "output/")
-    pdfs = list(filter(lambda path: path.endswith(".pdf") , os.listdir(p)))
-    if len(pdfs) > 0:
-        command = "pdftk %s cat output %s" % (" ".join(pdfs), p + "/all.pdf")
-        os.system(command)
-        print(command)
-    #os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
-    #print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
+    #pdfs = list(filter(lambda path: path.endswith(".pdf") , os.listdir(p)))
+    #if len(pdfs) > 0:
+    #    command = "pdftk %s cat output %s" % (" ".join(pdfs), p + "all.pdf")
+    #    print(command)
+    #    os.system(command)
+    os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
+    print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
 
 print("\n\n>> finished")

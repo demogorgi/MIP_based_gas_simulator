@@ -17,3 +17,5 @@ urmel_console_output: True
 grb_logfile: gurobi.log
 # gurobi console output 
 grb_console: True
+# contour output
+contour_output: True

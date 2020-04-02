@@ -13,7 +13,7 @@ def plot(_step, agent_decisions, compressors):
         pi_2 = cs["pi_2"]
         phi_max = cs["phi_max"]
         phi_min = cs["phi_min"]
-        
+
         cmd = ";".join([
 "gnuplot -e \"set term pdfcairo enhanced font 'Calibri Light, 10'",
 "set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),
@@ -25,15 +25,15 @@ def plot(_step, agent_decisions, compressors):
 
 # LINES
 "plot [0:%f] %s" % (cs["phi_max"] + 1, " ".join([
-    
+
     # l min line
     "[0:%f]" % (cs["L_max_pi"] + 0.5),
     "- %f / %f * x + %f title 'L_{min}' lt 1 lw 2, " % (
-        L_min_pi, 
-        L_min_phi, 
+        L_min_pi,
+        L_min_phi,
         L_min_pi
     ),
-    
+
     # l max line
     "- %f / %f * x + %f title 'L_{max}' lt 1 lw 2, " % (
         L_min_pi,
@@ -46,7 +46,7 @@ def plot(_step, agent_decisions, compressors):
             p_old(_from)
         )
     ),
-    
+
     # l gas line
     "(1 - %f) * ((-%f / %f) * x + %f) + %f * ((-%f / %f) * x + %f) dashtype 4 lt 3 title 'L_{gas}', " % (
         gas,
@@ -64,10 +64,10 @@ def plot(_step, agent_decisions, compressors):
             p_old(_from)
         )
     ),
-    
+
     # pi 1 line
     "%f dashtype 3 lt 1 title '{/Symbol p}_1', " % (pi_1),
-    
+
     # L_max_max line
     "(-%f / %f) * x + %f dashtype 3 lt 1 lw 1 title 'L_{MAX}', " % (
         L_min_pi,
@@ -80,7 +80,7 @@ def plot(_step, agent_decisions, compressors):
             p_i_min
         )
     ),
-    
+
     # ulim line
     "(%f - %f) / %f * x + %f lt 1 lw 2 title 'ulim', " % (
         pi_1,
@@ -88,10 +88,10 @@ def plot(_step, agent_decisions, compressors):
         phi_max,
         pi_2
     ),
-    
+
     # (old) pressure_to / pressure_from line
     "(%f / %f) dashtype 4 lt 3 title 'p_{out} / p_{in}'" % (
-        p_old(_to), 
+        p_old(_to),
         p_old(_from)
     ),
 ])),
@@ -143,18 +143,19 @@ def plot(_step, agent_decisions, compressors):
 
 # POINTS
 # add interception point
-"set label at %f '' point pointtype 7 pointsize 1" % (
+"set label at %f, %f '' point pointtype 7 pointsize 1" % (
     intercept(
-        L_min_pi, 
-        L_min_phi, 
-        p_i_min, 
+        L_min_pi,
+        L_min_phi,
+        p_i_min,
         p_i_max,
         L_max_pi,
         eta,
         gas,
         p_old(_from),
         p_old(_to)
-    )
+    ),
+    (p_old(_to) / p_old(_from))
 ),
 
 
@@ -162,5 +163,5 @@ def plot(_step, agent_decisions, compressors):
 "set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),
 "replot; \""
         ])
-        
+
         os.system(cmd)

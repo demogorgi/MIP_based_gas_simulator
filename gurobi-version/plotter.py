@@ -113,8 +113,8 @@ def plot(_step, agent_decisions, compressors, output):
 
 # TICKS
 # add L_max_axis_intercept value as tic
-"set ytics add('L_{max\\_axis\\_int}(%f))' %f) " % (
-    round(10 * p_old(_from)) / 10,
+"set ytics add('L_{max\\_axis\\_int}(%s))' %f) " % (
+    str(round(p_old(_from), 1)),
     L_max_axis_intercept(
         L_max_pi,
         eta,

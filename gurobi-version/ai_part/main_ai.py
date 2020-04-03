@@ -1,7 +1,7 @@
 from .agent_decisions_ai import Agent_Decision
 from instances.scn02.nodes import *
 
-import tensorflow as tf
+#import tensorflow as tf
 import re
 
 def ai_input(agent_decisions, solution):
@@ -22,5 +22,3 @@ def convert_solution(solution):
             if not re.search('_aux', k):
                 res = re.sub('var_node_p\[(\S*)]', r'\1', k)
                 pressure[res] = v
-
-    inp = tf.placeholder(pressure, tf.float32)

@@ -137,7 +137,7 @@ def setValveMode(stateXml, modes)
 end
 
 def closedFree(val)
-	if val == "1" 
+	if val == "1"
 		"free"
 	else
 		"closed"
@@ -199,7 +199,6 @@ FileUtils.cp(File.join(scenarioPath,"net_sim.xml"), contourInput)
 timestamp = Time.now()
 solFiles.each_with_index{ |f,i|
     puts("process #{f}")
-    sol2state(scenarioPath,contourInput,f,stateTemplate,(timestamp + i * 900).strftime("%Y-%m-%dT%H:%M:%S"))
+		sol2state(scenarioPath,contourInput,f,stateTemplate,(timestamp + i * 900).strftime("%Y-%m-%dT%H:%M:%S"))
 }
 stateTemplate.close()
-

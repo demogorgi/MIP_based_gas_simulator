@@ -4,7 +4,7 @@
 #require "profile"
 
 # generate gnuplot compressor wheel maps
-Gnuplot = false
+Gnuplot = true
 
 require "./agents2zpl.rb"
 require "./sol2state.rb"
@@ -183,6 +183,11 @@ if File.exist?("all.pdf")
 end
 
 # generate new compressor wheel map plot
+Dir.glob("*.pdf").each do |f|
+    prefix = f.match(/(.*)(?=_\d*.pdf)/)[1]
+    suffix = f.match(/([0-9]*).pdf/)[1]
+    File.rename(f, prefix + "_" + suffix.rjust(3, "0") + ".pdf")
+end
 if Gnuplot
 	system("pdftk *.pdf cat output all.pdf")
 end

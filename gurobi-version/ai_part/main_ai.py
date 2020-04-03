@@ -8,7 +8,7 @@ def ai_input(agent_decisions, solution):
     decisions = Agent_Decision()
     trader_dec = decisions.trader_decisions(agent_decisions)
 
-    print(trader_dec)
+    #print(trader_dec)
     convert_solution(solution)
 def convert_solution(solution):
     original_nodes = []

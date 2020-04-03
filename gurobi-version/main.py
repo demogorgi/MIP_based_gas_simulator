@@ -13,7 +13,7 @@
 # write_lp: False
 # # write solution files in the sol-format?
 # write_sol: False
-# # write irreducible infeasibility set if problem is infeasible? 
+# # write irreducible infeasibility set if problem is infeasible?
 # write_ilp: False
 # # write wheel maps with gnuplot?
 # gnuplot: False
@@ -21,10 +21,11 @@
 # urmel_console_output: True
 # # gurobi logfile
 # grb_logfile: gurobi.log
-# # gurobi console output 
+# # gurobi console output
 # grb_console: True
 
 from urmel import *
+from ai_part.main_ai import *
 
 data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
@@ -58,9 +59,9 @@ for i in range(numSteps):
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     solution = simulator_step(config, agent_decisions, compressors, i, dt)
 
+    ai_input(agent_decisions, solution)
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
-    # The solution should contain all information you need to compute penalties.     
+    # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-

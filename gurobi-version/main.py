@@ -5,25 +5,6 @@
 # it works for example with python3, gurobi 8.0.1, yaml 5.3
 # >python3 main.py path numIterations lengthTimestep
 
-# example config file:
-# # this file controls the amount of output
-# # prefix for output filenames
-# name: urmel
-# # write problem files in the lp-format?
-# write_lp: False
-# # write solution files in the sol-format?
-# write_sol: False
-# # write irreducible infeasibility set if problem is infeasible?
-# write_ilp: False
-# # write wheel maps with gnuplot?
-# gnuplot: False
-# # console output?
-# urmel_console_output: True
-# # gurobi logfile
-# grb_logfile: gurobi.log
-# # gurobi console output
-# grb_console: True
-
 from urmel import *
 
 data_path = sys.argv[1]
@@ -48,8 +29,10 @@ config = {
     "grb_logfile": "gurobi.log",
     # gurobi console output
     "grb_console": False,
-    #
-    "contour_output": False
+    # contour output (net- and state-files in contour folder)
+    "contour_output": False,
+    # is the ai-part active?
+    "ai" : True
 }
 
 # read manual file with configs
@@ -59,7 +42,10 @@ if os.path.exists(os.path.join(data_path, "config.yml")):
         ymlConfig = yaml.load(file, Loader=yaml.FullLoader)
         merged = {**config, **ymlConfig}
         config = merged
-        #print(config)
+        print(config)
+
+if config["ai"]:
+    from ai_part.main_ai import *
 
 # read manual file with compressor data
 # the dictionary does not change during the process
@@ -83,11 +69,14 @@ for i in range(numSteps):
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     solution = simulator_step(config, agent_decisions, compressors, i, dt)
 
+    if config["ai"]:
+        ai_input(agent_decisions, solution)
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
+
 
 # generate contour output
 if config["contour_output"]:

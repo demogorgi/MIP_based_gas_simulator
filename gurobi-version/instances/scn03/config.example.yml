@@ -19,3 +19,5 @@ grb_logfile: gurobi.log
 grb_console: True
 # contour output
 contour_output: True
+# is the ai-part active?
+ai: True

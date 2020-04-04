@@ -23,7 +23,7 @@ zeta:
 
 gas:
     CS:
-        N22^N23: 0.5
+        N22^N23: 0.40
 
 compressor:
     CS:

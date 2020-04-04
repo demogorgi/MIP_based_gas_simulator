@@ -88,36 +88,48 @@ def L_min(L_min_pi,L_min_phi,phi):
     return - L_min_pi / L_min_phi * phi + L_min_pi
 
 # Achsenabschnitt der Maximalleistung als Funktion vom Eingangsdruck. Quasi "Maximale Max-Leistung"
-def L_max_axis_intercept(L_max,L_eta,p_i_min,p_i_max,p_in):
-    return L_max * ( L_eta - 1 ) / ( p_i_max - p_i_min ) * ( p_in - p_i_min ) + L_max
+def L_max_axis_intercept(L_max_pi,L_eta,p_i_min,p_i_max,p_in):
+    return L_max_pi * ( L_eta - 1 ) / ( p_i_max - p_i_min ) * ( p_in - p_i_min ) + L_max_pi
 
 # Maximalleistung als Funktion vom Fluss unter Verwendung des Achsenabschnitts. Die Steigung erhalten wir aus der Parametrierung der Minimalleistung.
-def L_max(L_min_pi,L_min_phi,L_max,L_eta,p_i_min,p_i_max,phi,p_in):
-    return - L_min_pi / L_min_phi * phi + L_max_axis_intercept(L_max,L_eta,p_i_min,p_i_max,p_in)
+def L_max(L_min_pi,L_min_phi,L_max_pi,L_eta,p_i_min,p_i_max,phi,p_in):
+    return - L_min_pi / L_min_phi * phi + L_max_axis_intercept(L_max_pi,L_eta,p_i_min,p_i_max,p_in)
 
 # Leistung als Funktion des "Gaspedals" zwischen 0% und 100%
-def L_gas(L_min_pi,L_min_phi,phi,gas):
-    return ( 1 - gas ) * L_min(L_min_pi,L_min_phi,phi) + gas * L_max(L_min_pi,L_min_phi,L_max,L_eta,p_i_min,p_i_max,phi,p_in)
+def L_gas(L_min_pi,L_min_phi,phi,gas,L_max_pi,eta,p_i_min,p_i_max,p_in):
+    return ( 1 - gas ) * L_min(L_min_pi,L_min_phi,phi) + gas * L_max(L_min_pi,L_min_phi,L_max_pi,L_eta,p_i_min,p_i_max,phi,p_in)
 
 # pi_2: Geradengleichung mit den Punkten (0,pi_2) und (phi_max,pi_1)
 def ulim(phi,phi_max,pi_1,pi_2):
     return ( pi_1 - pi_2 ) / phi_max * phi + pi_2
 
 # Berechnung der phi-Koordinate des Schnittpunkts zwischen der Druckverhältnisgeraden (=p_out/p_in) und L_gas
-def intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out):
-    return (L_min_phi * (gas * L_max * p_in ** 2 - gas * L_eta * L_max * p_in ** 2 - 
-   gas * L_max * p_in * p_i_max - L_min_pi * p_in * p_i_max + 
-   gas * L_min_pi * p_in * p_i_max + gas * L_eta * L_max * p_in * p_i_min + 
+def intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,L_eta,gas,p_in,p_out):
+    return (L_min_phi * (gas * L_max_pi * p_in ** 2 - gas * L_eta * L_max_pi * p_in ** 2 - 
+   gas * L_max_pi * p_in * p_i_max - L_min_pi * p_in * p_i_max + 
+   gas * L_min_pi * p_in * p_i_max + gas * L_eta * L_max_pi * p_in * p_i_min + 
    L_min_pi * p_in * p_i_min - gas * L_min_pi * p_in * p_i_min + p_i_max * p_out -
     p_i_min * p_out))/(L_min_pi * p_in * (-p_i_max + p_i_min))
 
-# phi-Koordinate der Projektion von phi auf ulim
-def proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,pi):
-    return - ( ( - L_min_pi * phi - L_min_phi * pi + L_min_phi * pi_2 ) / ( L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2 ) ) * phi_max
+## phi-Koordinate der Projektion von phi auf ulim
+#def proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,pi):
+#    return - ( ( - L_min_pi * phi - L_min_phi * pi + L_min_phi * pi_2 ) / ( L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2 ) ) * phi_max
 
-# Berechnung des neuen phi. ggf. mit Projektion
-def phi_new(phi,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out):
-    return proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,ulim(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_max,pi_1,pi_2)) if (p_out / p_in) > ulim(phi, phi_max, pi_1, pi_2) else min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_min),phi_max)
+# is the pi doable with the compressor?
+def doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2):
+    if ulim(phi,phimax,pi1,pi2) >= p_out/p_in and phi <= phimax and phi >= phimin:
+        return True
+    else:
+        return False
+
+# Berechnung des neuen phi.
+#def phi_new(phi,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out):
+#    return proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,ulim(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_max,pi_1,pi_2)) if (p_out / p_in) > ulim(phi, phi_max, pi_1, pi_2) else min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_min),phi_max)
+def phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
+    if doable_pi(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min,phi_max,p_in,p_out,pi_1,pi_2) == True:
+        return intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out)
+    else:
+        return 0
 
 # factors for pressure drop for pipes ...
 def xip(i):

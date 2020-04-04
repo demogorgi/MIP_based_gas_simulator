@@ -16,6 +16,19 @@ def plot(_step, agent_decisions, compressors, output):
         phi_max = cs["phi_max"]
         phi_min = cs["phi_min"]
 
+        # L_min(phi_min)
+        p1y = - ( L_min_pi / L_min_phi ) * phi_min + L_min_pi
+        # ulim(phi_min)
+        p2y = ( pi_1 - pi_2 ) / phi_max * phi_min + pi_2
+        # ulim(phi_max)
+        p3y = ( pi_1 - pi_2 ) / phi_max * phi_max + pi_2
+        # interception point ulim and Lmax
+        p4x = (L_min_phi * phi_max * (L_max_pi * p_i_max - pi_2 * p_i_max - eta * L_max_pi * p_i_min + pi_2 * p_i_min - L_max_pi * p_old(_from) + eta * L_max_pi * p_old(_from)))/((L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2) * (p_i_max - p_i_min))
+        # ulim(p4x)
+        p4y =  ( pi_1 - pi_2 ) / phi_max * p4x + pi_2
+        # L_max(phi_max)
+        p5y = - ( L_min_pi / L_min_phi ) * phi_max +  L_max_axis_intercept(L_max_pi,eta,p_i_min,p_i_max,p_old(_from))
+
         cmd = ";".join([
 "gnuplot -e \"set term pdfcairo enhanced font 'Calibri Light, 10'",
 "set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),
@@ -24,6 +37,25 @@ def plot(_step, agent_decisions, compressors, output):
 # labels
 "set xlabel 'Fluss {/Symbol f}/m^3/s'",
 "set ylabel 'Druckverh\344ltnis {/Symbol p}/1'",
+
+# Wheel map polygon
+"set object 1 polygon from %f,%f to %f,%f to %f,%f to %f,%f to %f,0 to %f,0 to %f,%f fillstyle transparent solid 0.3" % (
+                          #  a        b        c        d        e       f       g
+    # a
+    phi_min,p1y,
+    # b
+    phi_min,p2y,
+    # c schnittpunkt ulim und Lmax
+    p4x,p4y,
+    # d
+    phi_max,p5y,
+    # e
+    phi_max,
+    # f
+    L_min_phi,
+    # g
+    phi_min,p1y
+    ),
 
 # LINES
 "plot [0:%f] %s" % (cs["phi_max"] + 1, " ".join([
@@ -68,7 +100,7 @@ def plot(_step, agent_decisions, compressors, output):
     ),
 
     # pi 1 line
-    "%f dashtype 3 lt 1 title '{/Symbol p}_1', " % (pi_1),
+    "%f dashtype 3 lt 6 title '{/Symbol p}_1', " % (pi_1),
 
     # L_max_max line
     "(-%f / %f) * x + %f dashtype 3 lt 1 lw 1 title 'L_{MAX}', " % (
@@ -84,7 +116,7 @@ def plot(_step, agent_decisions, compressors, output):
     ),
 
     # ulim line
-    "(%f - %f) / %f * x + %f lt 1 lw 2 title 'ulim', " % (
+    "(%f - %f) / %f * x + %f lt 6 lw 2 title 'ulim', " % (
         pi_1,
         pi_2,
         phi_max,
@@ -92,20 +124,20 @@ def plot(_step, agent_decisions, compressors, output):
     ),
 
     # (old) pressure_to / pressure_from line
-    "(%f / %f) dashtype 4 lt 3 title 'p_{out} / p_{in}'" % (
+    "(%f / %f) dashtype 5 lt 3 title 'p_{out} / p_{in}'" % (
         p_old(_to),
         p_old(_from)
     ),
 ])),
 # phi_min line
-"set arrow from %f,0 to %f,%f*2 nohead dashtype 2 lc rgb 'black' " % (
+"set arrow from %f,0 to %f,%f*1.5 nohead lw 2 lc rgb '#ff00ff' " % (
     phi_min,
     phi_min,
     pi_2
 ),
 
 # phi_max line
-"set arrow from %f,0 to %f,%f nohead dashtype 2 lc rgb 'black'" % (
+"set arrow from %f,0 to %f,%f*1.5 nohead lw 2 lc rgb '#ff00ff'" % (
     phi_max,
     phi_max,
     pi_2
@@ -142,24 +174,46 @@ def plot(_step, agent_decisions, compressors, output):
 # add L_phi_min value as a tic
 "set xtics add ('L_{/Symbol f}_{\\_min}' %f)" % L_min_phi,
 
-
 # POINTS
 # add interception point
 "set label at %f, %f '' point pointtype 7 pointsize 1" % (
-    intercept(
-        L_min_pi,
-        L_min_phi,
-        p_i_min,
-        p_i_max,
-        L_max_pi,
-        eta,
-        gas,
-        p_old(_from),
-        p_old(_to)
-    ),
-    (p_old(_to) / p_old(_from))
-),
+  phi_new(
+      phi_min,
+      phi_max,
+      pi_1,
+      pi_2,
+      L_min_pi,
+      L_max_pi,
+      L_min_phi,
+      p_i_min,
+      p_i_max,
+      L_max_pi,
+      eta,
+      gas,
+      p_old(_from),
+      p_old(_to)
+      ),
+  0 if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(_from),p_old(_to)) == 0 else p_old(_to) / p_old(_from)
+  ),
+  #if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(l),p_old(r)) == 0:
+  #    0
+  #else:
+  #    p_old(r) / p_old(l)
+  #),
 
+#    intercept(
+#        L_min_pi,
+#        L_min_phi,
+#        p_i_min,
+#        p_i_max,
+#        L_max_pi,
+#        eta,
+#        gas,
+#        p_old(_from),
+#        p_old(_to)
+#    ),
+#    (p_old(_to) / p_old(_from))
+#),
 
 # FINILIZE
 "set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),

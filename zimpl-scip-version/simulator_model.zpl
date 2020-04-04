@@ -59,26 +59,33 @@ defnumb vm(i,o) := rho / 3.6 * ( rtza(i,o) * q_old(i,o) ) / 2 * 1 / b2p * ( 1 / 
 #
 defnumb L_min(Lminpi,Lminphi,phi) :=  - Lminpi / Lminphi * phi + Lminpi;
 # Achsenabschnitt der Maximalleistung als Funktion vom Eingangsdruck. Quasi "Maximale Max-Leistung"
-defnumb L_max_axis_intercept(Lmax,Leta,p_in_min,p_in_max,p_in) := Lmax * ( Leta - 1 ) / ( p_in_max - p_in_min ) * ( p_in - p_in_min ) + Lmax;
+defnumb L_max_axis_intercept(Lmaxpi,Leta,p_in_min,p_in_max,p_in) := Lmaxpi * ( Leta - 1 ) / ( p_in_max - p_in_min ) * ( p_in - p_in_min ) + Lmaxpi;
 # Maximalleistung als Funktion vom Fluss unter Verwendung des Achsenabschnitts. Die Steigung erhalten wir aus der Parametrierung der Minimalleistung.
-defnumb L_max(Lminpi,Lminphi,Lmax,Leta,p_in_min,p_in_max,phi,p_in) := - Lminpi / Lminphi * phi + L_max_axis_intercept(Lmax,Leta,p_in_min,p_in_max,p_in);
+defnumb L_max(Lminpi,Lminphi,Lmaxpi,Leta,p_in_min,p_in_max,phi,p_in) := - Lminpi / Lminphi * phi + L_max_axis_intercept(Lmaxpi,Leta,p_in_min,p_in_max,p_in);
 # Leistung als Funktion des "Gaspedals" zwischen 0% und 100%
-defnumb L_gas(Lminpi,Lminphi,phi,gasp) := ( 1 - gasp ) * L_min(Lminpi,Lminphi,phi) + gasp * L_max(Lminpi,Lminphi,Lmax,Leta,p_in_min,p_in_max,phi,p_in);
+defnumb L_gas(Lminpi,Lminphi,phi,gasp,Lmaxpi,Leta,p_in_min,p_in_max,p_in) := ( 1 - gasp ) * L_min(Lminpi,Lminphi,phi) + gasp * L_max(Lminpi,Lminphi,Lmaxpi,Leta,p_in_min,p_in_max,phi,p_in);
 # pi2: Geradengleichung mit den Punkten (0,pi_2) und (phi_max,pi_1)
 defnumb ulim(phi,phimax,pi1,pi2) := ( pi1 - pi2 ) / phimax * phi + pi2;
 # Berechnung der phi-Koordinate des Schnittpunkts zwischen der Druckverhältnisgeraden (=p_out/p_in) und L_gas
-defnumb intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out) := 
-(Lminphi * (gasp * Lmax * p_in ** 2 - gasp * Leta * Lmax * p_in ** 2 - 
-   gasp * Lmax * p_in * p_in_max - Lminpi * p_in * p_in_max + 
-   gasp * Lminpi * p_in * p_in_max + gasp * Leta * Lmax * p_in * p_in_min + 
+# Die pi-Koordinate des Schnittpunkts ist p_out/p_in
+defnumb intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out) := 
+(Lminphi * (gasp * Lmaxpi * p_in ** 2 - gasp * Leta * Lmaxpi * p_in ** 2 - 
+   gasp * Lmaxpi * p_in * p_in_max - Lminpi * p_in * p_in_max + 
+   gasp * Lminpi * p_in * p_in_max + gasp * Leta * Lmaxpi * p_in * p_in_min + 
    Lminpi * p_in * p_in_min - gasp * Lminpi * p_in * p_in_min + p_in_max * p_out -
     p_in_min * p_out))/(Lminpi * p_in * (-p_in_max + p_in_min));
-# phi-Koordinate der Projektion von phi auf ulim
-defnumb proje(Lminpi,Lminphi,pi1,pi2,phimax,phi,pi) := - ( ( - Lminpi * phi - Lminphi * pi + Lminphi * pi2 ) / ( Lminpi * phimax + Lminphi * pi1 - Lminphi * pi2 ) ) * phimax;
-# Berechnung des neuen phi. Ggf. mit Projektion
-defnumb phi_new(phi,phimin,phimax,pi1,pi2,Lminpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out) := if p_out / p_in > ulim(phi,phimax,pi1,pi2) then proje(Lminpi,Lminphi,pi1,pi2,phimax,phi,ulim(intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out),phimax,pi1,pi2)) else min(max(intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out),phimin),phimax) end;
+# is the pi doable with the compressor?
+defstrg doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2) := if ulim(phi,phimax,pi1,pi2) >= p_out/p_in and phi <= phimax and phi >= phimin then "true" else "false" end;
+# compute the new phi
+defnumb new_phi(phimin,phimax,pi1,pi2,Lminpi,Lmaxpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out) :=
+      if doable_pi(intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out),phimin,phimax,p_in,p_out,pi1,pi2) == "true" then
+          intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out)
+      else
+          0
+      end;
 
 # Kennfeld plotten
+
 do forall <l,r> in CS do print "",
   "# __GNUPLOT__;",
   # encoding
@@ -119,7 +126,7 @@ do forall <l,r> in CS do print "",
   # add pi 1 line
   pi_1[l,r], 
   " dashtype 3 lt 1 title '{/Symbol p}_1', ",
-  # add Lmaxmax line
+  # add Lmaxpimax line
   ( - L_min_pi[l,r] / L_min_phi[l,r] ), 
   " * x + ", 
   L_max_axis_intercept(L_max_pi[l,r],eta[l,r],p_i_min[l,r],p_i_max[l,r],p_i_min[l,r]), 
@@ -140,7 +147,8 @@ do forall <l,r> in CS do print "",
   # TICKS
   # add L_max_axis_intercept value as a tic
   " set ytics add ( ", 
-  " 'L_{max\_axis\_int}(", round(10 * p_old(l)) / 10, ")' ",
+  #" 'L_{max\_axis\_int}(", round(10 * p_old(l)) / 10, ")' ",
+  " 'L_{max\_axis\_int}(", round(p_old(l)), ")' ",
   L_max_axis_intercept(L_max_pi[l,r],eta[l,r],p_i_min[l,r],p_i_max[l,r],p_old(l)),
   " );",
   # add pi_2 value as a tic
@@ -177,10 +185,9 @@ do forall <l,r> in CS do print "",
   # POINTS
   # add interception point
   " set label at ", 
-  intercept(L_min_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max_pi[l,r],eta[l,r],gas[l,r],p_old(l),p_old(r)),
-  #intercept(Lminpi,       Lminphi,       p_in_min,    p_in_max,    Lmax,        Leta,     gasp,    p_in,             p_out)
+  new_phi(phi_min[l,r],phi_max[l,r],pi_1[l,r],pi_2[l,r],L_min_pi[l,r],L_max_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max_pi[l,r],eta[l,r],gas[l,r],p_old(l),p_old(r)),
   ",", 
-  (p_old(r) / p_old(l)), 
+  if new_phi(phi_min[l,r],phi_max[l,r],pi_1[l,r],pi_2[l,r],L_min_pi[l,r],L_max_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max_pi[l,r],eta[l,r],gas[l,r],p_old(l),p_old(r)) == 0 then 0 else (p_old(r) / p_old(l)) end,
   " '' point pointtype 7 pointsize 1; ",
   
   # MISC
@@ -245,7 +252,6 @@ var lb_pressure_violation_DA[NO] >= - infinity;
 #do forall <l,r> in P do print "A(D[", l, ",", r, "]) = ", A(D[l,r]);
 #do forall <l,r> in P do print "2 Rs Tm zm = ", 2 * Rs * Tm * zm(var_node_p_old[l],var_node_p_old[r]), ", dt = ", dt, ", 2 Rs Tm zm dt / ( A(D[", l, ",", r, "]) * L[", l, ",", r, "] ) = ", 2 * Rs * Tm * zm(var_node_p_old[l],var_node_p_old[r]) * dt / ( A(D[l,r]) * L[l,r] );
 #do forall <l,r> in RE do print "csv;<", l, ", ", r, ">;", ";", var_non_pipe_Qo_old[l,r], ";", var_non_pipe_Qo_old_old[l,r], ";", q_old(l,r);
-
 
 minimize obj: sum <b> in X: (var_boundary_node_flow_slack_negative[b] + var_boundary_node_flow_slack_positive[b]) + 10 * sum <b> in E: (var_boundary_node_pressure_slack_negative[b] + var_boundary_node_pressure_slack_positive[b]);
 
@@ -356,7 +362,7 @@ subto compressor_eq_one: forall <l,r> in CS:
       var_non_pipe_Qo[l,r] >= 0;
 
 subto compressor_eq_two: forall <l,r> in CS:
-      var_non_pipe_Qo[l,r] == compressor[l,r] * 3.6 * p_old(l) * phi_new(q_old(l,r) / ( 3.6 * p_old(l) ),phi_min[l,r],phi_max[l,r],pi_1[l,r],pi_2[l,r],L_min_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max(L_min_pi[l,r],L_min_phi[l,r],L_max_pi[l,r],eta[l,r],p_i_min[l,r],p_i_max[l,r],q_old(l,r)  / ( 3.6 * p_old(l) ),L_min_pi[l,r]),eta[l,r],gas[l,r],p_old(l),p_old(r));
+      var_non_pipe_Qo[l,r] == compressor[l,r] * 3.6 * p_old(l) * new_phi(phi_min[l,r],phi_max[l,r],pi_1[l,r],pi_2[l,r],L_min_pi[l,r],L_max_pi[l,r],L_min_phi[l,r],p_i_min[l,r],p_i_max[l,r],L_max_pi[l,r],eta[l,r],gas[l,r],p_old(l),p_old(r));
 
 ### Entrymodellierung ###
 subto entry_flow_model:

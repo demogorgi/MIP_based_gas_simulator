@@ -111,23 +111,17 @@ def intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,L_eta,gas,p_in,p_out):
    L_min_pi * p_in * p_i_min - gas * L_min_pi * p_in * p_i_min + p_i_max * p_out -
     p_i_min * p_out))/(L_min_pi * p_in * (-p_i_max + p_i_min))
 
-## phi-Koordinate der Projektion von phi auf ulim
-#def proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,pi):
-#    return - ( ( - L_min_pi * phi - L_min_phi * pi + L_min_phi * pi_2 ) / ( L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2 ) ) * phi_max
-
 # is the pi doable with the compressor?
 def doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2):
-    if ulim(phi,phimax,pi1,pi2) >= p_out/p_in and phi <= phimax and phi >= phimin:
+    if ulim(phi,phimax,pi1,pi2) >= p_out/p_in:
         return True
     else:
         return False
 
 # Berechnung des neuen phi.
-#def phi_new(phi,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out):
-#    return proje(L_min_pi,L_min_phi,pi_1,pi_2,phi_max,phi,ulim(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_max,pi_1,pi_2)) if (p_out / p_in) > ulim(phi, phi_max, pi_1, pi_2) else min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max,L_eta,gas,p_in,p_out),phi_min),phi_max)
 def phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
     if doable_pi(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min,phi_max,p_in,p_out,pi_1,pi_2) == True:
-        return intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out)
+        return min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min),phi_max)
     else:
         return 0
 

@@ -13,7 +13,7 @@
    # p_i_max in bar
    p_i_max: 80
    # phi_min in m³/s
-   phi_min: 1
+   phi_min: 1.15
    # phi_max in m³/s
    phi_max: 5.5
    # pi_1

@@ -75,11 +75,11 @@ defnumb intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out) 
    Lminpi * p_in * p_in_min - gasp * Lminpi * p_in * p_in_min + p_in_max * p_out -
     p_in_min * p_out))/(Lminpi * p_in * (-p_in_max + p_in_min));
 # is the pi doable with the compressor?
-defstrg doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2) := if ulim(phi,phimax,pi1,pi2) >= p_out/p_in and phi <= phimax and phi >= phimin then "true" else "false" end;
+defstrg doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2) := if ulim(phi,phimax,pi1,pi2) >= p_out/p_in then "true" else "false" end;
 # compute the new phi
 defnumb new_phi(phimin,phimax,pi1,pi2,Lminpi,Lmaxpi,Lminphi,p_in_min,p_in_max,Lmax,Leta,gasp,p_in,p_out) :=
       if doable_pi(intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out),phimin,phimax,p_in,p_out,pi1,pi2) == "true" then
-          intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out)
+          min(max(intercept(Lminpi,Lminphi,p_in_min,p_in_max,Lmaxpi,Leta,gasp,p_in,p_out),phimin),phimax)
       else
           0
       end;

@@ -23,7 +23,7 @@ def ai_input(solution):
                 inflow[res] = v
         if re.search('(ub|lb)_pressure_violation_DA', k):
             key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
-            violations[key] = v
+            if not re.search('_aux', key): violations[key] = max(0,v)
         if re.search('(va|zeta|gas|compressor)_DA', k):
             dispatcher_dec[k] = v
         if re.search('_TA',k):
@@ -31,3 +31,6 @@ def ai_input(solution):
 
     for value in original_nodes:
         nodes_[value] = [pr[value], inflow[value]]
+
+    penalty = sum(violations.values())
+    #print(penalty)

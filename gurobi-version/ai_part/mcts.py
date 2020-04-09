@@ -3,15 +3,17 @@ from .configs import CONFIGS
 
 class TreeNode(object):
 
-    def __init__(self, parent = None, action = None, psa = 0.0, child_psas = []):
+    def __init__(self, parent, psa):
+        self.parent = parent
+
+        self.states = {}
+        self.children = {}
+
         self.Nsa = 0
         self.Wsa = 0.0
         self.Qsa = 0.0
         self.Psa = psa
-        self.action = action
-        self.children = []
-        self.child_psas = child_psas
-        self.parent = parent
+
 
     def is_not_leaf(self):
         if(len(self.children) > 0):
@@ -26,18 +28,21 @@ class TreeNode(object):
 
         for index, child in enumerate(self.children):
 
-            puct = child.Qsa + child.Psa * c_puct * (math.sqrt(self.Nsa) / (1 + child.Nsa))
+            puct = child.Qsa + c_puct * child.Psa  * (math.sqrt(self.Nsa) / (1 + child.Nsa))
 
             if puct > highest_puct:
                 highest_puct = puct
                 highest_index = index
         return self.children[highest_index]
-    def expand_node(self, psa_vector):
-        pass #TODO
+    def expand_node(self, move_history):
+
+        for move, psa in move_history:
+            if move not in self.children:
+                self.children[move] = TreeNode(self, psa)
 
     def add_child_node(self, parent, action, psa = 0.0):
 
-        child_node = TreeNode(parent = parent, action = action, psa = psa)
+        child_node = TreeNode(parent = parent, psa = psa)
         self.children.append(child_node)
         return child_node
 
@@ -47,9 +52,9 @@ class TreeNode(object):
         self.Qsa = self.Wsa / self.Nsa
 
 class MCTS(object):
+    #MCTS algorithm
     def __init__(self, net):
         self.root = None
-        #self.game = None TODO
         self.net = net
 
     def search(self, game, node, temperature):

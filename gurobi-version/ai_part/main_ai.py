@@ -1,15 +1,22 @@
 
-from instances.scn02.nodes import *
+import importlib
+import sys
 
 import tensorflow as tf
 import re
 
+wd = sys.argv[1].replace("/",".")
+wd = re.sub(r'\.$', '', wd)
+
+no = importlib.import_module(wd + ".nodes") #Nodes of the network(entry + exit +inner nodes)
+
+
 def ai_input(solution):
+
     original_nodes = []
-    for n in nodes:
+    for n in no.nodes:
         if '_aux' not in n:
             original_nodes.append(n)
-
 
     pr, inflow, dispatcher_dec, trader_dec, nodes_, violations = ({} for i in range(6))
 

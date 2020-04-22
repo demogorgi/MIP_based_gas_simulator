@@ -70,7 +70,7 @@ for i in range(numSteps):
     solution = simulator_step(config, agent_decisions, compressors, i, dt)
 
     if config["ai"]:
-        ai_input(solution, config, compressors, dt)
+        ai_input(solution, agent_decisions, config, compressors, dt)
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
     # The solution should contain all information you need to compute penalties.

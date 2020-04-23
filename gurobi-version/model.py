@@ -110,7 +110,7 @@ def simulate(agent_decisions,compressors,dt):
     #
     #subto re_drag:
     #      forall <l,r> in RE: zeta_DA[l,r] == zeta[l,r];
-    m.addConstrs((zeta_DA[r] == agent_decisions["zeta"]["RE"][joiner(r)] for r in co.resistors), name='re_drag')
+    m.addConstrs((zeta_DA[r] == 100000000 * agent_decisions["zeta"]["RE"][joiner(r)] for r in co.resistors), name='re_drag')
     #
     #subto cs_fuel:
     #      forall <l,r> in CS: gas_DA[l,r] == gas[l,r];
@@ -191,7 +191,8 @@ def simulate(agent_decisions,compressors,dt):
     ## pressure drop equation
     #subto resistor_eq: forall <l,r> in RE:
     #      b2p * delta_p[l,r] == xir(l,r) * vQr[l,r];
-    m.addConstrs(( b2p * delta_p[r] == xir(r,agent_decisions["zeta"]["RE"][joiner(r)]) * vQr[r] for r in co.resistors), name='resistor_eq')
+    #m.addConstrs(( b2p * delta_p[r] == xir(r,agent_decisions["zeta"]["RE"][joiner(r)]) * vQr[r] for r in co.resistors), name='resistor_eq')
+    m.addConstrs(( b2p * delta_p[r] == xir(r,zeta_DA[r]) * vQr[r] for r in co.resistors), name='resistor_eq')
     #
     #### flap trap model ###
     #

@@ -1,3 +1,6 @@
+*Invocation*
+python3 main.py scenarioPath numIterations lengthTimestep
+
 compressors.yml
   specification of the compressors in the network
   
@@ -30,13 +33,8 @@ net_sim.xml and state_sim.xml
   generated externally by create_netstate
   used to generate further state-xmls to be displayed in contour
   
+sol2state.rb
+  generates data that can be viewed in contour
+  
 urmel.py
   this file contains the simulator_step-method to perform a single simulator step
-
-invocation:
-  python3 main.py scenarioPath numIterations lengthTimestep
-  
-  helper script sol2state.rb generates data that can be viewed in contour:
-  ruby sol2stat sceanrioPath
-  
-

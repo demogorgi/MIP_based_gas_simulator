@@ -1,40 +1,40 @@
-*Invocation*
+# Invocation
 python3 main.py scenarioPath numIterations lengthTimestep
 
-compressors.yml
+## compressors.yml
   specification of the compressors in the network
   
-config.yml
+## config.yml
   controls the amount of output
 
-connections.py and nodes.py
+## connections.py and nodes.py
   contains the data for all elements in the network under consideration
   files are generated externally by create_netstate
 
-constants.py
+## constants.py
   contains relevant constants for physics model
   
-functions.py
+## functions.py
   contains helper functions for physics model
   
-init_decisions.yml
+## init_decisions.yml
   contains the initial decisions for active elements (valves, compressors, ...)
 
-init_scenario.py
+## init_scenario.py
   contains the initial physics values
   
-main.py
+## main.py
   manages the iterative process
   
-model.py
+## model.py
   contains the gurobi simulator model (pyhsics model)
   
-net_sim.xml and state_sim.xml
+## net_sim.xml and state_sim.xml
   generated externally by create_netstate
   used to generate further state-xmls to be displayed in contour
   
-sol2state.rb
+## sol2state.rb
   generates data that can be viewed in contour
   
-urmel.py
+## urmel.py
   this file contains the simulator_step-method to perform a single simulator step

@@ -3,7 +3,7 @@
 python3 main.py scenarioPath numIterations lengthTimestep
 
 #### compressors.yml
-  specification of the compressors in the network
+specification of the compressors in the network
   
 #### config.yml
   controls the amount of output

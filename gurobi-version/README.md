@@ -1,6 +1,6 @@
 # Simulator part
 ### Invocation
-   python3 main.py scenarioPath numIterations lengthTimestep
+    python3 main.py scenarioPath numIterations lengthTimestep
 
 #### compressors.yml
     specification of the compressors in the network
@@ -9,7 +9,8 @@
     controls the amount of output
 
 #### connections.py and nodes.py
-    contains the data for all elements in the network under consideration files are generated externally by create_netstate
+    contains the data for all elements in the network under consideration
+    files are generated externally by create_netstate
 
 #### constants.py
     contains relevant constants for physics model

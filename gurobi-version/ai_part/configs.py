@@ -15,7 +15,7 @@ class CFG(object):
     resnet_blocks = 5 #For Residual tower in NN
     learning_rate = 0.01 #0.001
     momentum = 0.9 #Momentum parameter for SGD optimizer
-
+    
     epochs = 10 #Number of epochs for NN training
     batch_size = 128 #Batch size for NN training
 
@@ -25,3 +25,6 @@ class CFG(object):
     temp_final = 0.001
 
     num_steps = 2 #Number of steps for self-play
+
+    pressure_wt_factor = 2
+    flow_wt_factor = 1

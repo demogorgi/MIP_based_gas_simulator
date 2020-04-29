@@ -2,14 +2,12 @@ import importlib
 import sys
 import re
 import numpy as np
+from .configs import *
 
 wd = sys.argv[1].replace("/",".")
 wd = re.sub(r'\.$', '', wd)
 
 no = importlib.import_module(wd + ".nodes") #Nodes of the network(entry + exit +inner nodes)
-
-pr_wt_factor = 2
-flow_wt_factor = 1
 
 original_nodes = []
 for n in no.nodes:
@@ -17,8 +15,14 @@ for n in no.nodes:
         original_nodes.append(n)
 pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
+pr_violations = 0
+flow_violations  = 0
+trader_violations = 0
 
-def sol2state(solution):
+
+def extract_from_solution(solution):
+    global pr_violations, flow_violations, trader_violations
+
     for k, v in solution.items():
         if not re.search('_aux', k):
             if k.startswith('var_node_p'):
@@ -32,34 +36,35 @@ def sol2state(solution):
         if re.search('nom_TA',k):
             trader_dec[k] = v
 
-    for value in original_nodes:
-        state_[value] = [pr[value], flow[value]]
-    state = []
-    for key, value in state_.items():
-        state.append(value)
-    state = np.array(state)
-
-    return state
-
-def penalty_DA(solution):
-    pr_violations = 0
-    flow_violations  = 0
-
-    for k, v in solution.items():
         if re.search('(ub|lb)_pressure_violation_DA', k):
             key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
             if not re.search('_aux', key): pr_violations += max(0,v)
 
         if re.search('slack_DA', k):
             flow_violations += abs(v)
-
-    penalty = int(pr_wt_factor * pr_violations + flow_wt_factor * flow_violations)
-    return penalty
-
-def penalty_TA(solution):
-    trader_penalty = 0
-    for k, v in solution.items():
         if re.search('scenario_balance_TA', k):
-            trader_penalty += abs(v)
-    trader_penalty = flow_wt_factor * trader_penalty
-    return trader_penalty
+            trader_violations += abs(v)
+
+    for value in original_nodes:
+        #state_[value] = [pr[value], flow[value]]
+        state_[value] = [pr[value]]
+
+    state = []
+    for k, v in dispatcher_dec.items():
+        state.append([v])
+
+    # for k, v in trader_dec.items():
+    #     state.append([v])
+
+    for key, value in state_.items():
+        state.append(value)
+    state = np.array(state)
+
+    return state
+
+def find_penalty():
+
+    dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
+    trader_penalty = int(trader_violations)
+
+    return [dispatcher_penalty, trader_penalty]

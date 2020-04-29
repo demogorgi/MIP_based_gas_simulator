@@ -29,7 +29,7 @@ class TreeNode(object):
     def select_child(self):
 
         c_puct = CFG.c_puct
-        h.action_size = sighest_puct = 0
+        highest_puct = 0
         highest_index = 0
 
         for index, child in enumerate(self.children):
@@ -77,7 +77,7 @@ class MCTS(object):
 
             # while node.is_not_leaf():#TODO change
             #
-            #     
+            #
 
             possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
 

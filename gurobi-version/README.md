@@ -43,11 +43,21 @@
 
 #### main_ai.py
     start point for AI part
+
 #### configs.py
     class contains all constant values used across the modules
+
 #### gas_network.py
     class represents a gas network logic for neural network
+
 #### mcts.py
     classes for Monte Carlo Tree Search algorithm
+
 #### sol2state.py
     functions to extract values from solution output from simulator part
+
+#### neural_network_architecture.py
+    class for neural network model to get policy and value head and a wrapper class for neural network
+
+#### train.py
+    class for main training of the neural network

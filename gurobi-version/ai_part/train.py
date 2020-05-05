@@ -19,7 +19,7 @@ class Train(object):
             self.self_play(gas_network, training_data)
 
         self.net.save_model()
-
+        
         self.net.train(training_data)
 
     def self_play(self, gas_network, training_data):

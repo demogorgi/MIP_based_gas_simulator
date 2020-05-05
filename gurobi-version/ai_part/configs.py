@@ -5,7 +5,7 @@ class CFG(object):
     dispatcher = 1 #Dispatcher agent
     trader = -1 #Trader agent
 
-    model_dir = "/ai_models/" #Directory to save models
+    model_dir = "./ai_part/models/" #Directory to save models
 
     c_puct = 4 #level of exploration (1-6) used in MCTS
     num_mcts_sims = 10 #Number of MCTS simulations 800
@@ -28,3 +28,5 @@ class CFG(object):
 
     pressure_wt_factor = 2
     flow_wt_factor = 1
+
+    load_model = 1 #Flag value for loading a saved model

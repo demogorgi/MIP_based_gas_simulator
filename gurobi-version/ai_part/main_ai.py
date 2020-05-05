@@ -18,5 +18,18 @@ def ai_input(solution, agent_decisions, config, compressors, dt):
 
     net = NeuralNetworkWrapper(gas_network)
 
+    if CFG.load_model:
+        file_path = CFG.model_dir + "best_model.meta"
+        if os.path.exists(file_path):
+            net.load_model("best_model")
+        else:
+            print("Trained model does not exist. Starting from scratch")
+    else:
+        print("Trained model not loaded. Starting from scratch")
+
     train  = Train(gas_network, net)
     train.start()
+
+    new_agent_decision = Gas_Network.decisions_dict
+
+    return new_agent_decision

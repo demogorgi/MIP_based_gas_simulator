@@ -42,13 +42,13 @@
 # AI part
 
 #### main_ai.py
-    start point for AI part
+    start point for AI part and returns new agent_decisions dictionary to Simulator
 
 #### configs.py
-    class contains all constant values used across the modules
+    class contains all global values which are used across the modules
 
 #### gas_network.py
-    class represents a gas network logic for neural network
+    class represents a gas network logic and its basic rules
 
 #### mcts.py
     classes for Monte Carlo Tree Search algorithm
@@ -60,4 +60,4 @@
     class for neural network model to get policy and value head and a wrapper class for neural network
 
 #### train.py
-    class for main training of the neural network
+    class to train the neural network

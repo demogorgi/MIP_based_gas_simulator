@@ -116,7 +116,7 @@ class Gas_Network(object):
 
     def take_action(self, action):
 
-        self.decisions_dict = self.generate_decision_dict(action)
+        Gas_Network.decisions_dict = self.generate_decision_dict(action)
         solution = simulator_step(self.config, self.decisions_dict, self.compressors, 0, self.dt)
 
         if solution:
@@ -126,4 +126,10 @@ class Gas_Network(object):
 
         penalty = find_penalty()
 
-        return True, penalty[0]
+        if penalty[0] > penalty[1]:
+            return True, 1
+        elif penalty[0] < penalty[1]:
+            return True, -1
+        else:
+            return True, 0
+        #return False, 0

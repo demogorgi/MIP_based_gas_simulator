@@ -99,7 +99,6 @@ class MCTS(object):
 
             prob_vector, v = self.net.predict(gas_network.state)
 
-
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 

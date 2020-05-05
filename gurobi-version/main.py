@@ -68,9 +68,10 @@ for i in range(numSteps):
     # i is the step number (neccessary for naming output files if any).
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     solution = simulator_step(config, agent_decisions, compressors, i, dt)
-
+    
     if config["ai"]:
-        ai_input(solution, agent_decisions, config, compressors, dt)
+        agent_decisions = ai_input(solution, agent_decisions, config, compressors, dt)
+
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
     # The solution should contain all information you need to compute penalties.

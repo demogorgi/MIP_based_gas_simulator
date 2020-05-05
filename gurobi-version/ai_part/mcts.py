@@ -33,8 +33,10 @@ class TreeNode(object):
 
 
     def is_not_leaf(self):
+
         if(len(self.children) > 0):
             return True
+
         return False
 
     def select_child(self):
@@ -101,7 +103,7 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            psa_vector = self.possible_decision_probabilty(possible_decisions, prob_vector)
+            psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 
             psa_vector_sum = sum(psa_vector)
 
@@ -142,7 +144,7 @@ class MCTS(object):
                 (1 - CFG.epsilon) * psa + CFG.epsilon * dirichlet_list[idx])
 
         return noisy_psa_vector
-    def possible_decision_probabilty(self, possible_decisions, prob_vector):
+    def possible_decision_probabilty(self, gas_network, possible_decisions, prob_vector):
 
         old_DA = list(v for k, v in dispatcher_dec.items())
         indices = []
@@ -158,5 +160,9 @@ class MCTS(object):
             for i in range(len(index)):
                 probability += prob_vector[index[i]]
             psa_vector.append(probability)
+
+        if len(psa_vector) < gas_network.action_size:
+            d = gas_network.action_size - len(psa_vector)
+            psa_vector = (psa_vector + [0] * d)
 
         return psa_vector

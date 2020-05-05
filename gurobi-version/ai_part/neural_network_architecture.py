@@ -106,7 +106,7 @@ class NeuralNetwork(object):
 
             dense2 = tf.layers.dense(
                 inputs = relu6,
-                units = self.action_size)
+                units = 1)
 
             self.v = tf.nn.tanh(dense2)
 
@@ -163,7 +163,7 @@ class NeuralNetworkWrapper(object):
 
         for epoch in range(CFG.epochs):
 
-            #print("Epoch", epoch+1)
+            print("Epoch", epoch+1)
             examples_num = len(training_data)
 
             for i in range(0, examples_num, CFG.batch_size):

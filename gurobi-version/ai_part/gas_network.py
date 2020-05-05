@@ -14,6 +14,8 @@ from .sol2state import *
 from urmel import *
 
 class Gas_Network(object):
+
+    #Class level variables
     state = None
     decisions_dict = {}
     config = None
@@ -32,9 +34,8 @@ class Gas_Network(object):
 
         network_clone = Gas_Network()
         network_clone.state = deepcopy(self.state)
-        #network_clone.current_agent = self.current_agent
+        network_clone.decisions_dict = deepcopy(self.decisions_dict)
         return network_clone
-
 
     #Function to get possible dispatcher decisions
     def dispatcher_decisions(self, old_decisions):
@@ -65,25 +66,24 @@ class Gas_Network(object):
 
     def generate_decision_dict(self, actions): #Generate new agent_decision dictionary
 
-        decisions_dict = self.decisions_dict
+        decisions = self.decisions_dict
         actions = self.decision_to_dict(actions)
 
-        result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', action[1]).replace(',', '^')
+        result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
 
-        for idx, action in enumerate(actions):
+        for key, value in actions.items():
 
-            key = action[1]
-            value = action[2]
             if re.search('va', key):
-                decisions_dict['va']['VA'][result(key)] = value
+                decisions['va']['VA'][result(key)] = value
             elif re.search('zeta', key):
-                decisions_dict['zeta']['RE'][result(key)] = value
+                decisions['zeta']['RE'][result(key)] = value
             elif re.search('gas', key):
-                decisions_dict['gas']['CS'][result(key)] = value
+                decisions['gas']['CS'][result(key)] = value
             elif re.search('compressor', key):
-                decisions_dict['compressor']['CS'][result(key)] = value
-        return decisions_dict
+                decisions['compressor']['CS'][result(key)] = value
+        return decisions
 
+    #Get a list of decisions [va, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
 
         possible_decisions = self.dispatcher_decisions(agent_decisions)
@@ -105,6 +105,7 @@ class Gas_Network(object):
             list_d.append(dec)
         return list_d
 
+    #Make decision as a 'dict' type to feed simulator_step
     def decision_to_dict(self, action):
         i = 0
         for k, v in dispatcher_dec.items():
@@ -118,7 +119,8 @@ class Gas_Network(object):
         self.decisions_dict = self.generate_decision_dict(action)
         solution = simulator_step(self.config, self.decisions_dict, self.compressors, 0, self.dt)
 
-        self.state = extract_from_solution(solution)
+        if solution:
+            self.state = extract_from_solution(solution)
 
     def get_reward(self):
 

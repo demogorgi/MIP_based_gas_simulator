@@ -16,7 +16,6 @@ def ai_input(solution, agent_decisions, config, compressors, dt):
 
     gas_network = Gas_Network()
 
-
     net = NeuralNetworkWrapper(gas_network)
 
     train  = Train(gas_network, net)

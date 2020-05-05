@@ -20,7 +20,7 @@ class Train(object):
 
         self.net.save_model()
 
-        #self.net.train(training_data)
+        self.net.train(training_data)
 
     def self_play(self, gas_network, training_data):
 
@@ -32,7 +32,7 @@ class Train(object):
         count = 0
         iteration_over = False
 
-        while not iteration_over: #Infinite loop
+        while not iteration_over:
 
             if count < CFG.temp_threshold:
                 best_child = mcts.search(gas_network, node, CFG.temp_initial)
@@ -44,6 +44,7 @@ class Train(object):
             action = best_child.action
 
             gas_network.take_action(action)
+
             count += 1
 
             iteration_over, value = gas_network.get_reward()

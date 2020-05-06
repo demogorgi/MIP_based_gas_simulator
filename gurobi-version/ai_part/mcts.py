@@ -3,6 +3,7 @@ from .configs import CFG
 
 import numpy as np
 from copy import deepcopy
+import random
 
 from .sol2state import *
 
@@ -92,15 +93,12 @@ class MCTS(object):
                 node = node.select_child()
                 gas_network.take_action(node.action)
 
-            possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
-
-            for i in range(len(possible_decisions[-1])):
-                gas_network.state[i] = possible_decisions[-1][i]
-
             prob_vector, v = self.net.predict(gas_network.state)
 
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
+
+            possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 
@@ -160,8 +158,11 @@ class MCTS(object):
                 probability += prob_vector[index[i]]
             psa_vector.append(probability)
 
-        if len(psa_vector) < gas_network.action_size:
-            d = gas_network.action_size - len(psa_vector)
-            psa_vector = (psa_vector + [0] * d)
+        if len(psa_vector) != gas_network.action_size:
+            if len(psa_vector) < gas_network.action_size:
+                d = gas_network.action_size - len(psa_vector)
+                psa_vector = (psa_vector + [0] * d)
+            else:
+                psa_vector = random.sample(psa_vector, gas_network.action_size)
 
         return psa_vector

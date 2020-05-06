@@ -126,10 +126,10 @@ class Gas_Network(object):
 
         penalty = find_penalty()
 
-        if penalty[0] > penalty[1]:
+        if penalty[0] > penalty[1]: #Dispatcher won
             return True, 1
-        elif penalty[0] < penalty[1]:
+        elif penalty[0] < penalty[1]: #Trader won
             return True, -1
         else:
-            return True, 0
+            return True, 0 #Draw
         #return False, 0

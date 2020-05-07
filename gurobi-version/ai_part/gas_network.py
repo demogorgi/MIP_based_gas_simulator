@@ -21,6 +21,7 @@ class Gas_Network(object):
     config = None
     compressors = None
     dt = 0
+    penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
 
     def __init__(self):
 
@@ -121,10 +122,12 @@ class Gas_Network(object):
 
         if solution:
             self.state = extract_from_solution(solution)
+            Gas_Network.penalty = find_penalty(solution)
 
     def get_reward(self):
 
-        penalty = find_penalty()
+        penalty = self.penalty
+        #print(penalty)
 
         if penalty[0] < penalty[1]: #Dispatcher won
             return True, 1

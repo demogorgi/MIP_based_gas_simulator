@@ -15,14 +15,12 @@ for n in no.nodes:
         original_nodes.append(n)
 pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
-pr_violations = 0
-flow_violations  = 0
-trader_violations = 0
+
 
 
 def extract_from_solution(solution):
     state = []
-    global pr_violations, flow_violations, trader_violations
+    #global pr_violations, flow_violations, trader_violations
 
     for k, v in solution.items():
         if not re.search('_aux', k):
@@ -37,15 +35,6 @@ def extract_from_solution(solution):
         if re.search('nom_TA',k):
             trader_dec[k] = v
 
-        if re.search('(ub|lb)_pressure_violation_DA', k):
-            key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
-            if not re.search('_aux', key): pr_violations += max(0,v)
-
-        if re.search('slack_DA', k):
-            flow_violations += abs(v)
-        if re.search('scenario_balance_TA', k):
-            trader_violations += abs(v)
-
     for k, v in dispatcher_dec.items(): #Dispatcher decision
         state_[k] = [v]
     for value in original_nodes: # Pressure values
@@ -58,7 +47,22 @@ def extract_from_solution(solution):
 
     return state
 
-def find_penalty():
+def find_penalty(solution):
+
+    pr_violations = 0 #Dispatcher pressure bound violations
+    flow_violations  = 0 #Dispatcher flow bound violations
+    trader_violations = 0 #Trader nomination violation
+
+    for k, v in solution.items():
+        if re.search('(ub|lb)_pressure_violation_DA', k):
+            key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
+            if not re.search('_aux', key): pr_violations += max(0,v)
+
+        if re.search('slack_DA', k):
+            flow_violations += abs(v)
+        if re.search('scenario_balance_TA', k):
+            trader_violations += abs(v)
+
 
     dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
     trader_penalty = int(CFG.flow_wt_factor * trader_violations)

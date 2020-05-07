@@ -13,6 +13,7 @@ def ai_input(solution, agent_decisions, config, compressors, dt):
 
     state = extract_from_solution(solution)
     Gas_Network.state = state
+    Gas_Network.penalty = find_penalty(solution)
 
     gas_network = Gas_Network()
 

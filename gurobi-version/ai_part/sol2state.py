@@ -21,6 +21,7 @@ trader_violations = 0
 
 
 def extract_from_solution(solution):
+    state = []
     global pr_violations, flow_violations, trader_violations
 
     for k, v in solution.items():
@@ -45,16 +46,11 @@ def extract_from_solution(solution):
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
 
-    for value in original_nodes:
+    for k, v in dispatcher_dec.items(): #Dispatcher decision
+        state_[k] = [v]
+    for value in original_nodes: # Pressure values
         #state_[value] = [pr[value], flow[value]]
         state_[value] = [pr[value]]
-
-    state = []
-    for k, v in dispatcher_dec.items():
-        state.append([v])
-
-    # for k, v in trader_dec.items():
-    #     state.append([v])
 
     for key, value in state_.items():
         state.append(value)
@@ -65,6 +61,6 @@ def extract_from_solution(solution):
 def find_penalty():
 
     dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
-    trader_penalty = int(trader_violations)
+    trader_penalty = int(CFG.flow_wt_factor * trader_violations)
 
     return [dispatcher_penalty, trader_penalty]

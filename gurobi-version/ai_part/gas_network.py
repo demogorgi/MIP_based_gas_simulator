@@ -24,7 +24,7 @@ class Gas_Network(object):
 
     def __init__(self):
 
-        self.cols = 1 #2 #Pressure and flow of nodes
+        self.cols = 1 #Decision values + pressures ,2 #Pressure and flow of nodes
         self.row = len(self.state)
         self.current_agent = CFG.dispatcher
         self.action_size = self.row * self.cols
@@ -105,7 +105,7 @@ class Gas_Network(object):
             list_d.append(dec)
         return list_d
 
-    #Make decision as a 'dict' type to feed simulator_step
+    #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
     def decision_to_dict(self, action):
         i = 0
         for k, v in dispatcher_dec.items():
@@ -126,9 +126,9 @@ class Gas_Network(object):
 
         penalty = find_penalty()
 
-        if penalty[0] > penalty[1]: #Dispatcher won
+        if penalty[0] < penalty[1]: #Dispatcher won
             return True, 1
-        elif penalty[0] < penalty[1]: #Trader won
+        elif penalty[0] > penalty[1]: #Trader won
             return True, -1
         else:
             return True, 0 #Draw

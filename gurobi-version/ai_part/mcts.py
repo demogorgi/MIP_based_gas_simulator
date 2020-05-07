@@ -104,7 +104,7 @@ class MCTS(object):
 
             psa_vector_sum = sum(psa_vector)
 
-            if psa_vector_sum > 0:
+            if psa_vector_sum > 0: #Renormalize the psa_vector
                 psa_vector /= psa_vector_sum
 
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector)

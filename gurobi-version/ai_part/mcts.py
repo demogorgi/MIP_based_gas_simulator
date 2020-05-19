@@ -141,6 +141,7 @@ class MCTS(object):
                 (1 - CFG.epsilon) * psa + CFG.epsilon * dirichlet_list[idx])
 
         return noisy_psa_vector
+
     def possible_decision_probabilty(self, gas_network, possible_decisions, prob_vector):
 
         old_DA = list(v for k, v in dispatcher_dec.items())

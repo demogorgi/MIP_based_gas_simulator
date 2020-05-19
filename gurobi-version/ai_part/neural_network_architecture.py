@@ -146,13 +146,11 @@ class NeuralNetworkWrapper(object):
 
     def predict(self, state):
 
-
         state = state[np.newaxis, :, :]
 
         pi,v = self.sess.run([self.net.pi, self.net.v],
                              feed_dict = {self.net.states: state,
                                           self.net.training: False})
-
         return pi[0], v[0][0]
 
 

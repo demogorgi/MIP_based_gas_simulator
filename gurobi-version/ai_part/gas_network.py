@@ -51,7 +51,9 @@ class Gas_Network(object):
             elif re.match('compressor', l):
                 valid_dispatcher_decisions.append((l, val(v)))
             elif re.match('zeta', l):
-                zeta = random.randrange(0, 10000) # [0, INFINITY)
+                zeta = random.randint(0, 10000) #[0, 10000]
+                #zeta = random.randrange(0, 10000) #[0, INFINITY)
+                #zeta = v
                 valid_dispatcher_decisions.append((l, zeta))
             elif re.match('gas', l):
                 gas = round(random.uniform(0.0, 1.0), 2)

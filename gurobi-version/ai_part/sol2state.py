@@ -16,11 +16,8 @@ for n in no.nodes:
 pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
 
-
-
 def extract_from_solution(solution):
     state = []
-    #global pr_violations, flow_violations, trader_violations
 
     for k, v in solution.items():
         if not re.search('_aux', k):
@@ -43,9 +40,21 @@ def extract_from_solution(solution):
 
     for key, value in state_.items():
         state.append(value)
-    state = np.array(state)
+
+    state = normalize_state(np.array(state), 0, 1)
+    state =  np.array(list(state))
 
     return state
+
+def normalize_state(array, low, high): #Normalize the values to [0,1]
+    minimum = min(array)
+    maximum = max(array)
+
+    diff = maximum - minimum
+    diffScale = high - low
+
+    return map ( lambda x: [float((x - minimum)*(float(diffScale)/diff)+low)], array)
+
 
 def find_penalty(solution):
 
@@ -65,6 +74,6 @@ def find_penalty(solution):
 
 
     dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
-    trader_penalty = int(CFG.flow_wt_factor * trader_violations)
+    trader_penalty = int(0.2*trader_violations)
 
     return [dispatcher_penalty, trader_penalty]

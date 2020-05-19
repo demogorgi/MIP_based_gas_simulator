@@ -6,6 +6,9 @@
 # >python3 main.py path numIterations lengthTimestep
 
 from urmel import *
+from datetime import datetime, timedelta
+
+timestep = datetime.now()
 
 data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
@@ -59,6 +62,13 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 
+#csv file to store agent decisions in a csv file
+with open('./ai_part/decisions_file.csv', 'w+', newline='') as f:
+    fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
+    thewriter = csv.DictWriter(f, fieldnames=fieldnames)
+    thewriter.writeheader()
+
+
 for i in range(numSteps):
     print("step %d" % i)
     # for every i in numSteps a simulator step is performed.
@@ -68,9 +78,18 @@ for i in range(numSteps):
     # i is the step number (neccessary for naming output files if any).
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     solution = simulator_step(config, agent_decisions, compressors, i, dt)
-    
+
     if config["ai"]:
-        agent_decisions = ai_input(solution, agent_decisions, config, compressors, dt)
+        #Generating new agent_decision for the next iteration from neural network as it learns to generate
+        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, dt)
+
+        #Store each new agent_decisions value from ai_part to csv
+        timestep += timedelta(0,dt)
+        timestamp = timestep.strftime("%H:%M:%S")
+        with open('./ai_part/decisions_file.csv', 'a+', newline = '') as f:
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
+            thewriter = csv.DictWriter(f, fieldnames=fieldnames)
+            thewriter.writerow(extracted_)
 
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.

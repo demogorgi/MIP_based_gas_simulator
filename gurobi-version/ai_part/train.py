@@ -1,12 +1,15 @@
 #File contains class to train NN using MCTS
 from .configs import *
 from .mcts import *
+from .evaluate import *
+from .neural_network_architecture import *
 
 class Train(object):
 
     def __init__(self, gas_network, nnet):
         self.gas_network = gas_network
         self.net = nnet
+        self.eval_net = NeuralNetworkWrapper(gas_network)
 
     def start(self):
         #Main training function
@@ -14,13 +17,40 @@ class Train(object):
         training_data = []
 
         for i in range(CFG.num_self_plays):
-
+            print("Start Self-play training", i+1)
             gas_network = self.gas_network.clone()
+            #print(training_data)
             self.self_play(gas_network, training_data)
 
-        self.net.save_model()
-        
+        self.net.save_model() #Current model saved
+
+        self.eval_net.load_model() #Current model is loaded
+
         self.net.train(training_data)
+
+        eval_mcts = MCTS(self.eval_net)
+
+        evaluator = Evaluate(eval_mcts = eval_mcts, gas_network = self.gas_network)
+
+        wins, losses = evaluator.evaluate()
+
+        print("Wins:", wins)
+        print("Losses: ", losses)
+
+        nums_ = wins + losses
+
+        if nums_ == 0:
+            win_rate = 0
+        else:
+            win_rate = wins / nums_
+
+        print("Win rate: ", win_rate)
+        if win_rate > 0.55:
+            print("New model saved as the best model")
+            self.net.save_model("best_model")
+        else:
+            print("New model discarded.")
+            self.net.load_model()
 
     def self_play(self, gas_network, training_data):
 

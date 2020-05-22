@@ -62,11 +62,12 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 
-#csv file to store agent decisions in a csv file
-with open('./ai_part/decisions_file.csv', 'w+', newline='') as f:
-    fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
-    thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-    thewriter.writeheader()
+#csv file to store agent decisions from ai in a csv file
+if config["ai"]:
+    with open('./ai_part/decisions_file.csv', 'w+', newline='') as f:
+        fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
+        thewriter = csv.DictWriter(f, fieldnames=fieldnames)
+        thewriter.writeheader()
 
 
 for i in range(numSteps):
@@ -84,12 +85,12 @@ for i in range(numSteps):
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, dt)
 
         #Store each new agent_decisions value from ai_part to csv
-        timestep += timedelta(0,dt)
         timestamp = timestep.strftime("%H:%M:%S")
         with open('./ai_part/decisions_file.csv', 'a+', newline = '') as f:
             fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
             thewriter = csv.DictWriter(f, fieldnames=fieldnames)
             thewriter.writerow(extracted_)
+        timestep += timedelta(0,dt)
 
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.

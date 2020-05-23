@@ -48,16 +48,24 @@ class Gas_Network(object):
         for l, v in old_decisions.items():
             if re.match('va', l):
                 valid_dispatcher_decisions.append((l, val(v)))
-            elif re.match('compressor', l):
-                valid_dispatcher_decisions.append((l, val(v)))
             elif re.match('zeta', l):
                 zeta = random.randint(0, 10000) #[0, 10000]
                 #zeta = random.randrange(0, 10000) #[0, INFINITY)
                 #zeta = v
                 valid_dispatcher_decisions.append((l, zeta))
             elif re.match('gas', l):
+                gas_label = l
                 gas = round(random.uniform(0.0, 1.0), 2)
-                valid_dispatcher_decisions.append((l, gas))
+            elif re.match('compressor', l):
+                compressor_label = l
+                compressor = val(v)
+
+        if compressor == 0: #If compressor is closed, gas value should be 0
+            gas = 0
+
+        valid_dispatcher_decisions.append((gas_label, gas))
+        valid_dispatcher_decisions.append((compressor_label, compressor))
+
         #Find all possible subsets of possible dispatcher decisions
         list_valid_decisions = []
         for i in range(len(valid_dispatcher_decisions)):

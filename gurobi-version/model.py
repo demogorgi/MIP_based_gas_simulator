@@ -96,12 +96,12 @@ def simulate(agent_decisions,compressors,dt):
     ## constraints to track trader agent's decisions
     #subto nomx:
     #      forall <x> in X: exit_nom_TA[x] == exit_nom[x];
-    m.addConstrs((exit_nom_TA[x] == agent_decisions["exit_nom"]["X"][x] for x in no.exits), name='nomx')
+    m.addConstrs((exit_nom_TA[x] == agent_decisions["exit_nom"]["X"][x][0] for x in no.exits), name='nomx')
     #
     #subto nome:
     #      forall <l,r> in S: entry_nom_TA[l,r] == entry_nom[l,r];
 #    m.addConstrs((entry_nom_TA[s] == agent_decisions["entry_nom"]["S"][s[0] + "^" + s[1]] for s in special), name='nome')
-    m.addConstrs((entry_nom_TA[s] == agent_decisions["entry_nom"]["S"][joiner(s)] for s in co.special), name='nome')
+    m.addConstrs((entry_nom_TA[s] == agent_decisions["entry_nom"]["S"][joiner(s)][0] for s in co.special), name='nome')
     #
     ## constraints to track dispatcher agent's decisions
     #subto va_mode:
@@ -143,11 +143,11 @@ def simulate(agent_decisions,compressors,dt):
     ## flow slack for boundary nodes
     #subto c_u_cons_boundary_node_wflow_slack_1:
     #      forall <x> in X: - var_boundary_node_flow_slack_positive[x] + var_node_Qo_in[x] <= + exit_nom[x];
-    m.addConstrs((- var_boundary_node_flow_slack_positive[x] + var_node_Qo_in[x] <= agent_decisions["exit_nom"]["X"][x] for x in no.exits), name='c_u_cons_boundary_node_wflow_slack_1')
+    m.addConstrs((- var_boundary_node_flow_slack_positive[x] + var_node_Qo_in[x] <= agent_decisions["exit_nom"]["X"][x][0] for x in no.exits), name='c_u_cons_boundary_node_wflow_slack_1')
     #
     #subto c_u_cons_boundary_node_wflow_slack_2:
     #      forall <x> in X: - var_boundary_node_flow_slack_negative[x] - var_node_Qo_in[x] <= - exit_nom[x];
-    m.addConstrs((- var_boundary_node_flow_slack_negative[x] - var_node_Qo_in[x] <= - agent_decisions["exit_nom"]["X"][x] for x in no.exits), name='c_u_cons_boundary_node_wflow_slack_2')
+    m.addConstrs((- var_boundary_node_flow_slack_negative[x] - var_node_Qo_in[x] <= - agent_decisions["exit_nom"]["X"][x][0] for x in no.exits), name='c_u_cons_boundary_node_wflow_slack_2')
     #
     ## pressure slack for boundary nodes
     #subto c_u_cons_boundary_node_wpressure_slack_1:
@@ -231,11 +231,12 @@ def simulate(agent_decisions,compressors,dt):
     #
     #subto nomination_check:
     #      forall <l,r> in S: var_pipe_Qo_out[l,r] + nom_entry_slack_DA[l,r] == entry_nom[l,r];
-    m.addConstrs((var_pipe_Qo_out[s] + nom_entry_slack_DA[s] == agent_decisions["entry_nom"]["S"][joiner(s)] for s in co.special), name='nomination_check')
+    m.addConstrs((var_pipe_Qo_out[s] + nom_entry_slack_DA[s] == agent_decisions["entry_nom"]["S"][joiner(s)][0] for s in co.special), name='nomination_check')
     #
     #subto track_scenario_balance:
     #      sum <l,r> in S: entry_nom[l,r] + sum <x> in X: exit_nom[x] == scenario_balance_TA;
-    m.addConstr((sum(agent_decisions["entry_nom"]["S"].values()) + sum(agent_decisions["exit_nom"]["X"].values()) == scenario_balance_TA), name='track_scenario_balance')
+    #m.addConstr((sum(agent_decisions["entry_nom"]["S"].values()) + sum(agent_decisions["exit_nom"]["X"].values()) == scenario_balance_TA), name='track_scenario_balance')
+    m.addConstr((sum([agent_decisions["entry_nom"]["S"][joiner(s)][0] for s in co.special]) + sum([agent_decisions["exit_nom"]["X"][x][0] for x in no.exits]) == scenario_balance_TA), 'track_scenario_balance')
     #
     #subto track_exit_nomination_slack:
     #      forall <x> in X: nom_exit_slack_DA[x] == var_boundary_node_flow_slack_positive[x] - var_boundary_node_flow_slack_negative[x];

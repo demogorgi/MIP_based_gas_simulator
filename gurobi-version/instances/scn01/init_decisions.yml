@@ -1,11 +1,11 @@
 # Decisions of the trader agent
 exit_nom:
     X:
-        END_1: -798
+        END_1: [-798,-798]
 
 entry_nom:
     S:
-        START_1_aux1^START_1: 798
+        START_1_aux1^START_1: [798,798]
 
 # Decisions of the dispatcher agent
 va:

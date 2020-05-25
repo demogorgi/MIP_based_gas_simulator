@@ -30,3 +30,11 @@ class CFG(object):
     flow_wt_factor = 0.1
 
     num_evaluation_plays = 10 # Number of evaluation plays
+
+    zeta_upper = 10000 #INFINITY for drag factor for RE
+
+    pressure_ub = 105.01325
+    pressure_lb = 1.01325
+
+    pressure_lb_XH = 56.01325
+    pressure_lb_XN = 46.01325

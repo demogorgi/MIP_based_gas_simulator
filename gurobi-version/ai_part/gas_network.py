@@ -49,7 +49,8 @@ class Gas_Network(object):
             if re.match('va', l):
                 valid_dispatcher_decisions.append((l, val(v)))
             elif re.match('zeta', l):
-                zeta = random.randint(0, 10000) #[0, 10000]
+                zeta = random.randint(0, CFG.zeta_upper) #[0, 10000]
+
                 #zeta = random.randrange(0, 10000) #[0, INFINITY)
                 #zeta = v
                 valid_dispatcher_decisions.append((l, zeta))
@@ -81,7 +82,6 @@ class Gas_Network(object):
         actions = self.decision_to_dict(actions)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
-
         for key, value in actions.items():
 
             if re.search('va', key):

@@ -1,13 +1,13 @@
 # Decisions of the trader agent
 exit_nom:
     X:
-        XN: -400
-        XH: -0
+        XN: [-400,-400]
+        XH: [0,0]
 
 entry_nom:
     S:
-        EH_aux1^EH: 0
-        EN_aux1^EN: 200
+        EH_aux1^EH: [0,0]
+        EN_aux1^EN: [200,200]
 
 # Decisions of the dispatcher agent
 va:

@@ -18,6 +18,7 @@ pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
 def extract_from_solution(solution):
     state = []
+    da_dec = {}
 
     for k, v in solution.items():
         if not re.search('_aux', k):
@@ -32,28 +33,49 @@ def extract_from_solution(solution):
         if re.search('nom_TA',k):
             trader_dec[k] = v
 
-    for k, v in dispatcher_dec.items(): #Dispatcher decision
+    da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
+    pressures = normalize_pressure(pr.copy())
+
+    for k, v in da_dec.items(): #Dispatcher decision
         state_[k] = [v]
     for value in original_nodes: # Pressure values
         #state_[value] = [pr[value], flow[value]]
-        state_[value] = [pr[value]]
+        state_[value] = [pressures[value]]
 
     for key, value in state_.items():
         state.append(value)
 
-    state = normalize_state(np.array(state), 0, 1)
-    state =  np.array(list(state))
+    #state = normalize_state(np.array(state), 0, 1)
+    state =  np.array(state)
+    
 
     return state
 
-def normalize_state(array, low, high): #Normalize the values to [0,1]
-    minimum = min(array)
-    maximum = max(array)
+def normalize_dispatcher_dec(decisions):
+    for label, value in decisions.items():
+        if re.search('zeta_DA', label):
+            decisions[label] = value/CFG.zeta_upper
+    return decisions
 
-    diff = maximum - minimum
-    diffScale = high - low
+def normalize_pressure(pressure_dict):
+    for label, value in pressure_dict.items():
+        if re.search('XN', label):
+            pressure_dict[label] = (value - CFG.pressure_lb_XN) / (CFG.pressure_ub - CFG.pressure_lb_XN)
+        elif re.search('XH', label):
+            pressure_dict[label] = (value - CFG.pressure_lb_XH) / (CFG.pressure_ub - CFG.pressure_lb_XH)
+        else:
+            pressure_dict[label] = (value - CFG.pressure_lb) / (CFG.pressure_ub - CFG.pressure_lb)
 
-    return map ( lambda x: [float((x - minimum)*(float(diffScale)/diff)+low)], array)
+    return pressure_dict
+
+# def normalize_state(array, low, high): #Normalize the values to [0,1]
+#     minimum = min(array)
+#     maximum = max(array)
+#
+#     diff = maximum - minimum
+#     diffScale = high - low
+#
+#     return map ( lambda x: [float((x - minimum)*(float(diffScale)/diff)+low)], array)
 
 
 def find_penalty(solution):

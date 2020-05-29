@@ -47,8 +47,8 @@ if os.path.exists(os.path.join(data_path, "config.yml")):
         config = merged
         print(config)
 
-if config["ai"]:
-    from ai_part.main_ai import *
+#if config["ai"]:
+from ai_part.main_ai import *
 
 # read manual file with compressor data
 # the dictionary does not change during the process
@@ -86,7 +86,7 @@ for i in range(numSteps):
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##
         ##########################################################################################
-        if step >= 4:
+        if i >= 4:
            agent_decisions["entry_nom"]["EN_aux1^EN"] = [0]
            agent_decisions["entry_nom"]["EH_aux1^EH"] = [1500]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
@@ -95,9 +95,9 @@ for i in range(numSteps):
            agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1000
         ###################################################################################
 
-    #Store each new agent_decisions value from ai_part to csv
+    #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
-    with open('./ai_part/decisions_file.csv', 'a+', newline = '') as f:
+    with open(path.join(sys.argv[1], 'output/decisions_file.csv'), 'a+', newline = '') as f:
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)

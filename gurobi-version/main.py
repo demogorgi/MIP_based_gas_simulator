@@ -80,7 +80,7 @@ for i in range(numSteps):
 
     if config["ai"]:
         #Generating new agent_decision for the next iteration from neural network as it learns to generate
-        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, dt)
+        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
     else:
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##

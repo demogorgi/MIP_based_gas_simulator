@@ -62,12 +62,11 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 
-#csv file to store agent decisions from ai in a csv file
-if config["ai"]:
-    with open('./ai_part/decisions_file.csv', 'w+', newline='') as f:
-        fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
-        thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-        thewriter.writeheader()
+#csv file to store (agent) decisions in a csv file in scenario output folder
+with open(path.join(sys.argv[1], 'output/decisions_file.csv'), 'w+', newline='') as f:
+    fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
+    thewriter = csv.DictWriter(f, fieldnames=fieldnames)
+    thewriter.writeheader()
 
 
 for i in range(numSteps):
@@ -83,14 +82,26 @@ for i in range(numSteps):
     if config["ai"]:
         #Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, dt)
+    else:
+        ##########################################################################################
+        ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##
+        ##########################################################################################
+        if step >= 4:
+           agent_decisions["entry_nom"]["EN_aux1^EN"] = [0]
+           agent_decisions["entry_nom"]["EH_aux1^EH"] = [1500]
+           agent_decisions["compressor"]["CS"]["N22^N23"] = 0
+           agent_decisions["compressor"]["gas"]["N22^N23"] = 0
+           agent_decisions["va"]["VA"]["N22^N23_1"] = 0
+           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1000
+        ###################################################################################
 
-        #Store each new agent_decisions value from ai_part to csv
-        timestamp = timestep.strftime("%H:%M:%S")
-        with open('./ai_part/decisions_file.csv', 'a+', newline = '') as f:
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
-            thewriter = csv.DictWriter(f, fieldnames=fieldnames)
-            thewriter.writerow(extracted_)
-        timestep += timedelta(0,dt)
+    #Store each new agent_decisions value from ai_part to csv
+    timestamp = timestep.strftime("%H:%M:%S")
+    with open('./ai_part/decisions_file.csv', 'a+', newline = '') as f:
+        fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
+        thewriter = csv.DictWriter(f, fieldnames=fieldnames)
+        thewriter.writerow(extracted_)
+    timestep += timedelta(0,dt)
 
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.

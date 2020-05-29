@@ -1,0 +1,27 @@
+# Decisions of the trader agent
+exit_nom:
+    X:
+        XN: [-700]
+        XH: [-800]
+
+entry_nom:
+    S:
+        EN_aux0^EN: [1500]
+        EH_aux0^EH: [   0]
+
+# Decisions of the dispatcher agent
+va:
+    VA:
+        N23^N23_1: 1
+
+zeta:
+    RE:
+        N25^N26_aux: 10000
+
+gas:
+    CS:
+        N22^N23: 0.4
+
+compressor:
+    CS:
+        N22^N23: 1

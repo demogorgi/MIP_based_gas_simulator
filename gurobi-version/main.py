@@ -62,7 +62,7 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     #print(agent_decisions)
 
 #csv file to store (agent) decisions in a csv file in scenario output folder
-with open(path.join(sys.argv[1], 'output/decisions_file.csv'), 'w+', newline='') as f:
+with open(path.join(data_path, 'output/decisions_file.csv'), 'w+', newline='') as f:
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
@@ -89,14 +89,14 @@ for i in range(numSteps):
            agent_decisions["entry_nom"]["EN_aux1^EN"] = [0]
            agent_decisions["entry_nom"]["EH_aux1^EH"] = [1500]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
-           agent_decisions["compressor"]["gas"]["N22^N23"] = 0
+           agent_decisions["gas"]["N22^N23"] = 0
            agent_decisions["va"]["VA"]["N22^N23_1"] = 0
            agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1000
         ###################################################################################
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
-    with open(path.join(sys.argv[1], 'output/decisions_file.csv'), 'a+', newline = '') as f:
+    with open(path.join(data_path, 'output/decisions_file.csv'), 'a+', newline = '') as f:
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
@@ -113,12 +113,12 @@ if config["contour_output"]:
     if not config["write_sol"]:
         print("WARNING: Config parameter \"write_sol\" needs to be True if contour_output is True.")
     else:
-        os.system("ruby sol2state.rb " + sys.argv[1])
+        os.system("ruby sol2state.rb " + data_path)
 
 # concat all compressor pdfs to a single one
 if config["gnuplot"]:
-    p = path.join(sys.argv[1], "output/")
+    p = path.join(data_path, "output/")
     os.system("pdftk " + p + "*.pdf cat output " + p + "all.pdf")
-    print("pdftk " + path.join(sys.argv[1], "output/*.pdf") + " cat output all.pdf")
+    print("pdftk " + path.join(data_path, "output/*.pdf") + " cat output all.pdf")
 
 print("\n\n>> finished")

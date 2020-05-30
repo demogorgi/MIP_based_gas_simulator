@@ -21,20 +21,21 @@ config = {
     # write problem files in the lp-format?
     "write_lp": False,
     # write solution files in the sol-format?
-    "write_sol": False,
+    "write_sol": True,
     # write irreducible infeasibility set if problem is infeasible?
+    "write_ilp": True,
     # write wheel maps with gnuplot?
     "gnuplot": True,
     # console output?
-    "urmel_console_output": False,
+    "urmel_console_output": True,
     # gurobi logfile
     "grb_logfile": "gurobi.log",
     # gurobi console output
-    "grb_console": False,
+    "grb_console": True,
     # contour output (net- and state-files in contour folder)
-    "contour_output": False,
+    "contour_output": True,
     # is the ai-part active?
-    "ai" : True
+    "ai" : False
 }
 
 # read manual file with configs
@@ -86,10 +87,10 @@ for i in range(numSteps):
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##
         ##########################################################################################
         if i >= 4:
-           agent_decisions["entry_nom"]["EN_aux1^EN"] = [0]
-           agent_decisions["entry_nom"]["EH_aux1^EH"] = [1500]
+           agent_decisions["entry_nom"]["S"]["EN_aux1^EN"] = [0]
+           agent_decisions["entry_nom"]["S"]["EH_aux1^EH"] = [1500]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
-           agent_decisions["gas"]["N22^N23"] = 0
+           agent_decisions["gas"]["CS"]["N22^N23"] = 0
            agent_decisions["va"]["VA"]["N22^N23_1"] = 0
            agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1000
         ###################################################################################

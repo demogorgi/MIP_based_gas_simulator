@@ -86,13 +86,7 @@ for i in range(numSteps):
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##
         ##########################################################################################
-        if i >= 4:
-           agent_decisions["entry_nom"]["S"]["EN_aux1^EN"] = [0]
-           agent_decisions["entry_nom"]["S"]["EH_aux1^EH"] = [1500]
-           agent_decisions["compressor"]["CS"]["N22^N23"] = 0
-           agent_decisions["gas"]["CS"]["N22^N23"] = 0
-           agent_decisions["va"]["VA"]["N22^N23_1"] = 0
-           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1000
+        pass
         ###################################################################################
 
     #Store each new (agent) decisions value from ai_part to csv

@@ -42,7 +42,7 @@ pipes, length, roughness = gp.multidict({
 	('N20', 'XH'): [20000, 0.000012],
 	('EH_aux0', 'EH'): [100, 0.000012],
 	('EH_aux1', 'EH_aux0'): [10000, 0.000012],
-	('EH_NDin1', 'EH_aux1'): [1000, 0.000012],
+	('EH_NDin1', 'EH_aux1'): [10000, 0.000012],
 	('EH_ND', 'EH_NDin2'): [10000, 0.000012],
 	('EH_aux2', 'EH_aux1'): [10000, 0.000012],
 	('EH_aux3', 'EH_aux2'): [1000, 0.000012],
@@ -50,7 +50,7 @@ pipes, length, roughness = gp.multidict({
 	('EH_HD', 'EH_HDin2'): [10000, 0.000012],
 	('EN_aux0', 'EN'): [100, 0.000012],
 	('EN_aux1', 'EN_aux0'): [10000, 0.000012],
-	('EN_NDin1', 'EN_aux1'): [1000, 0.000012],
+	('EN_NDin1', 'EN_aux1'): [10000, 0.000012],
 	('EN_ND', 'EN_NDin2'): [10000, 0.000012],
 	('EN_aux2', 'EN_aux1'): [10000, 0.000012],
 	('EN_aux3', 'EN_aux2'): [1000, 0.000012],
@@ -79,7 +79,7 @@ diameter = {
 	('N20', 'XH'): 0.9,
 	('EH_aux0', 'EH'): 0.5,
 	('EH_aux1', 'EH_aux0'): 2,
-	('EH_NDin1', 'EH_aux1'): 0.3,
+	('EH_NDin1', 'EH_aux1'): 2,
 	('EH_ND', 'EH_NDin2'): 2,
 	('EH_aux2', 'EH_aux1'): 2,
 	('EH_aux3', 'EH_aux2'): 0.3,
@@ -87,7 +87,7 @@ diameter = {
 	('EH_HD', 'EH_HDin2'): 2,
 	('EN_aux0', 'EN'): 0.5,
 	('EN_aux1', 'EN_aux0'): 2,
-	('EN_NDin1', 'EN_aux1'): 0.3,
+	('EN_NDin1', 'EN_aux1'): 2,
 	('EN_ND', 'EN_NDin2'): 2,
 	('EN_aux2', 'EN_aux1'): 2,
 	('EN_aux3', 'EN_aux2'): 0.3,
@@ -99,10 +99,10 @@ diameter = {
 	('N25', 'N26_aux'): 0.9
 }
 
-# special pipes ACHTUNG HIER HAT MICHAEL WAS ANDERES HINGESCHRIEBEN
+# special pipes
 special = gp.tuplelist([
-        ('EN_aux0', 'EN'),
-        ('EH_aux0', 'EH')
+	('EH_aux0', 'EH'),
+	('EN_aux0', 'EN')
 ])
 
 connections = pipes + resistors + valves + flap_traps + compressors

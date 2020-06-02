@@ -192,7 +192,9 @@ def simulate(agent_decisions,compressors,dt):
     #subto resistor_eq: forall <l,r> in RE:
     #      b2p * delta_p[l,r] == xir(l,r) * vQr[l,r];
     #m.addConstrs(( b2p * delta_p[r] == xir(r,agent_decisions["zeta"]["RE"][joiner(r)]) * vQr[r] for r in co.resistors), name='resistor_eq')
-    m.addConstrs(( b2p * delta_p[r] == xir(r,100000000 * zeta_DA[r]) * vQr[r] for r in co.resistors), name='resistor_eq')
+    n = 5 # parameter to form the zeta-curve
+    m.addConstrs(( b2p * delta_p[r] == xir(r, 10 ** 8 * agent_decisions["zeta"]["RE"][joiner(r)] ** n * 10 ** ( 4 * ( 1 - n ) ) ) * vQr[r] for r in co.resistors), name='resistor_eq')
+#    m.addConstrs(( b2p * delta_p[r] == xir(r,100000000 * zeta_DA[r]) * vQr[r] for r in co.resistors), name='resistor_eq')
     #
     #### flap trap model ###
     #

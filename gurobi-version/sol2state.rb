@@ -196,6 +196,7 @@ solFiles = Dir.glob(File.join(scenarioPath, "output/*.sol")).sort()
 contourInput = File.join(scenarioPath, "/output/contour")
 Dir.mkdir(contourInput) unless File.exists?(contourInput)
 FileUtils.cp(File.join(scenarioPath,"net_sim.xml"), contourInput)
+#FileUtils.cp(File.join(scenarioPath,"state_sim.xml"), contourInput)
 timestamp = Time.now()
 solFiles.each_with_index{ |f,i|
     puts("process #{f}")

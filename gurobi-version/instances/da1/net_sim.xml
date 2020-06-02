@@ -9,7 +9,25 @@
 		</documentation>
 	</information>
 	<units>
-		<net unit="[object Object]"/>
+		<nodeHeight unit="m"/>
+		<boundaryNodeInflowLimits unit="1000m_cube_per_hour"/>
+		<boundaryNodeInflowPressureLimits unit="barg"/>
+		<NodePressureLimits unit="barg"/>
+		<pipeLength unit="km"/>
+		<pipeDiameter unit="mm"/>
+		<pipeRoughness unit="mm"/>
+		<resistorDiameter unit="mm"/>
+		<controlValveTargetMaxFlowLimits unit="1000m_cube_per_hour"/>
+		<controlValveTargetMinPressureInLimits unit="barg"/>
+		<controlValveTargetMinPressureOutLimits unit="barg"/>
+		<controlValveTargetMaxPressureOutLimits unit="barg"/>
+		<controlValveDiameter unit="mm"/>
+		<compressorStationTargetFlowLimits unit="1000m_cube_per_hour"/>
+		<compressorStationTargetMinPressureInLimits unit="barg"/>
+		<compressorStationTargetMaxPressureOutLimits unit="barg"/>
+		<compressorStationDiameter unit="mm"/>
+		<networkFlowLimits unit="1000m_cube_per_hour"/>
+		<networkVelocityLimits unit="m_per_s"/>
 	</units>
 	<nodes>
 		<innode id="M3183349669" alias="N23_1" x="337" y="676" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
@@ -60,10 +78,6 @@
 			<height value="0.0"/>
 			<pressureLimits lower="0" upper="104"/>
 		</innode>
-		<innode id="M420970524" alias="N22" x="-127" y="658" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
-			<height value="0.0"/>
-			<pressureLimits lower="0" upper="104"/>
-		</innode>
 		<innode id="M2968417131" alias="EH" x="590" y="191" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
 			<pressureLimits lower="0" upper="104"/>
@@ -86,19 +100,19 @@
 		</innode>
 		<innode id="M990826768" behaviour="" alias="EH_aux2" x="1256" y="-550" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="85.00"/>
+			<pressureLimits lower="0" upper="83.00"/>
 		</innode>
 		<innode id="M571859025" behaviour="" alias="EH_aux3" x="1478" y="-797" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="85.00"/>
+			<pressureLimits lower="0" upper="83.00"/>
 		</innode>
 		<innode id="M1256248232" behaviour="" alias="EH_HDin1" x="1231" y="-1019" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="85.00"/>
+			<pressureLimits lower="0" upper="83.00"/>
 		</innode>
 		<innode id="M1640857707" behaviour="" alias="EH_HDin2" x="984" y="-1241" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="85.00"/>
+			<pressureLimits lower="0" upper="83.00"/>
 		</innode>
 		<innode id="M3870610669" alias="EN" x="-649" y="168" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
@@ -122,19 +136,19 @@
 		</innode>
 		<innode id="M1491002410" behaviour="" alias="EN_aux2" x="-1573" y="-651" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="71.00"/>
+			<pressureLimits lower="0" upper="70.00"/>
 		</innode>
 		<innode id="M1103484267" behaviour="" alias="EN_aux3" x="-1881" y="-924" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="71.00"/>
+			<pressureLimits lower="0" upper="70.00"/>
 		</innode>
 		<innode id="M2358237743" behaviour="" alias="EN_HDin1" x="-2154" y="-616" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="71.00"/>
+			<pressureLimits lower="0" upper="70.00"/>
 		</innode>
 		<innode id="M2812447212" behaviour="" alias="EN_HDin2" x="-2427" y="-308" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="71.00"/>
+			<pressureLimits lower="0" upper="70.00"/>
 		</innode>
 		<innode id="M3265523266" alias="N26_aux" x="54.5" y="1173" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0"/>
@@ -148,35 +162,39 @@
 			<height value="0.0"/>
 			<pressureLimits lower="0" upper="104"/>
 		</innode>
+		<innode id="M420970524" alias="N22" x="-127" y="658" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="104"/>
+		</innode>
 		<boundaryNode behaviour="exit" id="M4064994510" alias="XN" x="-764" y="1897" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
 			<pressureLimits lower="55.00" upper="72.00"/>
-			<inflowLimits lower="-690" upper="-710"/>
+			<inflowLimits lower="-710" upper="-690"/>
 		</boundaryNode>
 		<boundaryNode behaviour="exit" id="M2752529224" alias="XH" x="1046" y="1884" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
 			<pressureLimits lower="66.00" upper="85.00"/>
-			<inflowLimits lower="-790" upper="-810"/>
+			<inflowLimits lower="-810" upper="-790"/>
 		</boundaryNode>
 		<boundaryNode id="M1514605383" behaviour="entry" alias="EH_ND" x="293" y="-969" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
-			<height value="0.0"/>
-			<pressureLimits lower="0" upper="85.00"/>
-			<inflowLimits lower="0" upper="100"/>
-		</boundaryNode>
-		<boundaryNode id="M1590327285" behaviour="entry" alias="EH_HD" x="737" y="-1463" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
 			<pressureLimits lower="0" upper="83.00"/>
 			<inflowLimits lower="0" upper="1600"/>
 		</boundaryNode>
-		<boundaryNode id="M3574071015" behaviour="entry" alias="EN_ND" x="-2084" y="546" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+		<boundaryNode id="M1590327285" behaviour="entry" alias="EH_HD" x="737" y="-1463" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
-			<pressureLimits lower="0" upper="71.00"/>
+			<pressureLimits lower="0" upper="85.00"/>
 			<inflowLimits lower="0" upper="100"/>
 		</boundaryNode>
-		<boundaryNode id="M3515515477" behaviour="entry" alias="EN_HD" x="-2700" y="0" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+		<boundaryNode id="M3574071015" behaviour="entry" alias="EN_ND" x="-2084" y="546" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
 			<height value="0.0"/>
 			<pressureLimits lower="0" upper="70.00"/>
 			<inflowLimits lower="0" upper="1600"/>
+		</boundaryNode>
+		<boundaryNode id="M3515515477" behaviour="entry" alias="EN_HD" x="-2700" y="0" geoWGS84Long="7.0055" geoWGS84Lat="51.4685">
+			<height value="0.0"/>
+			<pressureLimits lower="0" upper="71.00"/>
+			<inflowLimits lower="0" upper="100"/>
 		</boundaryNode>
 	</nodes>
 	<connections>
@@ -264,8 +282,8 @@
 			<roughness value="0.012"/>
 		</pipe>
 		<pipe id="M4293928023" alias="EH_NDin1^EH_aux1" to="M270762707" from="M2629382325">
-			<length value="1"/>
-			<diameter value="300"/>
+			<length value="10"/>
+			<diameter value="2000"/>
 			<roughness value="0.012"/>
 		</pipe>
 		<pipe id="M1778821370" alias="EH_ND^EH_NDin2" to="M3079955318" from="M1514605383">
@@ -304,8 +322,8 @@
 			<roughness value="0.012"/>
 		</pipe>
 		<pipe id="M1779319860" alias="EN_NDin1^EN_aux1" to="M1945352169" from="M1523988786">
-			<length value="1"/>
-			<diameter value="300"/>
+			<length value="10"/>
+			<diameter value="2000"/>
 			<roughness value="0.012"/>
 		</pipe>
 		<pipe id="M2235239706" alias="EN_ND^EN_NDin2" to="M1912302321" from="M3574071015">

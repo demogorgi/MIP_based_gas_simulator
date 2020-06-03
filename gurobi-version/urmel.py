@@ -62,7 +62,9 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
             sc.var_pipe_Qo_in_old[pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
             sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
             sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
+        ###############
         ### the following can be is used to generate a new initial state. Ugly: It is written in every iteration.
+        ###############
         new_init_scenario = "import gurobipy as gp\nfrom gurobipy import GRB\n"
         if False:
             new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)

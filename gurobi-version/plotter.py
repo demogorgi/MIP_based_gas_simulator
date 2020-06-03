@@ -3,6 +3,7 @@ from urmel import *
 def plot(_step, agent_decisions, compressors, output):
     for k in compressors:
         cs = compressors[k]
+        compressor = agent_decisions["compressor"]["CS"][k] 
         _from, _to = k.split("^")
         gas = agent_decisions["gas"]["CS"][k]
         L_min_pi = cs["L_min_pi"]
@@ -178,6 +179,7 @@ def plot(_step, agent_decisions, compressors, output):
 # add interception point
 "set label at %f, %f '' point pointtype 7 pointsize 1" % (
   phi_new(
+      compressor,
       phi_min,
       phi_max,
       pi_1,
@@ -193,7 +195,7 @@ def plot(_step, agent_decisions, compressors, output):
       p_old(_from),
       p_old(_to)
       ),
-  0 if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(_from),p_old(_to)) == 0 else p_old(_to) / p_old(_from)
+  0 if phi_new(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(_from),p_old(_to)) == 0 else p_old(_to) / p_old(_from)
   ),
   #if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(l),p_old(r)) == 0:
   #    0

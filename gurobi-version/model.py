@@ -224,7 +224,7 @@ def simulate(agent_decisions,compressors,dt):
     m.addConstrs((var_non_pipe_Qo[cs] >= 0 for cs in co.compressors), name='compressor_eq_one')
     #
     #subto compressor_eq_two: forall <l,r> in CS:
-    m.addConstrs((var_non_pipe_Qo[cs] == agent_decisions["compressor"]["CS"][joiner(cs)] * 3.6 * p_old(cs[0]) * phi_new(compressors[joiner(cs)]["phi_min"],compressors[joiner(cs)]["phi_max"],compressors[joiner(cs)]["pi_1"],compressors[joiner(cs)]["pi_2"],compressors[joiner(cs)]["L_min_pi"],compressors[joiner(cs)]["L_max_pi"],compressors[joiner(cs)]["L_min_phi"],compressors[joiner(cs)]["p_i_min"],compressors[joiner(cs)]["p_i_max"],compressors[joiner(cs)]["L_max_pi"],compressors[joiner(cs)]["eta"],agent_decisions["gas"]["CS"][joiner(cs)],p_old(cs[0]),p_old(cs[1])) for cs in co.compressors), name='compressor_eq_two')
+    m.addConstrs((var_non_pipe_Qo[cs] == compressor_DA[cs] * 3.6 * p_old(cs[0]) * phi_new(compressor_DA[cs],compressors[joiner(cs)]["phi_min"],compressors[joiner(cs)]["phi_max"],compressors[joiner(cs)]["pi_1"],compressors[joiner(cs)]["pi_2"],compressors[joiner(cs)]["L_min_pi"],compressors[joiner(cs)]["L_max_pi"],compressors[joiner(cs)]["L_min_phi"],compressors[joiner(cs)]["p_i_min"],compressors[joiner(cs)]["p_i_max"],compressors[joiner(cs)]["L_max_pi"],compressors[joiner(cs)]["eta"],agent_decisions["gas"]["CS"][joiner(cs)],p_old(cs[0]),p_old(cs[1])) for cs in co.compressors), name='compressor_eq_two')
     #
     #### Entrymodellierung ###
     #subto entry_flow_model:

@@ -112,15 +112,15 @@ def intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,L_eta,gas,p_in,p_out):
     p_i_min * p_out))/(L_min_pi * p_in * (-p_i_max + p_i_min))
 
 # is the pi doable with the compressor?
-def doable_pi(phi,phimin,phimax,p_in,p_out,pi1,pi2):
-    if ulim(phi,phimax,pi1,pi2) >= p_out/p_in:
+def doable_pi(compressor,phi,phimin,phimax,p_in,p_out,pi1,pi2):
+    if compressor == 1 and ulim(phi,phimax,pi1,pi2) >= p_out/p_in:
         return True
     else:
         return False
 
 # Berechnung des neuen phi.
-def phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
-    if doable_pi(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min,phi_max,p_in,p_out,pi_1,pi_2) == True:
+def phi_new(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
+    if doable_pi(compressor,intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min,phi_max,p_in,p_out,pi_1,pi_2) == True:
         return min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min),phi_max)
     else:
         return 0

@@ -2,8 +2,8 @@
 
 class CFG(object):
 
-    dispatcher = 1 #Dispatcher agent
-    trader = -1 #Trader agent
+    dispatcher_agent = 1 #Dispatcher agent
+    trader_agent = -1 #Trader agent
 
     model_dir = "./ai_part/models/" #Directory to save models
     load_model = True #Flag value for loading a saved model
@@ -32,9 +32,3 @@ class CFG(object):
     num_evaluation_plays = 10 # Number of evaluation plays
 
     zeta_upper = 10000 #INFINITY for drag factor for RE
-
-    pressure_ub = 105.01325
-    pressure_lb = 1.01325
-
-    pressure_lb_XH = 56.01325
-    pressure_lb_XN = 46.01325

@@ -2,6 +2,8 @@ import importlib
 import sys
 import re
 import numpy as np
+import random
+
 from .configs import *
 
 wd = sys.argv[1].replace("/",".")
@@ -12,7 +14,10 @@ no = importlib.import_module(wd + ".nodes") #Nodes of the network(entry + exit +
 original_nodes = []
 for n in no.nodes:
     if '_aux' not in n:
-        original_nodes.append(n)
+        if '_HD' not in n:
+            if '_ND' not in n:
+                original_nodes.append(n)
+
 pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
 
@@ -21,7 +26,7 @@ def extract_from_solution(solution):
     da_dec = {}
 
     for k, v in solution.items():
-        if not re.search('_aux', k):
+        if not re.search('_aux|_HD|_ND', k):
             if k.startswith('var_node_p'):
                 res = re.sub('var_node_p\[(\S*)]', r'\1', k)
                 pr[res] = round(v, 2)
@@ -34,20 +39,22 @@ def extract_from_solution(solution):
             trader_dec[k] = v
 
     da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
+    ta_dec = normalize_trader_dec(trader_dec.copy())
     pressures = normalize_pressure(pr.copy())
 
     for k, v in da_dec.items(): #Dispatcher decision
         state_[k] = [v]
-    for value in original_nodes: # Pressure values
+    for k, v in ta_dec.items(): #Trader decision
+        state_[k] = [v]
+
+    for value in original_nodes:
         #state_[value] = [pr[value], flow[value]]
-        state_[value] = [pressures[value]]
+        state_[value] = [pressures[value]] # Pressure values
 
     for key, value in state_.items():
         state.append(value)
 
-    #state = normalize_state(np.array(state), 0, 1)
     state =  np.array(state)
-    
 
     return state
 
@@ -59,24 +66,22 @@ def normalize_dispatcher_dec(decisions):
 
 def normalize_pressure(pressure_dict):
     for label, value in pressure_dict.items():
-        if re.search('XN', label):
-            pressure_dict[label] = (value - CFG.pressure_lb_XN) / (CFG.pressure_ub - CFG.pressure_lb_XN)
-        elif re.search('XH', label):
-            pressure_dict[label] = (value - CFG.pressure_lb_XH) / (CFG.pressure_ub - CFG.pressure_lb_XH)
-        else:
-            pressure_dict[label] = (value - CFG.pressure_lb) / (CFG.pressure_ub - CFG.pressure_lb)
-
+        pressure_dict[label] = (value - no.pressure_limits_lower[label])/(no.pressure_limits_upper[label] - no.pressure_limits_lower[label])
     return pressure_dict
 
-# def normalize_state(array, low, high): #Normalize the values to [0,1]
-#     minimum = min(array)
-#     maximum = max(array)
-#
-#     diff = maximum - minimum
-#     diffScale = high - low
-#
-#     return map ( lambda x: [float((x - minimum)*(float(diffScale)/diff)+low)], array)
-
+def normalize_trader_dec(decisions):
+    norm = lambda value, lb, ub: (value - lb)/(ub - lb)
+    for label, value in decisions.items():
+        key = re.sub('nom\S*_TA\[(\S*)]', r'\1', label)
+        if re.search('XH', key):
+            decisions[label] = norm(value, no.q_lb['XH'], no.q_ub['XH'])
+        elif re.search('XN', key):
+            decisions[label] = norm(value, no.q_lb['XN'], no.q_ub['XN'])
+        elif re.search('EH', key):
+            decisions[label] = norm(value, no.q_lb['EH'], no.q_ub['EH'])
+        elif re.search('EN', key):
+            decisions[label] = norm(value, no.q_lb['EN'], no.q_ub['EN'])
+    return decisions
 
 def find_penalty(solution):
 
@@ -87,13 +92,12 @@ def find_penalty(solution):
     for k, v in solution.items():
         if re.search('(ub|lb)_pressure_violation_DA', k):
             key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
-            if not re.search('_aux', key): pr_violations += max(0,v)
+            if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
 
         if re.search('slack_DA', k):
             flow_violations += abs(v)
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
-
 
     dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
     trader_penalty = int(0.2*trader_violations)

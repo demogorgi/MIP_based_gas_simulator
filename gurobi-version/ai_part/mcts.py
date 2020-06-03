@@ -1,9 +1,5 @@
 import math
-from .configs import CFG
-
-import numpy as np
 from copy import deepcopy
-import random
 
 from .sol2state import *
 
@@ -97,7 +93,7 @@ class MCTS(object):
 
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
-
+    
             possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
@@ -149,7 +145,7 @@ class MCTS(object):
         for idx, decision in enumerate(possible_decisions):
             x = []
             for i in range(len(decision)):
-                if old_DA[i] != decision[i]:
+                if old_DA[i] == decision[i]:
                     x.append(i)
             indices.append(x)
         psa_vector = []

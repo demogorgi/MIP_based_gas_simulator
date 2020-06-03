@@ -1,15 +1,9 @@
 
-import sys
-
 import tensorflow as tf
-import numpy as np
-import re
-import random
 import itertools
 
 from copy import deepcopy
 
-from .configs import *
 from .sol2state import *
 from urmel import *
 
@@ -27,9 +21,11 @@ class Gas_Network(object):
 
         self.cols = 1 #Decision values + pressures ,2 #Pressure and flow of nodes
         self.row = len(self.state)
-        self.current_agent = CFG.dispatcher
+        self.current_agent = CFG.dispatcher_agent
         self.action_size = self.row * self.cols
         self.agent_decisions = dispatcher_dec #{**dispatcher_dec, **trader_dec}
+        #self.trader_dec = trader_dec
+
 
     def clone(self):
 
@@ -40,32 +36,33 @@ class Gas_Network(object):
 
     #Function to get possible dispatcher decisions
     def dispatcher_decisions(self, old_decisions):
-        valid_dispatcher_decisions = []
+
+        da_decisions = {}
+        #valid_da_decisions = []
 
         val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                valid_dispatcher_decisions.append((l, val(v)))
+                #va = val(v)
+                da_decisions[l] = val(v)
             elif re.match('zeta', l):
                 zeta = random.randint(0, CFG.zeta_upper) #[0, 10000]
-
                 #zeta = random.randrange(0, 10000) #[0, INFINITY)
                 #zeta = v
-                valid_dispatcher_decisions.append((l, zeta))
+                da_decisions[l] = zeta
             elif re.match('gas', l):
-                gas_label = l
                 gas = round(random.uniform(0.0, 1.0), 2)
+                da_decisions[l] = gas
             elif re.match('compressor', l):
-                compressor_label = l
-                compressor = val(v)
+                da_decisions[l] = val(v)
 
-        if compressor == 0: #If compressor is closed, gas value should be 0
-            gas = 0
-
-        valid_dispatcher_decisions.append((gas_label, gas))
-        valid_dispatcher_decisions.append((compressor_label, compressor))
+        for k, v in da_decisions.items():
+            if re.search('compressor', k): #re.sub() TODO
+                if v == 0:
+                    da_decisions['gas_DA[N22,N23]'] = 0
+        valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
 
         #Find all possible subsets of possible dispatcher decisions
         list_valid_decisions = []
@@ -76,13 +73,13 @@ class Gas_Network(object):
 
         return valid_decisions
 
-    def generate_decision_dict(self, actions): #Generate new agent_decision dictionary
+    def generate_decision_dict(self, dispatcher_actions): #Generate new agent_decision dictionary
 
         decisions = self.decisions_dict
-        actions = self.decision_to_dict(actions)
+        dispatcher_actions= self.decision_to_dict(dispatcher_actions)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
-        for key, value in actions.items():
+        for key, value in dispatcher_actions.items():
 
             if re.search('va', key):
                 decisions['va']['VA'][result(key)] = value
@@ -92,6 +89,7 @@ class Gas_Network(object):
                 decisions['gas']['CS'][result(key)] = value
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)] = value
+
         return decisions
 
     #Get a list of decisions [va, zeta, gas, compressor]
@@ -113,26 +111,28 @@ class Gas_Network(object):
                     dec[2] = d[i][1]
                 if re.search('compressor', d[i][0]):
                     dec[3] = d[i][1]
+                if dec[3] == 0: dec[2] = 0
             list_d.append(dec)
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
-    def decision_to_dict(self, action):
+    def decision_to_dict(self, da_action):
         i = 0
+
         for k, v in dispatcher_dec.items():
-            dispatcher_dec[k] = action[i]
+            dispatcher_dec[k] = da_action[i]
             i += 1
-        return dispatcher_dec
+            return dispatcher_dec
 
 
-    def take_action(self, action):
+    def take_action(self, da_action):
 
-        Gas_Network.decisions_dict = self.generate_decision_dict(action)
+        Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
         solution = simulator_step(self.config, self.decisions_dict, self.compressors, 0, self.dt)
-
         if solution:
             self.state = extract_from_solution(solution)
             Gas_Network.penalty = find_penalty(solution)
+
 
     def get_reward(self):
 
@@ -143,6 +143,8 @@ class Gas_Network(object):
             return True, 1
         elif penalty[0] > penalty[1]: #Trader won
             return True, -1
+        elif penalty[0] == 0 and penalty[1] == 0:
+            return True, 1
         else:
             return True, 0 #Draw
         #return False, 0

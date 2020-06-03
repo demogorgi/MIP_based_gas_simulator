@@ -21,21 +21,21 @@ config = {
     # write problem files in the lp-format?
     "write_lp": False,
     # write solution files in the sol-format?
-    "write_sol": True,
+    "write_sol": False,
     # write irreducible infeasibility set if problem is infeasible?
-    "write_ilp": True,
+    "write_ilp": False,
     # write wheel maps with gnuplot?
     "gnuplot": True,
     # console output?
-    "urmel_console_output": True,
+    "urmel_console_output": False,
     # gurobi logfile
     "grb_logfile": "gurobi.log",
     # gurobi console output
-    "grb_console": True,
+    "grb_console": False,
     # contour output (net- and state-files in contour folder)
-    "contour_output": True,
+    "contour_output": False,
     # is the ai-part active?
-    "ai" : False
+    "ai" : True
 }
 
 # read manual file with configs

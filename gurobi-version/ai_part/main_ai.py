@@ -2,11 +2,14 @@ from .sol2state import *
 from .gas_network import Gas_Network
 from .neural_network_architecture import NeuralNetworkWrapper
 from .train import Train
+
 import os
 import csv
 
+numSteps  = int(sys.argv[2])
+dt = int(sys.argv[3])
 
-def get_decisions_from_ai(solution, agent_decisions, config, compressors, dt):
+def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
 
     Gas_Network.decisions_dict = agent_decisions
     Gas_Network.config = config

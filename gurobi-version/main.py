@@ -82,13 +82,13 @@ for i in range(numSteps):
     if config["ai"]:
         #Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
-        ### would that be an opportunity to prescribe trader decisions?
-        ###if i < 20:
-        ###   agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1500]
-        ###   agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [0]
-        ###else:
-        ###   agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
-        ###   agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
+        # would that be an opportunity to prescribe trader decisions?
+        if i < 15:
+           agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1500]
+           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [0]
+        else:
+           agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
+           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
     else:
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##

@@ -15,6 +15,7 @@ class Gas_Network(object):
     config = None
     compressors = None
     dt = 0
+    numSteps = 1
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
 
     def __init__(self):
@@ -45,12 +46,9 @@ class Gas_Network(object):
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                #va = val(v)
                 da_decisions[l] = val(v)
             elif re.match('zeta', l):
-                zeta = random.randint(0, CFG.zeta_upper) #[0, 10000]
-                #zeta = random.randrange(0, 10000) #[0, INFINITY)
-                #zeta = v
+                zeta = random.randint(0, CFG.zeta_upper) #[0, 10000] [0, INFINITY)
                 da_decisions[l] = zeta
             elif re.match('gas', l):
                 gas = round(random.uniform(0.0, 1.0), 2)
@@ -112,7 +110,10 @@ class Gas_Network(object):
                 if re.search('compressor', d[i][0]):
                     dec[3] = d[i][1]
                 if dec[3] == 0: dec[2] = 0
+            if dec in list_d:
+                continue
             list_d.append(dec)
+        #print(list_d)
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -128,11 +129,13 @@ class Gas_Network(object):
     def take_action(self, da_action):
 
         Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
-        solution = simulator_step(self.config, self.decisions_dict, self.compressors, 0, self.dt)
-        if solution:
-            self.state = extract_from_solution(solution)
-            Gas_Network.penalty = find_penalty(solution)
+        #print(da_action)
 
+        for i in range(self.numSteps):
+            solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt)
+
+            #self.state = extract_from_solution(solution)
+            Gas_Network.penalty = find_penalty(solution)
 
     def get_reward(self):
 

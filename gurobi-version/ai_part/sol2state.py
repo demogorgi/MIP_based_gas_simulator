@@ -22,9 +22,11 @@ pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
 
 def extract_from_solution(solution):
+    #global pr, dispatcher_dec, trader_dec
     state = []
     da_dec = {}
 
+#    if solution:
     for k, v in solution.items():
         if not re.search('_aux|_HD|_ND', k):
             if k.startswith('var_node_p'):
@@ -37,6 +39,10 @@ def extract_from_solution(solution):
             dispatcher_dec[k] = v
         if re.search('nom_TA',k):
             trader_dec[k] = v
+    # else:
+    #     pr = pr
+    #     dispatcher_dec = dispatcher_dec
+    #     trader_dec = trader_dec
 
     da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
     ta_dec = normalize_trader_dec(trader_dec.copy())
@@ -88,18 +94,21 @@ def find_penalty(solution):
     pr_violations = 0 #Dispatcher pressure bound violations
     flow_violations  = 0 #Dispatcher flow bound violations
     trader_violations = 0 #Trader nomination violation
+    if solution:
+        for k, v in solution.items():
+            if re.search('(ub|lb)_pressure_violation_DA', k):
+                key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
+                if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
 
-    for k, v in solution.items():
-        if re.search('(ub|lb)_pressure_violation_DA', k):
-            key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
-            if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
+            if re.search('slack_DA', k):
+                flow_violations += abs(v)
+            if re.search('scenario_balance_TA', k):
+                trader_violations += abs(v)
 
-        if re.search('slack_DA', k):
-            flow_violations += abs(v)
-        if re.search('scenario_balance_TA', k):
-            trader_violations += abs(v)
-
-    dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
-    trader_penalty = int(0.2*trader_violations)
+        dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
+        trader_penalty = int(0.2*trader_violations)
+    else:
+        dispatcher_penalty = 10
+        trader_penalty = 0
 
     return [dispatcher_penalty, trader_penalty]

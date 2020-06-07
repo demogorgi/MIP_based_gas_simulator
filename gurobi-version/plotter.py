@@ -218,7 +218,7 @@ def plot(_step, agent_decisions, compressors, output):
 #),
 
 # FINILIZE
-"set output '%s/CS_%s_%s_%s.pdf'" % (output, _from, _to, _step),
+"set output '%s/CS_%s_%s%s.pdf'" % (output, _from, _to, _step),
 "replot; \""
         ])
 

@@ -36,12 +36,10 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
     # get the model status
     status = m.status
     # generate often used strings
-    _step = str(step).rjust(5, "0")
+    _step = "_" + str(step).rjust(5, "0")
     if config["ai"]:
-        _nr_calls = "_" + str(nr_calls).rjust(5, "0")
-    else:
-        _nr_calls = ""
-    step_files_path = "".join([output, "/", config["name"], "_", _step, _nr_calls]).replace("\\", "/")
+        _step += "_" + str(nr_calls).rjust(5, "0")
+    step_files_path = "".join([output, "/", config["name"], _step]).replace("\\", "/")
     # if solved to optimallity
     print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2

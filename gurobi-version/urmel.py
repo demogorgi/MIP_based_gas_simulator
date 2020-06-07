@@ -24,6 +24,8 @@ if not os.path.exists(output):
     os.makedirs(output)
 
 def simulator_step(config, agent_decisions, compressors, step, dt):
+    simulator_step.counter += 1
+    nr_calls = simulator_step.counter
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)
     # control output
@@ -35,7 +37,11 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
     status = m.status
     # generate often used strings
     _step = str(step).rjust(5, "0")
-    step_files_path = "".join([output, "/", config["name"], "_", _step]).replace("\\", "/")
+    if config["ai"]:
+        _nr_calls = "_" + str(nr_calls).rjust(5, "0")
+    else:
+        _nr_calls = ""
+    step_files_path = "".join([output, "/", config["name"], "_", _step, _nr_calls]).replace("\\", "/")
     # if solved to optimallity
     print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2

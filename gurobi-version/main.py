@@ -69,6 +69,7 @@ with open(path.join(data_path, 'output/decisions_file.csv'), 'w+', newline='') a
     thewriter.writeheader()
 
 
+simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
     # for every i in numSteps a simulator step is performed.

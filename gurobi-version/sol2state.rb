@@ -166,7 +166,7 @@ Barg2Bar = 1.01325
 
 def sol2state(scenarioPath,contourInput,solFile,stateTemplate,timestamp)
 
-	i = File.basename(solFile).scan(/(\d+)/).join('')
+	i = File.basename(solFile).scan(/(\d+)/).join("_")
 	stateFile = File.join(contourInput, "state_#{i}.xml")
 	FileUtils.cp(stateTemplate, stateFile)
 

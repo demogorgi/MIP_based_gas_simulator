@@ -25,6 +25,7 @@ if not os.path.exists(output):
 
 def simulator_step(config, agent_decisions, compressors, step, dt):
     simulator_step.counter += 1
+    print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     nr_calls = simulator_step.counter
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)
@@ -41,7 +42,8 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         _step += "_" + str(nr_calls).rjust(5, "0")
     step_files_path = "".join([output, "/", config["name"], _step]).replace("\\", "/")
     # if solved to optimallity
-    print ("model status: ", status)
+    if config['urmel_console_output']:
+        print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2
         # plot data with gnuplot
         if config['gnuplot']: os.system(plot(_step, agent_decisions, compressors, output))
@@ -53,7 +55,6 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
             sol[v.varName] = v.x
             if config['urmel_console_output']:
                 print('%s %g' % (v.varName, v.x))
-        #print(sol)
         # set old to old_old and current value to old for flows and pressures
         for node in no.nodes:
             sc.var_node_p_old_old[node] = sc.var_node_p_old[node]

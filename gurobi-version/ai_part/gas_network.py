@@ -60,6 +60,9 @@ class Gas_Network(object):
             if re.search('compressor', k): #re.sub() TODO
                 if v == 0:
                     da_decisions['gas_DA[N22,N23]'] = 0
+            if re.search('valve', k):
+                if v == 0:
+                    da_decisions['compressor_DA[N23,N23_1]'] = 0
         valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
 
         #Find all possible subsets of possible dispatcher decisions
@@ -110,7 +113,8 @@ class Gas_Network(object):
                 if re.search('compressor', d[i][0]):
                     dec[3] = d[i][1]
                 if dec[3] == 0: dec[2] = 0
-            if dec in list_d:
+
+            if (dec in list_d) or (dec[3] == 1 and dec[0] == 0):
                 continue
             list_d.append(dec)
         #print(list_d)

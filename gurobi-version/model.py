@@ -29,7 +29,7 @@ def simulate(agent_decisions,compressors,dt):
     
     ## Node variables
     # pressure for every node
-    var_node_p = m.addVars(no.nodes, lb=1.01325, ub=151.01325, name="var_node_p")
+    var_node_p = m.addVars(no.nodes, lb=1.01325, ub=501.01325, name="var_node_p")
     # flow slack variables for exits, with obj coefficient
     var_boundary_node_flow_slack_positive = m.addVars(no.exits, obj=1, name="var_boundary_node_flow_slack_positive");
     var_boundary_node_flow_slack_negative = m.addVars(no.exits, obj=1, name="var_boundary_node_flow_slack_negative");

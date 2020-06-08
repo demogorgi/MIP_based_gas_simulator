@@ -20,6 +20,8 @@ config = {
     "name": "urmel",
     # debug mode with more output
     "debug": False,
+    # write new initial state
+    "new_init_scenario": False,
     # write problem files in the lp-format?
     "write_lp": False,
     # write solution files in the sol-format?
@@ -98,7 +100,7 @@ for i in range(numSteps):
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ## -> todo: read from file here
         ##########################################################################################
-        #pass
+        pass
         #if i >= 50:
         #   agent_decisions["gas"]["CS"]["N22^N23"] = 0.2
         #if i >= 100:
@@ -117,13 +119,41 @@ for i in range(numSteps):
         #   agent_decisions["gas"]["CS"]["N22^N23"] = 0.9
         #if i >= 450:
         #   agent_decisions["gas"]["CS"]["N22^N23"] = 1.0
-        if i >= 10:
+        #
+        if i == 10:
            agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
            agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
            agent_decisions["gas"]["CS"]["N22^N23"] = 0
-           agent_decisions["va"]["VA"]["N22^N23_1"] = 0
            agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 100
+        if i == 20:
+           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0
+        #if i == 30:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 80
+        #if i == 40:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 70
+        #if i == 50:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 60
+        #if i == 60:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 50
+        #if i == 70:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 40
+        #if i == 80:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 30
+        #if i == 90:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 20
+        #if i == 100:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 10
+        #if i == 110:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1
+        #if i == 120:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.1
+        #if i == 130:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.01
+        #if i == 140:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.001
+        #if i == 150:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.0001
         ###################################################################################
 
     #Store each new (agent) decisions value from ai_part to csv

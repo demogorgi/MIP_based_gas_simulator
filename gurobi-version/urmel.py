@@ -71,7 +71,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt, process_type)
         ### the following can be is used to generate a new initial state. Ugly: It is written in every iteration.
         ###############
         new_init_scenario = "import gurobipy as gp\nfrom gurobipy import GRB\n"
-        if False:
+        if config["new_init_scenario"]:
             new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)
             new_init_scenario += "\nvar_node_p_old = " + str(sc.var_node_p_old)
             new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(sc.var_non_pipe_Qo_old_old)

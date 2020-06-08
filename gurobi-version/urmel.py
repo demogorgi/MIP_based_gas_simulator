@@ -23,7 +23,7 @@ if os.path.exists(output):
 if not os.path.exists(output):
     os.makedirs(output)
 
-def simulator_step(config, agent_decisions, compressors, step, dt):
+def simulator_step(config, agent_decisions, compressors, step, dt, process_type):
     simulator_step.counter += 1
     print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     nr_calls = simulator_step.counter
@@ -46,9 +46,9 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2
         # plot data with gnuplot
-        if config['gnuplot']: os.system(plot(_step, agent_decisions, compressors, output))
-        if config['write_lp']: m.write(step_files_path + ".lp")
-        if config['write_sol']: m.write(step_files_path + ".sol")
+        if config['gnuplot'] and ( process_type == "sim" or config["debug"] ): os.system(plot(_step, agent_decisions, compressors, output))
+        if config['write_lp'] and ( process_type == "sim" or config["debug"] ): m.write(step_files_path + ".lp")
+        if config['write_sol'] and ( process_type == "sim" or config["debug"] ): m.write(step_files_path + ".sol")
         # store solution in dictionary
         sol = {}
         for v in m.getVars():
@@ -87,7 +87,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt):
         return sol
     # if infeasible write IIS for analysis and debugging
     elif status == GRB.INFEASIBLE:
-        if config['write_ilp']:
+        if config['write_ilp'] and ( process_type == "sim" or config["debug"] ):
             if config['urmel_console_output']:
                 print("Model is infeasible. %s.ilp written." % config['name'])
             m.computeIIS()

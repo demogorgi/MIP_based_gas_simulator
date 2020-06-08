@@ -136,7 +136,7 @@ class Gas_Network(object):
         #print(da_action)
 
         for i in range(self.numSteps):
-            solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt)
+            solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt, "ai")
 
             #self.state = extract_from_solution(solution)
             Gas_Network.penalty = find_penalty(solution)

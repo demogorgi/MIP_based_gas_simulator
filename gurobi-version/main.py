@@ -18,6 +18,8 @@ dt        = int(sys.argv[3])
 config = {
     # prefix for output filenames
     "name": "urmel",
+    # debug mode with more output
+    "debug": False,
     # write problem files in the lp-format?
     "write_lp": False,
     # write solution files in the sol-format?
@@ -25,7 +27,7 @@ config = {
     # write irreducible infeasibility set if problem is infeasible?
     "write_ilp": False,
     # write wheel maps with gnuplot?
-    "gnuplot": True,
+    "gnuplot": False,
     # console output?
     "urmel_console_output": False,
     # gurobi logfile
@@ -78,12 +80,14 @@ for i in range(numSteps):
     # compressors (compressors.yml in scenario folder) specifies the compressors in the network under consideration.
     # i is the step number (neccessary for naming output files if any).
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
-    solution = simulator_step(config, agent_decisions, compressors, i, dt)
+    # If the last argument "porcess_type" is "sim" files (sol, lp, ... ) will be written if their option is set.
+    # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
+    solution = simulator_step(config, agent_decisions, compressors, i, dt, "sim")
 
     if config["ai"]:
-        #Generating new agent_decision for the next iteration from neural network as it learns to generate
+        # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
-        # would that be an opportunity to prescribe trader decisions?
+        # In the following part, decisions can be prescribed -> todo: read from file here
         if i < 10:
            agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1500]
            agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [0]
@@ -92,7 +96,7 @@ for i in range(numSteps):
            agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
     else:
         ##########################################################################################
-        ##  Getting manually set agent decisions directly from the following code (dirty hack)  ##
+        ##  Getting manually set agent decisions directly from the following code (dirty hack)  ## -> todo: read from file here
         ##########################################################################################
         #pass
         #if i >= 50:

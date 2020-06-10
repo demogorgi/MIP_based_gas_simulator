@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 
-from .sol2state import *
+from .sol2statepenalty import *
 
 class TreeNode(object):
     #Class represents a state (of network) and stores statistics for action(decision) at the state
@@ -89,11 +89,11 @@ class MCTS(object):
                 node = node.select_child()
                 gas_network.take_action(node.action)
 
-            prob_vector, v = self.net.predict(gas_network.state)
+            prob_vector, v = self.net.policy_value(gas_network.state)
 
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
-    
+
             possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
@@ -105,7 +105,7 @@ class MCTS(object):
 
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector)
 
-            iteration_over, wsa = gas_network.get_reward()
+            iteration_over, wsa = gas_network.get_reward(gas_network.penalty)
 
             while node is not None:
                 wsa = -wsa

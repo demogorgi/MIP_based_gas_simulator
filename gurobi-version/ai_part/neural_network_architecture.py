@@ -8,7 +8,7 @@ class NeuralNetwork(object):
 
     def __init__(self, gas_network):
         self.row = gas_network.row
-        self.cols = gas_network.cols
+        self.cols = 1
         self.action_size = gas_network.action_size
         self.pi = None
         self.v = None
@@ -144,7 +144,7 @@ class NeuralNetworkWrapper(object):
         self.net = NeuralNetwork(self.gas_network)
         self.sess = self.net.sess
 
-    def predict(self, state):
+    def policy_value(self, state):
 
         state = state[np.newaxis, :, :]
 

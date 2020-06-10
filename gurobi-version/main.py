@@ -91,11 +91,11 @@ for i in range(numSteps):
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
         # In the following part, decisions can be prescribed -> todo: read from file here
         if i < 10:
-           agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1500]
+           agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1100]
            agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [0]
         else:
            agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
-           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
+           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1100]
     else:
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ## -> todo: read from file here
@@ -122,38 +122,54 @@ for i in range(numSteps):
         #
         if i == 10:
            agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
-           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1500]
+           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1100]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
            agent_decisions["gas"]["CS"]["N22^N23"] = 0
-           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 100
-        if i == 20:
-           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0
-        #if i == 30:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 80
+           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 10000
+        if i == 30:
+           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 200
         #if i == 40:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 70
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 580
         #if i == 50:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 60
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 560
         #if i == 60:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 50
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 540
         #if i == 70:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 40
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 520
         #if i == 80:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 30
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 500
         #if i == 90:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 20
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 450
         #if i == 100:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 10
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 400
         #if i == 110:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 350
         #if i == 120:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.1
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 300
         #if i == 130:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.01
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 280
         #if i == 140:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.001
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 260
         #if i == 150:
-        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.0001
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 240
+        #if i == 160:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 200
+        #if i == 170:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 175
+        #if i == 180:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 150
+        #if i == 190:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 100
+        #if i == 190:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 6
+        #if i == 200:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 4
+        #if i == 210:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 2
+        #if i == 220:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 1
+        #if i == 220:
+        #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 0.1
         ###################################################################################
 
     #Store each new (agent) decisions value from ai_part to csv

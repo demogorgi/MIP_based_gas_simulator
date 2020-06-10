@@ -68,21 +68,22 @@ def simulator_step(config, agent_decisions, compressors, step, dt, process_type)
             sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
             sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
         ###############
-        ### the following can be is used to generate a new initial state. Ugly: It is written in every iteration.
+        ### the following can be is used to generate a new initial state.
         ###############
-        new_init_scenario = "import gurobipy as gp\nfrom gurobipy import GRB\n"
-        if config["new_init_scenario"]:
-            new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)
-            new_init_scenario += "\nvar_node_p_old = " + str(sc.var_node_p_old)
-            new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(sc.var_non_pipe_Qo_old_old)
-            new_init_scenario += "\nvar_non_pipe_Qo_old = " + str(sc.var_non_pipe_Qo_old)
-            new_init_scenario += "\nvar_pipe_Qo_in_old_old = " + str(sc.var_pipe_Qo_in_old_old)
-            new_init_scenario += "\nvar_pipe_Qo_in_old = " + str(sc.var_pipe_Qo_in_old)
-            new_init_scenario += "\nvar_pipe_Qo_out_old_old = " + str(sc.var_pipe_Qo_out_old_old)
-            new_init_scenario += "\nvar_pipe_Qo_out_old = " + str(sc.var_pipe_Qo_out_old)
-            f = open(path.join(sys.argv[1],'new_init_scenario.py'), "w")
-            f.write(new_init_scenario)
-            f.close()
+        if config["new_init_scenario"] and step == int(sys.argv[2]) - 1:
+            new_init_scenario = "import gurobipy as gp\nfrom gurobipy import GRB\n"
+            if config["new_init_scenario"]:
+                new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)
+                new_init_scenario += "\nvar_node_p_old = " + str(sc.var_node_p_old)
+                new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(sc.var_non_pipe_Qo_old_old)
+                new_init_scenario += "\nvar_non_pipe_Qo_old = " + str(sc.var_non_pipe_Qo_old)
+                new_init_scenario += "\nvar_pipe_Qo_in_old_old = " + str(sc.var_pipe_Qo_in_old_old)
+                new_init_scenario += "\nvar_pipe_Qo_in_old = " + str(sc.var_pipe_Qo_in_old)
+                new_init_scenario += "\nvar_pipe_Qo_out_old_old = " + str(sc.var_pipe_Qo_out_old_old)
+                new_init_scenario += "\nvar_pipe_Qo_out_old = " + str(sc.var_pipe_Qo_out_old)
+                f = open(path.join(sys.argv[1],'new_init_scenario.py'), "w")
+                f.write(new_init_scenario)
+                f.close()
         #########################################################################################################
         return sol
     # if infeasible write IIS for analysis and debugging

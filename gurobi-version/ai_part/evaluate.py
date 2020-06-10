@@ -23,12 +23,12 @@ class Evaluate(object):
 
             while not iteration_over:
 
-                best_child = self.eval_mcts.search(gas_network, node, CFG.temp_final)
+                best_child = self.eval_mcts.search(gas_network, node, CFG.temperature)
 
                 action = best_child.action
                 gas_network.take_action(action)
 
-                iteration_over, value = gas_network.get_reward()
+                iteration_over, value = gas_network.get_reward(gas_network.penalty)
 
                 best_child.parent = None
                 node = best_child
@@ -41,4 +41,11 @@ class Evaluate(object):
                 print("Draw")
             print("\n")
 
-        return wins, losses
+        num_games = wins + losses
+        if num_games == 0:
+            win_ratio = 0
+        else:
+            win_ratio = wins / num_games
+
+
+        return win_ratio

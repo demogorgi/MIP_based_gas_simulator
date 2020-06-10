@@ -4,7 +4,7 @@ import itertools
 
 from copy import deepcopy
 
-from .sol2state import *
+from .sol2statepenalty import *
 from urmel import *
 
 class Gas_Network(object):
@@ -20,12 +20,10 @@ class Gas_Network(object):
 
     def __init__(self):
 
-        self.cols = 1 #Decision values + pressures ,2 #Pressure and flow of nodes
         self.row = len(self.state)
         self.current_agent = CFG.dispatcher_agent
-        self.action_size = self.row * self.cols
+        self.action_size = self.row
         self.agent_decisions = dispatcher_dec #{**dispatcher_dec, **trader_dec}
-        #self.trader_dec = trader_dec
 
 
     def clone(self):
@@ -39,7 +37,6 @@ class Gas_Network(object):
     def dispatcher_decisions(self, old_decisions):
 
         da_decisions = {}
-        #valid_da_decisions = []
 
         val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
@@ -59,7 +56,7 @@ class Gas_Network(object):
         for k, v in da_decisions.items():
             if re.search('compressor', k): #re.sub() TODO
                 if v == 0:
-                    da_decisions['gas_DA[N22,N23]'] = 0
+                    da_decisions['gas_DA[N22,N23]'] = 0.0
             if re.search('valve', k):
                 if v == 0:
                     da_decisions['compressor_DA[N23,N23_1]'] = 0
@@ -97,9 +94,8 @@ class Gas_Network(object):
     def get_decisions(self, agent_decisions):
 
         possible_decisions = self.dispatcher_decisions(agent_decisions)
-        #print(possible_decisions)
         decisions = list(v for k, v in dispatcher_dec.items())
-        #print(decisions)
+
         list_d = []
         for d in possible_decisions:
             dec = decisions.copy()
@@ -112,46 +108,42 @@ class Gas_Network(object):
                     dec[2] = d[i][1]
                 if re.search('compressor', d[i][0]):
                     dec[3] = d[i][1]
-                if dec[3] == 0: dec[2] = 0
+                if dec[3] == 0: dec[2] = 0.0
 
             if (dec in list_d) or (dec[3] == 1 and dec[0] == 0):
                 continue
             list_d.append(dec)
-        #print(list_d)
+
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
     def decision_to_dict(self, da_action):
         i = 0
+        da_dec = dispatcher_dec.copy()
 
-        for k, v in dispatcher_dec.items():
-            dispatcher_dec[k] = da_action[i]
+        for k, v in da_dec.items():
+            da_dec[k] = da_action[i]
             i += 1
-            return dispatcher_dec
+        return da_dec
 
-
+    #Apply the chosen decision
     def take_action(self, da_action):
 
         Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
-        #print(da_action)
 
         for i in range(self.numSteps):
             solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt, "ai")
 
-            #self.state = extract_from_solution(solution)
+            self.state = extract_from_solution(solution)
             Gas_Network.penalty = find_penalty(solution)
 
-    def get_reward(self):
-
-        penalty = self.penalty
-        #print(penalty)
+    #Find the reward value for dispatcher agent
+    def get_reward(self, penalty):
 
         if penalty[0] < penalty[1]: #Dispatcher won
             return True, 1
         elif penalty[0] > penalty[1]: #Trader won
             return True, -1
-        elif penalty[0] == 0 and penalty[1] == 0:
-            return True, 1
         else:
-            return True, 0 #Draw
+            return True, 1e-4 #Draw
         #return False, 0

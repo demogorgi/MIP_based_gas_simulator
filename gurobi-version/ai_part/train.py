@@ -19,7 +19,6 @@ class Train(object):
         for i in range(CFG.num_self_plays):
             print("Start Self-play training", i+1)
             gas_network = self.gas_network.clone()
-            #print(training_data)
             self.self_play(gas_network, training_data)
 
         self.net.save_model() #Current model saved
@@ -32,24 +31,14 @@ class Train(object):
 
         evaluator = Evaluate(eval_mcts = eval_mcts, gas_network = self.gas_network)
 
-        wins, losses = evaluator.evaluate()
+        win_ratio = evaluator.evaluate()
 
-        print("Wins:", wins)
-        print("Losses: ", losses)
-
-        nums_ = wins + losses
-
-        if nums_ == 0:
-            win_rate = 0
-        else:
-            win_rate = wins / nums_
-
-        print("Win rate: ", win_rate)
-        if win_rate > 0.55:
+        print("Win rate: ", win_ratio)
+        if win_ratio > 0.55:
             print("New model saved as the best model")
             self.net.save_model("best_model")
         else:
-            print("New model discarded.")
+            print("New model is not the best model.")
             self.net.load_model()
 
     def self_play(self, gas_network, training_data):
@@ -59,25 +48,18 @@ class Train(object):
 
         node = TreeNode()
 
-        count = 0
         iteration_over = False
 
         while not iteration_over:
 
-            if count < CFG.temp_threshold:
-                best_child = mcts.search(gas_network, node, CFG.temp_initial)
-            else:
-                best_child = mcts.search(gas_network, node, CFG.temp_final)
+            best_child = mcts.search(gas_network, node, CFG.temperature)
 
             self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
 
             action = best_child.action
-
             gas_network.take_action(action)
 
-            count += 1
-
-            iteration_over, value = gas_network.get_reward()
+            iteration_over, value = gas_network.get_reward(gas_network.penalty)
 
             best_child.parent = None
             node = best_child    #Make the child node the root node

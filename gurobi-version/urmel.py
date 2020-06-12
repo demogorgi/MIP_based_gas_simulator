@@ -24,8 +24,9 @@ if not os.path.exists(output):
     os.makedirs(output)
 
 def simulator_step(config, agent_decisions, compressors, step, dt, process_type):
-    simulator_step.counter += 1
-    print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
+    if process_type == "sim":
+        simulator_step.counter += 1
+        print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     nr_calls = simulator_step.counter
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, dt)

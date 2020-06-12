@@ -27,7 +27,7 @@ class Train(object):
 
         self.net.train(training_data)
 
-        eval_mcts = MCTS(self.eval_net)
+        eval_mcts = MCTS(self.net)
 
         evaluator = Evaluate(eval_mcts = eval_mcts, gas_network = self.gas_network)
 

@@ -104,3 +104,19 @@ def find_penalty(solution):
     trader_penalty = int(trader_violations)
 
     return [dispatcher_penalty, trader_penalty]
+
+def get_con_pos():
+    va = 0
+    rs = 0
+    cs = 0
+    for k,v in dispatcher_dec.items():
+        if re.search('va', k):
+            va += 1
+        if re.search('zeta', k):
+            rs += 1
+        if re.search('compressor',k):
+            cs += 1
+    rs_pos = va
+    gas_pos = va+rs
+    cs_pos = va+rs+cs
+    return rs_pos,gas_pos,cs_pos

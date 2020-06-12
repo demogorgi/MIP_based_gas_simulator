@@ -53,13 +53,6 @@ class Gas_Network(object):
             elif re.match('compressor', l):
                 da_decisions[l] = val(v)
 
-        for k, v in da_decisions.items():
-            if re.search('compressor', k): #re.sub() TODO
-                if v == 0:
-                    da_decisions['gas_DA[N22,N23]'] = 0.0
-            if re.search('valve', k):
-                if v == 0:
-                    da_decisions['compressor_DA[N23,N23_1]'] = 0
         valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
 
         #Find all possible subsets of possible dispatcher decisions
@@ -90,30 +83,33 @@ class Gas_Network(object):
 
         return decisions
 
-    #Get a list of decisions [va, zeta, gas, compressor]
+    #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
 
         possible_decisions = self.dispatcher_decisions(agent_decisions)
-        decisions = list(v for k, v in dispatcher_dec.items())
+        decisions = list(v for k, v in agent_decisions.items())
+        rs, gs, cs = get_con_pos()
 
         list_d = []
         for d in possible_decisions:
+            valve = 0
             dec = decisions.copy()
             for i in range(len(d)):
                 if re.search('va', d[i][0]):
-                    dec[0] = d[i][1]
+                    dec[valve] = d[i][1]
+                    valve += 1
                 if re.search('zeta', d[i][0]):
-                    dec[1] = d[i][1]
+                    dec[rs] = d[i][1]
                 if re.search('gas', d[i][0]):
-                    dec[2] = d[i][1]
+                    dec[gs] = d[i][1]
                 if re.search('compressor', d[i][0]):
-                    dec[3] = d[i][1]
-                if dec[3] == 0: dec[2] = 0.0
+                    dec[cs] = d[i][1]
+                if dec[cs] == 0: dec[gs] = 0.0
 
-            if (dec in list_d) or (dec[3] == 1 and dec[0] == 0):
+            if (dec in list_d):
                 continue
             list_d.append(dec)
-
+        #list_d = self.check_feasibility(list_d)
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -147,3 +143,16 @@ class Gas_Network(object):
         else:
             return True, 1e-4 #Draw
         #return False, 0
+
+    #To check the feasibility of the selected set of decisions
+    def check_feasibility(self, possible_decisions):
+        feasible_decisions = []
+        for dec in possible_decisions:
+            dec_dict = self.generate_decision_dict(dec)
+
+            for i in range(self.numSteps):
+                solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt, "ai")
+
+                if solution:
+                    feasible_decisions.append(dec)
+        return feasible_decisions

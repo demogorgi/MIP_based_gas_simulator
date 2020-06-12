@@ -12,7 +12,8 @@ dt = int(sys.argv[3])
 
 def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
 
-    Gas_Network.decisions_dict = shift_to_left(agent_decisions, step)
+    #Gas_Network.decisions_dict = shift_to_left(agent_decisions)
+    Gas_Network.decisions_dict = agent_decisions
     Gas_Network.config = config
     Gas_Network.compressors = compressors
     Gas_Network.dt = dt
@@ -55,11 +56,11 @@ def create_dict_for_csv(agent_decisions, timestamp = ''):
 
     return fieldnames, extracted_
 
-def shift_to_left(agent_decisions,step):
+def shift_to_left(agent_decisions):
     for key, value in agent_decisions.items():
         for label, val in value.items():
             for l, v in val.items():
-                if re.search('^X', label):
+                if re.search('^X', label): #if re.search('^(X|S)', label):
                     d = deque(v)
                     d.rotate(-1)
                     agent_decisions[key][label][l] = list(d)

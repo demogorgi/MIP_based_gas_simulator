@@ -78,9 +78,12 @@ def vi(i,o):
 def vo(i,o):
     return rtza(i,o) * rho / 3.6 * q_out_old((i,o)) / ( b2p * p_old(o) )
 
-# Function for resistor model
+## Function for resistor model
 def vm(i,o):
-    return rho / 3.6 * ( rtza(i,o) * q_old((i,o)) ) / 2 * 1 / b2p * ( 1 / p_old(i) + 1 / p_old(o) )
+    vm =  rho / 3.6 * ( rtza(i,o) * q_old((i,o)) ) / 2 * 1 / b2p * ( 1 / p_old(i) + 1 / p_old(o) )
+    vmm = max(vm, 2)
+    #print("i: %s, o: %s, vm: %f, vmm: %f" % (i,o,vm,vmm))
+    return vmm
 
 # Functions for compressor model
 #

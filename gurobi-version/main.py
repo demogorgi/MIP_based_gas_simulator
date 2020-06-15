@@ -15,7 +15,7 @@ numSteps  = int(sys.argv[2])
 dt        = int(sys.argv[3])
 
 pn = importlib.import_module(data_path.replace("/",".") + ".prescribed_nominations")
-hd = importlib.import_module(data_path.replace("/",".") + ".human_decisions")
+hd = importlib.import_module(data_path.replace("/",".") + ".fixed_decisions")
 
 # default configs which are merged with instance configuration
 config = {
@@ -98,10 +98,10 @@ for i in range(numSteps):
         pn.get_prescribed_nominations(agent_decisions,i)
     else:
         #####################################
-        ##  Getting human decisions        ##
+        ##  Getting fixed decisions        ##
         #####################################
         # pass
-        hd.get_human_decisions(agent_decisions,i)
+        hd.get_fixed_decisions(agent_decisions,i)
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")

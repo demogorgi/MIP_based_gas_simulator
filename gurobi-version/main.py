@@ -14,8 +14,8 @@ data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
 dt        = int(sys.argv[3])
 
-pn = importlib.import_module(data_path.replace("/",".") + ".prescribed_nominations")
-hd = importlib.import_module(data_path.replace("/",".") + ".fixed_decisions")
+pn = importlib.import_module((data_path + ".prescribed_nominations").replace("/",".").replace("..","."))
+hd = importlib.import_module((data_path + ".fixed_decisions").replace("/",".").replace("..",".")) 
 
 # default configs which are merged with instance configuration
 config = {

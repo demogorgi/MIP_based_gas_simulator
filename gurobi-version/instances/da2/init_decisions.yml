@@ -89,7 +89,7 @@ exit_nom:
 entry_nom:
     S:
         EN_aux0^EN:
-            - 1498
+            - 1100
             - 1499
             - 1500
             - 1501

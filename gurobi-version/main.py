@@ -100,7 +100,7 @@ for i in range(numSteps):
         ##########################################################################################
         ##  Getting manually set agent decisions directly from the following code (dirty hack)  ## -> todo: read from file here
         ##########################################################################################
-        pass
+        #pass
         #if i >= 50:
         #   agent_decisions["gas"]["CS"]["N22^N23"] = 0.2
         #if i >= 100:
@@ -120,14 +120,15 @@ for i in range(numSteps):
         #if i >= 450:
         #   agent_decisions["gas"]["CS"]["N22^N23"] = 1.0
         #
+        if i == 0:
+           agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [1100]
+           agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [0]
         if i == 10:
            agent_decisions["entry_nom"]["S"]["EN_aux0^EN"] = [0]
            agent_decisions["entry_nom"]["S"]["EH_aux0^EH"] = [1100]
            agent_decisions["compressor"]["CS"]["N22^N23"] = 0
            agent_decisions["gas"]["CS"]["N22^N23"] = 0
-           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 10000
-        if i == 30:
-           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 200
+           agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 191
         #if i == 40:
         #   agent_decisions["zeta"]["RE"]["N25^N26_aux"] = 580
         #if i == 50:

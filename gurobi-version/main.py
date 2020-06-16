@@ -7,15 +7,14 @@
 
 from urmel import *
 from datetime import datetime, timedelta
+import pprint
+from deepmerge import always_merger
 
 timestep = datetime.now()
 
 data_path = sys.argv[1]
 numSteps  = int(sys.argv[2])
 dt        = int(sys.argv[3])
-
-pn = importlib.import_module((data_path + ".prescribed_nominations").replace("/",".").replace("..","."))
-hd = importlib.import_module((data_path + ".fixed_decisions").replace("/",".").replace("..",".")) 
 
 # default configs which are merged with instance configuration
 config = {
@@ -69,12 +68,22 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 
+# read manual file with prescribed nominations and/or fixed decisions
+# the dictionary changes with every new control
+with open(path.join(data_path, 'fixed_decisions.yml')) as file:
+    fixed_decisions = yaml.load(file, Loader=yaml.FullLoader)
+    #print(fixed_decisions)
+
 #csv file to store (agent) decisions in a csv file in scenario output folder
 with open(path.join(data_path, 'output/decisions_file.csv'), 'w+', newline='') as f:
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
+# update agent_decisions with fixed decisions
+agent_decisions = always_merger.merge(agent_decisions,fixed_decisions)
+print("Updated agent decisions:")
+pprint.pprint(agent_decisions)
 
 simulator_step.counter = 0
 for i in range(numSteps):
@@ -92,16 +101,6 @@ for i in range(numSteps):
     if config["ai"]:
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
-        #####################################
-        ##  Getting prescribed nominations ##
-        #####################################
-        pn.get_prescribed_nominations(agent_decisions,i)
-    else:
-        #####################################
-        ##  Getting fixed decisions        ##
-        #####################################
-        # pass
-        hd.get_fixed_decisions(agent_decisions,i)
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")

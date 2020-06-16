@@ -139,4 +139,3 @@ def xip(i):
 # ... and resistors
 def xir(i,zeta):
     return zeta / ( 2 * A(co.diameter[i]) );
-    #return agent_decisions["zeta"]["RE"][joiner(i)] / ( 2 * A(co.diameter[i]) );

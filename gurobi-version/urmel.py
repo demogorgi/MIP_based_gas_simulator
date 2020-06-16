@@ -29,7 +29,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt, process_type)
         print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     nr_calls = simulator_step.counter
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
-    m = simulate(agent_decisions, compressors, dt)
+    m = simulate(agent_decisions, compressors, step, dt)
     # control output
     m.params.logToConsole = config['grb_console']
     m.params.logfile = config['grb_logfile']
@@ -47,7 +47,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt, process_type)
         print ("model status: ", status)
     if status == GRB.OPTIMAL: # == 2
         # plot data with gnuplot
-        if config['gnuplot'] and ( process_type == "sim" or config["debug"] ): os.system(plot(_step, agent_decisions, compressors, output))
+        if config['gnuplot'] and ( process_type == "sim" or config["debug"] ): os.system(plot(step, _step, agent_decisions, compressors, output))
         if config['write_lp'] and ( process_type == "sim" or config["debug"] ): m.write(step_files_path + ".lp")
         if config['write_sol'] and ( process_type == "sim" or config["debug"] ): m.write(step_files_path + ".sol")
         # store solution in dictionary

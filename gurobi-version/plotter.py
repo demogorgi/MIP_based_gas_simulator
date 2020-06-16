@@ -1,11 +1,11 @@
 from urmel import *
 
-def plot(_step, agent_decisions, compressors, output):
+def plot(step, _step, agent_decisions, compressors, output):
     for k in compressors:
         cs = compressors[k]
-        compressor = agent_decisions["compressor"]["CS"][k] 
+        compressor = get_agent_decision(agent_decisions["compressor"]["CS"][k],step)
         _from, _to = k.split("^")
-        gas = agent_decisions["gas"]["CS"][k]
+        gas = get_agent_decision(agent_decisions["gas"]["CS"][k],step) 
         L_min_pi = cs["L_min_pi"]
         L_min_phi = cs["L_min_phi"]
         L_max_pi = cs["L_max_pi"]

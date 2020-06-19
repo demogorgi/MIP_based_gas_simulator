@@ -17,6 +17,7 @@ class Gas_Network(object):
     dt = 0
     numSteps = 1
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
+    step = 0
 
     def __init__(self):
 
@@ -64,24 +65,41 @@ class Gas_Network(object):
 
         return valid_decisions
 
-    def generate_decision_dict(self, dispatcher_actions): #Generate new agent_decision dictionary
-
+    def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
+        step = self.step+1
         decisions = self.decisions_dict
-        dispatcher_actions= self.decision_to_dict(dispatcher_actions)
+        dispatcher_actions= self.decision_to_dict(dispatcher_action)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
         for key, value in dispatcher_actions.items():
-
             if re.search('va', key):
-                decisions['va']['VA'][result(key)] = value
+                decisions['va']['VA'][result(key)][step] = value
             elif re.search('zeta', key):
-                decisions['zeta']['RE'][result(key)] = value
+                decisions['zeta']['RE'][result(key)][step] = value
             elif re.search('gas', key):
-                decisions['gas']['CS'][result(key)] = value
+                decisions['gas']['CS'][result(key)][step] = value
             elif re.search('compressor', key):
-                decisions['compressor']['CS'][result(key)] = value
-
+                decisions['compressor']['CS'][result(key)][step] = value
         return decisions
+
+    def is_decision_exists(self, action):
+        #print(action)
+        d = list(v for k, v in dispatcher_dec.items())
+        #print(d)
+        if d == action:
+            return True
+        else:
+            return False
+
+    def remove_duplicate_action(self):
+        if self.step > 0:
+            for key, values in Gas_Network.decisions_dict.items():
+                for label, val in values.items():
+                    for l, v in val.items():
+                        if re.search('va|zeta|gas|compressor',key):
+                            del v[self.step]
+
+        return Gas_Network.decisions_dict
 
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
@@ -128,10 +146,11 @@ class Gas_Network(object):
         Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
 
         for i in range(self.numSteps):
-            solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt, "ai")
+            solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
 
-            self.state = extract_from_solution(solution)
+            #self.state = extract_from_solution(solution)
             Gas_Network.penalty = find_penalty(solution)
+
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
@@ -145,14 +164,13 @@ class Gas_Network(object):
         #return False, 0
 
     #To check the feasibility of the selected set of decisions
-    def check_feasibility(self, possible_decisions):
-        feasible_decisions = []
-        for dec in possible_decisions:
-            dec_dict = self.generate_decision_dict(dec)
+    def check_feasibility(self, possible_decision):
 
-            for i in range(self.numSteps):
-                solution = simulator_step(self.config, self.decisions_dict, self.compressors, i, self.dt, "ai")
+        dec_dict = self.generate_decision_dict(possible_decision)
 
-                if solution:
-                    feasible_decisions.append(dec)
-        return feasible_decisions
+        for i in range(self.numSteps):
+            solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
+
+            if not solution:
+                return False
+        return True

@@ -50,10 +50,10 @@ class TreeNode(object):
                 highest_puct = puct
                 highest_index = index
         return self.children[highest_index]
-    def expand_node(self, gas_network, psa_vector):
+    def expand_node(self, gas_network, psa_vector, valid_decisions):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-        valid_decisions = gas_network.get_decisions(gas_network.agent_decisions)
+        #valid_decisions = gas_network.get_decisions(gas_network.agent_decisions)
 
         for idx, move in enumerate(valid_decisions):
             action = deepcopy(move)
@@ -103,7 +103,7 @@ class MCTS(object):
             if psa_vector_sum > 0: #Renormalize the psa_vector
                 psa_vector /= psa_vector_sum
 
-            node.expand_node(gas_network = gas_network, psa_vector = psa_vector)
+            node.expand_node(gas_network = gas_network, psa_vector = psa_vector, valid_decisions = possible_decisions)
 
             iteration_over, wsa = gas_network.get_reward(gas_network.penalty)
 

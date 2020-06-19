@@ -85,6 +85,7 @@ agent_decisions = always_merger.merge(agent_decisions,fixed_decisions)
 print("Updated agent decisions:")
 pprint.pprint(agent_decisions)
 
+
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
@@ -115,6 +116,11 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
+
+
+f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")
+yaml.dump(agent_decisions, f)
+f.close()
 
 # generate contour output
 if config["contour_output"]:

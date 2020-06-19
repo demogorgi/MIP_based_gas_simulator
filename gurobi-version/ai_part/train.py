@@ -71,3 +71,23 @@ class Train(object):
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
             training_data.append([state, psa_vector, state_value[2]])
+
+    def get_decision(self, net):
+        mcts = MCTS(net)
+        gas_network = self.gas_network.clone()
+        feasible = False
+        node = TreeNode()
+
+        if not feasible:
+            best_child = mcts.search(gas_network, node, CFG.temperature)
+            best_action = best_child.action
+
+            feasible = gas_network.check_feasibility(best_action)
+            gas_network.take_action(best_action)
+
+        dec_exists = gas_network.is_decision_exists(best_action)
+        if dec_exists:
+            decisions_ = gas_network.remove_duplicate_action()
+            return decisions_
+
+        return gas_network.decisions_dict

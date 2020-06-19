@@ -12,11 +12,11 @@ dt = int(sys.argv[3])
 
 def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
 
-    #Gas_Network.decisions_dict = shift_to_left(agent_decisions)
     Gas_Network.decisions_dict = agent_decisions
     Gas_Network.config = config
     Gas_Network.compressors = compressors
     Gas_Network.dt = dt
+    Gas_Network.step = step
 
     Gas_Network.state = extract_from_solution(solution)
     Gas_Network.penalty = find_penalty(solution)
@@ -37,7 +37,7 @@ def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
     train  = Train(gas_network, net)
     train.start()
 
-    new_agent_decision = Gas_Network.decisions_dict
+    new_agent_decision = train.get_decision(net)
 
     return new_agent_decision
 
@@ -55,13 +55,3 @@ def create_dict_for_csv(agent_decisions, timestamp = ''):
     fieldnames = list(extracted_.keys())
 
     return fieldnames, extracted_
-
-def shift_to_left(agent_decisions):
-    for key, value in agent_decisions.items():
-        for label, val in value.items():
-            for l, v in val.items():
-                if re.search('^X', label): #if re.search('^(X|S)', label):
-                    d = deque(v)
-                    d.rotate(-1)
-                    agent_decisions[key][label][l] = list(d)
-    return agent_decisions

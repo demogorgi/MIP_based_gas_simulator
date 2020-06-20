@@ -24,10 +24,8 @@ if not os.path.exists(output):
     os.makedirs(output)
 
 def simulator_step(config, agent_decisions, compressors, step, dt, process_type):
-    if process_type == "sim":
-        simulator_step.counter += 1
-        print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
-    nr_calls = simulator_step.counter
+    simulator_step.counter += 1
+    print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated
     m = simulate(agent_decisions, compressors, step, dt)
     # control output
@@ -40,7 +38,7 @@ def simulator_step(config, agent_decisions, compressors, step, dt, process_type)
     # generate often used strings
     _step = "_" + str(step).rjust(5, "0")
     if config["ai"]:
-        _step += "_" + str(nr_calls).rjust(5, "0")
+        _step += "_" + str(simulator_step.counter).rjust(5, "0")
     step_files_path = "".join([output, "/", config["name"], _step]).replace("\\", "/")
     # if solved to optimallity
     if config['urmel_console_output']:

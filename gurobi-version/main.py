@@ -99,7 +99,7 @@ for i in range(numSteps):
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(config, agent_decisions, compressors, i, dt, "sim")
 
-    if config["ai"]:
+    if config["ai"] and i > 0:
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
 

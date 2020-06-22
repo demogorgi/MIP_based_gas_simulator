@@ -111,16 +111,14 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
+    #Write agent decisions in output folder
+    f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")
+    yaml.dump(agent_decisions, f)
     ################################### @Bitty ###################################
     # Bitty, I think this is the place where the AI comes into play.
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-
-
-f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")
-yaml.dump(agent_decisions, f)
-f.close()
 
 # generate contour output
 if config["contour_output"]:

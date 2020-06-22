@@ -66,11 +66,12 @@ class Gas_Network(object):
         return valid_decisions
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
-        step = self.step+1
+        step = self.step + 1
         decisions = self.decisions_dict
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
+        #if step < self.dt:
         for key, value in dispatcher_actions.items():
             if re.search('va', key):
                 decisions['va']['VA'][result(key)][step] = value
@@ -81,25 +82,6 @@ class Gas_Network(object):
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)][step] = value
         return decisions
-
-    def is_decision_exists(self, action):
-        #print(action)
-        d = list(v for k, v in dispatcher_dec.items())
-        #print(d)
-        if d == action:
-            return True
-        else:
-            return False
-
-    def remove_duplicate_action(self):
-        if self.step > 0:
-            for key, values in Gas_Network.decisions_dict.items():
-                for label, val in values.items():
-                    for l, v in val.items():
-                        if re.search('va|zeta|gas|compressor',key):
-                            del v[self.step]
-
-        return Gas_Network.decisions_dict
 
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
@@ -145,11 +127,10 @@ class Gas_Network(object):
 
         Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
 
-        for i in range(self.numSteps):
-            solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
+        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step+1, self.dt, "ai")
 
-            #self.state = extract_from_solution(solution)
-            Gas_Network.penalty = find_penalty(solution)
+        #self.state = extract_from_solution(solution)
+        Gas_Network.penalty = find_penalty(solution)
 
 
     #Find the reward value for dispatcher agent

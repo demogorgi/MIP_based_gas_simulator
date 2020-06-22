@@ -38,6 +38,8 @@ def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
     train.start()
 
     new_agent_decision = train.get_decision(net)
+    if step < numSteps:
+        new_agent_decision = remove_duplicate_decision(agent_decisions, new_agent_decision, step)
 
     return new_agent_decision
 
@@ -55,3 +57,15 @@ def create_dict_for_csv(agent_decisions, timestamp = ''):
     fieldnames = list(extracted_.keys())
 
     return fieldnames, extracted_
+
+def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
+    next_step = step + 1
+    for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
+        for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+            for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                for i in range(step, -1, -1):
+                    if i in value1 and next_step in value2:
+                        if value1[i] == value2[next_step]:
+                            del value2[next_step]
+                            break
+    return new_agent_decisions

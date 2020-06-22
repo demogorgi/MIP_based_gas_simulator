@@ -85,9 +85,4 @@ class Train(object):
             feasible = gas_network.check_feasibility(best_action)
             gas_network.take_action(best_action)
 
-        dec_exists = gas_network.is_decision_exists(best_action)
-        if dec_exists:
-            decisions_ = gas_network.remove_duplicate_action()
-            return decisions_
-
         return gas_network.decisions_dict

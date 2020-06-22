@@ -66,7 +66,7 @@ class Gas_Network(object):
         return valid_decisions
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
-        step = self.step + 1
+        step = self.step
         decisions = self.decisions_dict
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
 
@@ -127,7 +127,7 @@ class Gas_Network(object):
 
         Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
 
-        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step+1, self.dt, "ai")
+        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
 
         #self.state = extract_from_solution(solution)
         Gas_Network.penalty = find_penalty(solution)
@@ -148,10 +148,8 @@ class Gas_Network(object):
     def check_feasibility(self, possible_decision):
 
         dec_dict = self.generate_decision_dict(possible_decision)
+        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
 
-        for i in range(self.numSteps):
-            solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
-
-            if not solution:
-                return False
+        if not solution:
+            return False
         return True

@@ -101,7 +101,7 @@ for i in range(numSteps):
 
     if config["ai"]:
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
-        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i)
+        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i+1)
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")

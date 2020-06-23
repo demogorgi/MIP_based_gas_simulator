@@ -29,7 +29,7 @@ config = {
     # write solution files in the sol-format?
     "write_sol": False,
     # write irreducible infeasibility set if problem is infeasible?
-    "write_ilp": False,
+    "write_ilp": True,
     # write wheel maps with gnuplot?
     "gnuplot": False,
     # console output?
@@ -106,7 +106,11 @@ for i in range(numSteps):
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
     with open(path.join(data_path, 'output/decisions_file.csv'), 'a+', newline = '') as f:
-        fieldnames, extracted_ = create_dict_for_csv(agent_decisions, timestamp)
+        if config["ai"]:
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i+1, timestamp)
+        else:
+            penalty_ = find_penalty(solution)
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i+1, timestamp, penalty_)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)

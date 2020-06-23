@@ -22,11 +22,9 @@ class CFG(object):
 
     num_self_plays = 10 #Number of self-play games
     temperature = 1 #Temperature for MCTS search
-    
+
     #Weights to calculate penalty for both agents
     pressure_wt_factor = 1
     flow_wt_factor = 0.1
 
     num_evaluation_plays = 5 # Number of evaluation plays
-
-    zeta_upper = 10000 #INFINITY for drag factor for RE

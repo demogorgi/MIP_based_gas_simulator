@@ -62,7 +62,7 @@ def extract_from_solution(solution):
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
         if re.search('zeta_DA', label):
-            decisions[label] = value/CFG.zeta_upper
+            decisions[label] = value/10000
     return decisions
 
 def normalize_pressure(pressure_dict):

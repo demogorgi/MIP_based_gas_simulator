@@ -10,7 +10,11 @@ import csv
 numSteps  = int(sys.argv[2])
 dt = int(sys.argv[3])
 
+penalty = [0,0]
+
 def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
+    global penalty
+
     if step < numSteps:
         Gas_Network.decisions_dict = agent_decisions
         Gas_Network.config = config
@@ -39,20 +43,27 @@ def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
 
         new_agent_decision = train.get_decision(net)
         new_agent_decision = remove_duplicate_decision(agent_decisions, new_agent_decision, step)
-
+        penalty = Gas_Network.penalty
         return new_agent_decision
 
-def create_dict_for_csv(agent_decisions, timestamp = ''):
+def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty_ = []):
+    global penalty
+    
     extracted_ = {}
     extracted_['Time'] = timestamp
-    extracted_['Penalty'] = Gas_Network.penalty
+    if penalty_:
+        penalty = penalty_
+    extracted_['Dispatcher Penalty'] = penalty[0]
+    extracted_['Trader Penalty'] = penalty[1]
 
     for i, j in agent_decisions.items():
         for k,l in j.items():
             for m,n in l.items():
                 key = i+"["+m+"]"
-                extracted_[key] = n
-
+                for p in range(step,-1,-1):
+                    if p in n:
+                        extracted_[key] = n[p]
+                        break
     fieldnames = list(extracted_.keys())
 
     return fieldnames, extracted_

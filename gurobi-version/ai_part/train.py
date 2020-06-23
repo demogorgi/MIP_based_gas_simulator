@@ -57,6 +57,7 @@ class Train(object):
             self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
 
             action = best_child.action
+
             gas_network.take_action(action)
 
             iteration_over, value = gas_network.get_reward(gas_network.penalty)
@@ -83,6 +84,7 @@ class Train(object):
             best_action = best_child.action
 
             feasible = gas_network.check_feasibility(best_action)
-            gas_network.take_action(best_action)
+            if feasible:
+                gas_network.take_action(best_action)
 
         return gas_network.decisions_dict

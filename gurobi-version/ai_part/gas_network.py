@@ -46,7 +46,7 @@ class Gas_Network(object):
             if re.match('va', l):
                 da_decisions[l] = val(v)
             elif re.match('zeta', l):
-                zeta = random.randint(0, CFG.zeta_upper) #[0, 10000] [0, INFINITY)
+                zeta = random.randint(100, 1200) #[100,1200]
                 da_decisions[l] = zeta
             elif re.match('gas', l):
                 gas = round(random.uniform(0.0, 1.0), 2)

@@ -75,7 +75,7 @@ with open(path.join(data_path, 'fixed_decisions.yml')) as file:
     #print(fixed_decisions)
 
 #csv file to store (agent) decisions in a csv file in scenario output folder
-with open(path.join(data_path, 'output/decisions_file.csv'), 'w+', newline='') as f:
+with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f:
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
@@ -103,14 +103,16 @@ for i in range(numSteps):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i+1)
 
+    if not agent_decisions: continue
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
-    with open(path.join(data_path, 'output/decisions_file.csv'), 'a+', newline = '') as f:
+    with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
+        bn_pr_flows = get_bn_pressures_flows(solution)
         if config["ai"]:
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i+1, timestamp)
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty_ = [], bn_pr_flows = bn_pr_flows)
         else:
             penalty_ = find_penalty(solution)
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i+1, timestamp, penalty_)
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty_, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)

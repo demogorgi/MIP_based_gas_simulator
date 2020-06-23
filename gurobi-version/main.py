@@ -69,7 +69,6 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     #print(agent_decisions)
 
 # read manual file with prescribed nominations and/or fixed decisions
-# the dictionary changes with every new control
 with open(path.join(data_path, 'fixed_decisions.yml')) as file:
     fixed_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(fixed_decisions)

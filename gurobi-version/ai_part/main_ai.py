@@ -68,7 +68,7 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty_ = []
             extracted_[f"var_pipe_Qo_in[{i}]"] = None
     else:
         for i, j in bn_pr_flows.items():
-            extracted_[i] = j
+            extracted_[i] = round(j,3)
     if penalty_:
         penalty = penalty_
     extracted_['Dispatcher Penalty'] = penalty[0]

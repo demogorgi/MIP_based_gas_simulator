@@ -136,7 +136,7 @@ class Gas_Network(object):
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
 
-        if penalty[0] < penalty[1]: #Dispatcher won
+        if penalty[0] < penalty[1] or penalty[0] == 0: #Dispatcher won
             return True, 1
         elif penalty[0] > penalty[1]: #Trader won
             return True, -1

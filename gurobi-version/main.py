@@ -102,7 +102,7 @@ for i in range(numSteps):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i+1)
 
-    if not agent_decisions: continue
+        if not agent_decisions: continue
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
     with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
@@ -111,7 +111,7 @@ for i in range(numSteps):
             fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty_ = [], bn_pr_flows = bn_pr_flows)
         else:
             penalty_ = find_penalty(solution)
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty_, bn_pr_flows)
+            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i-1, timestamp, penalty_, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)

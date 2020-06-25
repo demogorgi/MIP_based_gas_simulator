@@ -5,8 +5,8 @@ from gurobipy import GRB
 
 # set up Q boundaries
 nodes_with_bds, q_lb, q_ub = gp.multidict({
-	'XN': [-710, -690],
-	'XH': [-810, -790],
+	'XN': [-510, -490],
+	'XH': [-610, -590],
 	'EH': [0, 1600],
 	'EN': [0, 1600]
 })

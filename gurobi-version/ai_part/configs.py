@@ -27,4 +27,4 @@ class CFG(object):
     pressure_wt_factor = 1
     flow_wt_factor = 0.1
 
-    num_evaluation_plays = 5 # Number of evaluation plays
+    num_evaluation_plays = 10 # Number of evaluation plays

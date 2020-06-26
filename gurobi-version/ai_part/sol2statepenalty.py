@@ -106,7 +106,7 @@ def find_penalty(solution):
             trader_violations += abs(v)
 
     dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
-    trader_penalty = int(trader_violations)
+    trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
 

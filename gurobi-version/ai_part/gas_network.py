@@ -18,6 +18,7 @@ class Gas_Network(object):
     numSteps = 1
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
     step = 0
+    penalties = []
 
     def __init__(self):
 
@@ -129,20 +130,20 @@ class Gas_Network(object):
 
         solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
 
-        #self.state = extract_from_solution(solution)
+        self.state = extract_from_solution(solution)
         Gas_Network.penalty = find_penalty(solution)
-
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
 
-        if penalty[0] < penalty[1] or penalty[0] == 0: #Dispatcher won
-            return True, 1
-        elif penalty[0] > penalty[1]: #Trader won
-            return True, -1
-        else:
-            return True, 1e-4 #Draw
-        #return False, 0
+        if penalty[0] == 0 or penalty[0] < 10:
+            return 10
+        elif penalty[0] > 10 and penalty[0] < 50:
+            return 5
+        elif penalty[0] > 50 and penalty[0] < 100:
+            return -5
+        else: return -10
+
 
     #To check the feasibility of the selected set of decisions
     def check_feasibility(self, possible_decision):

@@ -3,6 +3,7 @@ from .configs import *
 from .mcts import *
 from .evaluate import *
 from .neural_network_architecture import *
+from .gas_network import *
 
 class Train(object):
 
@@ -23,16 +24,14 @@ class Train(object):
 
         self.net.save_model() #Current model saved
 
-        self.eval_net.load_model() #Current model is loaded
-
         self.net.train(training_data)
 
-        eval_mcts = MCTS(self.net)
+        new_agent_decision = self.get_decision()
 
-        evaluator = Evaluate(eval_mcts = eval_mcts, gas_network = self.gas_network)
-
-        win_ratio = evaluator.evaluate()
-
+        Gas_Network.penalties.append(Gas_Network.penalty)
+        evaluator = Evaluate()
+        win_ratio = evaluator.evaluate(Gas_Network.penalties)
+        #print(Gas_Network.state)
         print("Win rate: ", win_ratio)
         if win_ratio > 0.55:
             print("New model saved as the best model")
@@ -40,6 +39,8 @@ class Train(object):
         else:
             print("New model is not the best model.")
             self.net.load_model()
+
+        return new_agent_decision
 
     def self_play(self, gas_network, training_data):
 
@@ -60,7 +61,8 @@ class Train(object):
 
             gas_network.take_action(action)
 
-            iteration_over, value = gas_network.get_reward(gas_network.penalty)
+            value = gas_network.get_reward(gas_network.penalty)
+            iteration_over =True
 
             best_child.parent = None
             node = best_child    #Make the child node the root node
@@ -73,18 +75,24 @@ class Train(object):
             psa_vector = deepcopy(state_value[1])
             training_data.append([state, psa_vector, state_value[2]])
 
-    def get_decision(self, net):
-        mcts = MCTS(net)
+    def get_decision(self):
+        mcts = MCTS(self.net)
         gas_network = self.gas_network.clone()
         feasible = False
         node = TreeNode()
 
-        if not feasible:
+        dec_penalty = {}
+
+        for i in range(CFG.num_evaluation_plays):
+
             best_child = mcts.search(gas_network, node, CFG.temperature)
             best_action = best_child.action
 
-            feasible = gas_network.check_feasibility(best_action)
-            if feasible:
-                gas_network.take_action(best_action)
+            gas_network.take_action(best_action)
 
-        return gas_network.decisions_dict
+            dec_penalty[i] = [best_action, gas_network.penalty[0]]
+
+        d = dec_penalty[min(dec_penalty, key=dec_penalty.get)]
+        best_decision = gas_network.generate_decision_dict(d[0])
+
+        return best_decision

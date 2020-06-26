@@ -53,7 +53,7 @@
 #### mcts.py
     classes for Monte Carlo Tree Search algorithm
 
-#### sol2state.py
+#### sol2statepenalty.py
     functions to extract values from solution output from simulator part
 
 #### neural_network_architecture.py
@@ -61,3 +61,6 @@
 
 #### train.py
     class to train the neural network
+
+#### evaluate.py
+    class to evaluate the neural netwok

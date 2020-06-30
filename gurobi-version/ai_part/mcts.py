@@ -105,7 +105,7 @@ class MCTS(object):
 
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector, valid_decisions = possible_decisions)
 
-            wsa = gas_network.get_reward(gas_network.penalty)
+            wsa = gas_network.get_reward(gas_network.exp_penalty)
 
             while node is not None:
                 wsa = -wsa

@@ -17,6 +17,7 @@ class Gas_Network(object):
     dt = 0
     numSteps = 1
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
+    exp_penalty = [0,0]
     step = 0
     penalties = []
 
@@ -131,7 +132,7 @@ class Gas_Network(object):
         solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
 
         self.state = extract_from_solution(solution)
-        Gas_Network.penalty = find_penalty(solution)
+        Gas_Network.exp_penalty = find_penalty(solution)
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):

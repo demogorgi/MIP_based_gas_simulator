@@ -21,7 +21,7 @@ class Evaluate(object):
                 losses += 1
             else:
                 print("Draw")
-            print("\n")
+            #print("\n")
         num_games = wins + losses
         if num_games == 0:
             win_ratio = 0

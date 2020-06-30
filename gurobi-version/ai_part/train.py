@@ -28,17 +28,18 @@ class Train(object):
 
         new_agent_decision = self.get_decision()
 
-        Gas_Network.penalties.append(Gas_Network.penalty)
-        evaluator = Evaluate()
-        win_ratio = evaluator.evaluate(Gas_Network.penalties)
-        #print(Gas_Network.state)
-        print("Win rate: ", win_ratio)
-        if win_ratio > 0.55:
-            print("New model saved as the best model")
-            self.net.save_model("best_model")
-        else:
-            print("New model is not the best model.")
-            self.net.load_model()
+        #Evaluating the decisions
+        if Gas_Network.penalties:
+            evaluator = Evaluate()
+            win_ratio = evaluator.evaluate(Gas_Network.penalties)
+
+            print("Win rate: ", win_ratio)
+            if win_ratio > 0.55:
+                print("New model saved as the best model")
+                self.net.save_model("best_model")
+            else:
+                print("New model is not the best model.")
+                self.net.load_model()
 
         return new_agent_decision
 
@@ -61,7 +62,7 @@ class Train(object):
 
             gas_network.take_action(action)
 
-            value = gas_network.get_reward(gas_network.penalty)
+            value = gas_network.get_reward(gas_network.exp_penalty)
             iteration_over =True
 
             best_child.parent = None
@@ -87,12 +88,15 @@ class Train(object):
 
             best_child = mcts.search(gas_network, node, CFG.temperature)
             best_action = best_child.action
-
+            #print(best_action)
             gas_network.take_action(best_action)
 
-            dec_penalty[i] = [best_action, gas_network.penalty[0]]
+            dec_penalty[i] = [best_action, gas_network.exp_penalty[0]]
 
         d = dec_penalty[min(dec_penalty, key=dec_penalty.get)]
         best_decision = gas_network.generate_decision_dict(d[0])
-
-        return best_decision
+        #print(best_decision)
+        if d[1] < gas_network.penalty[0]:
+            return best_decision
+        else:
+            return None

@@ -10,9 +10,7 @@ import csv
 numSteps  = int(sys.argv[2])
 dt = int(sys.argv[3])
 
-penalty = [0,0]
-def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
-    global penalty
+def get_decisions_from_ai(solution, agent_decisions, config, compressors, step, penalty):
 
     if step < numSteps:
         Gas_Network.decisions_dict = agent_decisions
@@ -22,10 +20,10 @@ def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
         Gas_Network.step = step
 
         Gas_Network.state = extract_from_solution(solution)
-        Gas_Network.penalty = find_penalty(solution)
-
+        Gas_Network.penalty = penalty
+        if step-1 > 0:
+            Gas_Network.penalties.append(Gas_Network.penalty)
         gas_network = Gas_Network()
-        #print(Gas_Network.state)
         net = NeuralNetworkWrapper(gas_network)
 
         if CFG.load_model:
@@ -40,12 +38,27 @@ def get_decisions_from_ai(solution, agent_decisions, config, compressors, step):
         train  = Train(gas_network, net)
         new_agent_decision = train.start()
 
-        new_agent_decision = remove_duplicate_decision(agent_decisions, new_agent_decision, numSteps)
-        penalty = Gas_Network.penalty
-        return new_agent_decision
+        if new_agent_decision:
+            new_agent_decision = remove_duplicate_decision(agent_decisions, new_agent_decision, step)
+            return new_agent_decision
+        else:
+            return agent_decisions
 
-def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty_ = [], bn_pr_flows = {}):
-    global penalty
+#Function to remove duplicate entries from fixed_decisions.yml file
+def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
+    for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
+        if not re.search('(entry|exit)_nom',k1):
+            for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+                for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                    for i in range(step-1, -1, -1):
+                        if i in value1:
+                            break
+                    if value1[i] == value2[step]:
+                        del value2[step]
+    return new_agent_decisions
+    
+#Create csv to store agent decisions, boundary flows, pressures and agent penalty values
+def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [], bn_pr_flows = {}):
 
     extracted_ = {}
     extracted_['Time'] = timestamp
@@ -53,7 +66,7 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty_ = []
         for k,l in j.items():
             for m,n in l.items():
                 key = i+"["+m+"]"
-                for p in range(step+1,-1,-1):
+                for p in range(step,-1,-1):
                     if p in n:
                         extracted_[key] = n[p]
                         break
@@ -67,11 +80,12 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty_ = []
     else:
         for i, j in bn_pr_flows.items():
             extracted_[i] = round(j,3)
-    if penalty_:
-        penalty = penalty_
-
-    extracted_['Dispatcher Penalty'] = penalty[0]
-    extracted_['Trader Penalty'] = penalty[1]
+    if penalty:
+        extracted_['Dispatcher Penalty'] = penalty[0]
+        extracted_['Trader Penalty'] = penalty[1]
+    else:
+        extracted_['Dispatcher Penalty'] = None
+        extracted_['Trader Penalty'] = None
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())
@@ -82,16 +96,3 @@ def reordered_headers(fieldnames):
     order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17]
     fieldnames = [fieldnames[i] for i in order]
     return fieldnames
-
-def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, numSteps):
-
-    for step in range(1,numSteps):
-        for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
-            for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
-                for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                    for i in range(step-1, -1, -1):
-                        if i in value1 and step in value2:
-                            if value1[i] == value2[step]:
-                                del value2[step]
-                                break
-    return new_agent_decisions

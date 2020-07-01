@@ -50,13 +50,13 @@ def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
         if not re.search('(entry|exit)_nom',k1):
             for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
                 for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                    for i in range(step-1, -1, -1):
+                    for i in range(step, -1, -1):
                         if i in value1:
                             break
                     if value1[i] == value2[step]:
                         del value2[step]
     return new_agent_decisions
-    
+
 #Create csv to store agent decisions, boundary flows, pressures and agent penalty values
 def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [], bn_pr_flows = {}):
 

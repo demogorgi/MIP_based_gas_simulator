@@ -15,7 +15,6 @@ class Gas_Network(object):
     config = None
     compressors = None
     dt = 0
-    numSteps = 1
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
     exp_penalty = [0,0]
     step = 0
@@ -106,12 +105,12 @@ class Gas_Network(object):
                     dec[gs] = d[i][1]
                 if re.search('compressor', d[i][0]):
                     dec[cs] = d[i][1]
-                if dec[cs] == 0: dec[gs] = 0.0
+                if dec[cs] == 0: dec[gs] = 0
 
-            if (dec in list_d):
+            if (dec in list_d) or (dec[0] == 0 and dec[1] == 0):
                 continue
             list_d.append(dec)
-        #list_d = self.check_feasibility(list_d)
+
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -136,7 +135,7 @@ class Gas_Network(object):
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
-
+        #low penalty rewards high value
         if penalty[0] == 0 or penalty[0] < 10:
             return 10
         elif penalty[0] > 10 and penalty[0] < 50:
@@ -146,12 +145,18 @@ class Gas_Network(object):
         else: return -10
 
 
-    #To check the feasibility of the selected set of decisions
-    def check_feasibility(self, possible_decision):
+    # def check_steps_over(self, step, value):
+    #     value_sum += value
+    #     if step < num_steps:
+    #         return False, 0
+    #     else: return True, value_sum
 
-        dec_dict = self.generate_decision_dict(possible_decision)
-        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
+    def get_action_penalty(self, action):
 
-        if not solution:
-            return False
-        return True
+        decision = self.generate_decision_dict(action)
+        solution = simulator_step(self.config, decision, self.compressors, self.step, self.dt, "ai")
+
+        penalty = find_penalty(solution)
+
+        value = self.get_reward(penalty)
+        return value

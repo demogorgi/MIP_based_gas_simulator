@@ -9,7 +9,7 @@ class CFG(object):
     load_model = True #Flag value for loading a saved model
 
     c_puct = 4 #level of exploration (1-6) used in MCTS
-    num_mcts_sims = 10 #Number of MCTS simulations 800
+    num_mcts_sims = 5#10 #Number of MCTS simulations 800
     dirichlet_alpha = 0.5
     epsilon = 0.25
 

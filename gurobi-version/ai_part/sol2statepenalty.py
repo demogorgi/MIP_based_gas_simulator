@@ -25,6 +25,8 @@ for n in no.nodes:
 
 pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
 
+# num_steps = 5 #Number of steps for each iteration
+# value_sum = 0
 
 def extract_from_solution(solution):
     #global pr, dispatcher_dec, trader_dec

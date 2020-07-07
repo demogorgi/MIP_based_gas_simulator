@@ -39,11 +39,8 @@ simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
     # for every i in numSteps a simulator step is performed.
-    # config (config.yml in scenario folder) controls the amount of output.
     # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
-    # compressors (compressors.yml in scenario folder) specifies the compressors in the network under consideration.
     # i is the step number (neccessary for naming output files if any).
-    # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     # If the last argument "porcess_type" is "sim" files (sol, lp, ... ) will be written if their option is set.
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(agent_decisions, i, "sim")

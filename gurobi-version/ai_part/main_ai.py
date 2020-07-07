@@ -6,21 +6,16 @@ from .train import Train
 from collections import deque
 import os
 import csv
+from params import *
 
-numSteps  = int(sys.argv[2])
-dt = int(sys.argv[3])
-
-def get_decisions_from_ai(solution, agent_decisions, config, compressors, step, penalty):
+def get_decisions_from_ai(solution, agent_decisions, step, penalty):
 
     if step < numSteps:
         Gas_Network.decisions_dict = agent_decisions
-        Gas_Network.config = config
-        Gas_Network.compressors = compressors
-        Gas_Network.dt = dt
         Gas_Network.step = step
-
-        Gas_Network.state = extract_from_solution(solution)
         Gas_Network.penalty = penalty
+        
+        Gas_Network.state = extract_from_solution(solution)
         if step-1 > 0:
             Gas_Network.penalties.append(Gas_Network.penalty)
         gas_network = Gas_Network()

@@ -6,61 +6,11 @@
 # >python3 main.py path numIterations lengthTimestep
 
 from urmel import *
-from datetime import datetime, timedelta
 import pprint
 from deepmerge import always_merger
 
-timestep = datetime.now()
-
-data_path = sys.argv[1]
-numSteps  = int(sys.argv[2])
-dt        = int(sys.argv[3])
-
-# default configs which are merged with instance configuration
-config = {
-    # prefix for output filenames
-    "name": "urmel",
-    # debug mode with more output
-    "debug": False,
-    # write new initial state
-    "new_init_scenario": False,
-    # write problem files in the lp-format?
-    "write_lp": False,
-    # write solution files in the sol-format?
-    "write_sol": False,
-    # write irreducible infeasibility set if problem is infeasible?
-    "write_ilp": True,
-    # write wheel maps with gnuplot?
-    "gnuplot": False,
-    # console output?
-    "urmel_console_output": False,
-    # gurobi logfile
-    "grb_logfile": "gurobi.log",
-    # gurobi console output
-    "grb_console": False,
-    # contour output (net- and state-files in contour folder)
-    "contour_output": False,
-    # is the ai-part active?
-    "ai" : True
-}
-
-# read manual file with configs
-# the dictionary does not change during the process
-if os.path.exists(os.path.join(data_path, "config.yml")):
-    with open(os.path.join(data_path, 'config.yml')) as file:
-        ymlConfig = yaml.load(file, Loader=yaml.FullLoader)
-        merged = {**config, **ymlConfig}
-        config = merged
-        print(config)
-
 #if config["ai"]:
 from ai_part.main_ai import *
-
-# read manual file with compressor data
-# the dictionary does not change during the process
-with open(path.join(data_path, 'compressors.yml')) as file:
-    compressors = yaml.load(file, Loader=yaml.FullLoader)
-    #print(compressors)
 
 # read manual file with initial gas network control
 # the dictionary changes with every new control
@@ -96,24 +46,21 @@ for i in range(numSteps):
     # dt is the length of the current time step and could be changed for each iteration, but I think we shouldn't do that.
     # If the last argument "porcess_type" is "sim" files (sol, lp, ... ) will be written if their option is set.
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
-    solution = simulator_step(config, agent_decisions, compressors, i, dt, "sim")
+    solution = simulator_step(agent_decisions, i, "sim")
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
     with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
         bn_pr_flows = get_bn_pressures_flows(solution)
         penalty = find_penalty(solution)
-        if config["ai"]:
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows = bn_pr_flows)
-        else:
-            fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
+        fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
     if config["ai"]:
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
-        agent_decisions = get_decisions_from_ai(solution, agent_decisions, config, compressors, i+1, penalty)
+        agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
 
         if not agent_decisions: continue
 

@@ -12,9 +12,6 @@ class Gas_Network(object):
     #Class level variables
     state = None
     decisions_dict = {}
-    config = None
-    compressors = None
-    dt = 0
     penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
     exp_penalty = [0,0]
     step = 0
@@ -26,7 +23,6 @@ class Gas_Network(object):
         self.current_agent = CFG.dispatcher_agent
         self.action_size = self.row
         self.agent_decisions = dispatcher_dec #{**dispatcher_dec, **trader_dec}
-
 
     def clone(self):
 
@@ -107,7 +103,7 @@ class Gas_Network(object):
                     dec[cs] = d[i][1]
                 if dec[cs] == 0: dec[gs] = 0
 
-            if (dec in list_d) or (dec[0] == 0 and dec[1] == 0):
+            if (dec in list_d):# or (dec[0] == 0 and dec[1] == 0):
                 continue
             list_d.append(dec)
 
@@ -126,12 +122,12 @@ class Gas_Network(object):
     #Apply the chosen decision
     def take_action(self, da_action):
 
-        Gas_Network.decisions_dict = self.generate_decision_dict(da_action)
+        self.decisions_dict = self.generate_decision_dict(da_action)
 
-        solution = simulator_step(self.config, self.decisions_dict, self.compressors, self.step, self.dt, "ai")
+        solution = simulator_step(self.decisions_dict, self.step, "ai")
 
         self.state = extract_from_solution(solution)
-        Gas_Network.exp_penalty = find_penalty(solution)
+        self.exp_penalty = find_penalty(solution)
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
@@ -144,14 +140,15 @@ class Gas_Network(object):
             return -5
         else: return -10
 
+    def check_steps_over(self, step, value):
+        global value_sum
 
-    # def check_steps_over(self, step, value):
-    #     value_sum += value
-    #     if step < num_steps:
-    #         return False, 0
-    #     else: return True, value_sum
+        value_sum += value
+        if step < num_steps:
+            return False, 0
+        else: return True, value_sum
 
-    def get_action_penalty(self, action):
+    def get_action_value(self, action):
 
         decision = self.generate_decision_dict(action)
         solution = simulator_step(self.config, decision, self.compressors, self.step, self.dt, "ai")

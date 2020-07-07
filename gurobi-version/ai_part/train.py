@@ -50,23 +50,28 @@ class Train(object):
 
         node = TreeNode()
 
-        iteration_over = False
+        #iteration_over = False
+        step = 0
 
-        while not iteration_over:
+        #while not iteration_over:
 
-            best_child = mcts.search(gas_network, node, CFG.temperature)
+        best_child = mcts.search(gas_network, node, CFG.temperature)
 
-            self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
+        self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
 
-            action = best_child.action
+        action = best_child.action
 
-            gas_network.take_action(action)
+        gas_network.take_action(action)
 
-            value = gas_network.get_reward(gas_network.exp_penalty)
-            iteration_over =True
+        value = gas_network.get_reward(gas_network.exp_penalty)
 
-            best_child.parent = None
-            node = best_child    #Make the child node the root node
+            #Considering 5 future steps to make a decision
+            # v = gas_network.get_action_value(action)
+            # iteration_over, value = gas_network.check_steps_over(step, v)
+            # step += 1
+
+            #best_child.parent = None
+            #node = best_child    #Make the child node the root node
 
         # Update v as the value of the game result
         for state_value in self_play_data:
@@ -95,8 +100,8 @@ class Train(object):
 
         d = dec_penalty[min(dec_penalty, key=dec_penalty.get)]
         best_decision = gas_network.generate_decision_dict(d[0])
-        #print(best_decision)
-        if d[1] < gas_network.penalty[0]:
+
+        if d[1] < 10:
             return best_decision
         else:
             return None

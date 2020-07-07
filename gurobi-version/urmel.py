@@ -4,18 +4,15 @@
 # this file contains the simulator_step-method to perform a single simulator step
 
 import importlib
-import sys
-from os import path
 import re
 import shutil
-import os
 import gurobipy as gp
 from gurobipy import GRB
 from constants import *
 from functions import *
 from model import *
-import yaml
 from plotter import *
+from params import *
 
 output = path.join(sys.argv[1],'output')
 if os.path.exists(output):
@@ -23,7 +20,8 @@ if os.path.exists(output):
 if not os.path.exists(output):
     os.makedirs(output)
 
-def simulator_step(config, agent_decisions, compressors, step, dt, process_type):
+def simulator_step(agent_decisions, step, process_type):
+
     simulator_step.counter += 1
     print("timestep %d overall simulator steps %d" % (step,simulator_step.counter))
     # m ist the simulator model with agent decisisons, compressor specs and timestep length incorporated

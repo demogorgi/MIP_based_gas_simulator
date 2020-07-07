@@ -39,6 +39,9 @@
 #### urmel.py
     this file contains the simulator_step-method to perform a single simulator step
 
+#### params.py
+    this file contains the variables which should be available globally
+
 # AI part
 
 #### main_ai.py

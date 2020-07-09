@@ -24,11 +24,11 @@ def plot(step, _step, agent_decisions, compressors, output):
         # ulim(phi_max)
         p3y = ( pi_1 - pi_2 ) / phi_max * phi_max + pi_2
         # interception point ulim and Lmax
-        p4x = (L_min_phi * phi_max * (L_max_pi * p_i_max - pi_2 * p_i_max - eta * L_max_pi * p_i_min + pi_2 * p_i_min - L_max_pi * p_old(_from) + eta * L_max_pi * p_old(_from)))/((L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2) * (p_i_max - p_i_min))
+        p4x = (L_min_phi * phi_max * (L_max_pi * p_i_max - pi_2 * p_i_max - eta * L_max_pi * p_i_min + pi_2 * p_i_min - L_max_pi * p_old(step,_from) + eta * L_max_pi * p_old(step,_from)))/((L_min_pi * phi_max + L_min_phi * pi_1 - L_min_phi * pi_2) * (p_i_max - p_i_min))
         # ulim(p4x)
         p4y =  ( pi_1 - pi_2 ) / phi_max * p4x + pi_2
         # L_max(phi_max)
-        p5y = - ( L_min_pi / L_min_phi ) * phi_max +  L_max_axis_intercept(L_max_pi,eta,p_i_min,p_i_max,p_old(_from))
+        p5y = - ( L_min_pi / L_min_phi ) * phi_max +  L_max_axis_intercept(L_max_pi,eta,p_i_min,p_i_max,p_old(step,_from))
 
         cmd = ";".join([
 "gnuplot -e \"set term pdfcairo enhanced font 'Calibri Light, 10'",
@@ -78,7 +78,7 @@ def plot(step, _step, agent_decisions, compressors, output):
             eta,
             p_i_min,
             p_i_max,
-            p_old(_from)
+            p_old(step,_from)
         )
     ),
 
@@ -96,7 +96,7 @@ def plot(step, _step, agent_decisions, compressors, output):
             eta,
             p_i_min,
             p_i_max,
-            p_old(_from)
+            p_old(step,_from)
         )
     ),
 
@@ -126,8 +126,8 @@ def plot(step, _step, agent_decisions, compressors, output):
 
     # (old) pressure_to / pressure_from line
     "(%f / %f) dashtype 5 lt 3 title 'p_{out} / p_{in}'" % (
-        p_old(_to),
-        p_old(_from)
+        p_old(step,_to),
+        p_old(step,_from)
     ),
 ])),
 # phi_min line
@@ -147,13 +147,13 @@ def plot(step, _step, agent_decisions, compressors, output):
 # TICKS
 # add L_max_axis_intercept value as tic
 "set ytics add('L_{max\\_axis\\_int}(%s))' %f) " % (
-    str(round(p_old(_from), 1)),
+    str(round(p_old(step,_from), 1)),
     L_max_axis_intercept(
         L_max_pi,
         eta,
         p_i_min,
         p_i_max,
-        p_old(_from)
+        p_old(step,_from)
     )
 ),
 
@@ -192,15 +192,15 @@ def plot(step, _step, agent_decisions, compressors, output):
       L_max_pi,
       eta,
       gas,
-      p_old(_from),
-      p_old(_to)
+      p_old(step,_from),
+      p_old(step,_to)
       ),
-  0 if phi_new(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(_from),p_old(_to)) == 0 else p_old(_to) / p_old(_from)
+  0 if phi_new(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(step,_from),p_old(step,_to)) == 0 else p_old(step,_to) / p_old(step,_from)
   ),
-  #if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(l),p_old(r)) == 0:
+  #if phi_new(phi_min,phi_max,pi_1,pi_2,L_min_pi,L_max_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_old(step,l),p_old(step,r)) == 0:
   #    0
   #else:
-  #    p_old(r) / p_old(l)
+  #    p_old(step,r) / p_old(step,l)
   #),
 
 #    intercept(
@@ -211,10 +211,10 @@ def plot(step, _step, agent_decisions, compressors, output):
 #        L_max_pi,
 #        eta,
 #        gas,
-#        p_old(_from),
-#        p_old(_to)
+#        p_old(step,_from),
+#        p_old(step,_to)
 #    ),
-#    (p_old(_to) / p_old(_from))
+#    (p_old(step,_to) / p_old(step,_from))
 #),
 
 # FINILIZE

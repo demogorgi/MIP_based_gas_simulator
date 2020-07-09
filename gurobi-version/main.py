@@ -34,7 +34,6 @@ agent_decisions = always_merger.merge(agent_decisions,fixed_decisions)
 print("Updated agent decisions:")
 pprint.pprint(agent_decisions)
 
-
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)

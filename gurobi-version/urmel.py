@@ -53,31 +53,44 @@ def simulator_step(agent_decisions, step, process_type):
             if config['urmel_console_output']:
                 print('%s %g' % (v.varName, v.x))
         # set old to old_old and current value to old for flows and pressures
+        states[step] = {'p': {}, 'q': {}, 'q_in': {}, 'q_out': {}}
         for node in no.nodes:
-            sc.var_node_p_old_old[node] = sc.var_node_p_old[node]
-            sc.var_node_p_old[node] = sol["var_node_p[%s]" % node]
+            states[step]['p'][node] = sol["var_node_p[%s]" % node]
+            #sc.var_node_p_old_old[node] = sc.var_node_p_old[node]
+            #sc.var_node_p_old[node] = sol["var_node_p[%s]" % node]
         for non_pipe in co.non_pipes:
-            sc.var_non_pipe_Qo_old_old[non_pipe] = sc.var_non_pipe_Qo_old[non_pipe]
-            sc.var_non_pipe_Qo_old[non_pipe] = sol["var_non_pipe_Qo[%s,%s]" % non_pipe]
+            states[step]['q'][non_pipe] = sol["var_non_pipe_Qo[%s,%s]" % non_pipe]
+            #sc.var_non_pipe_Qo_old_old[non_pipe] = sc.var_non_pipe_Qo_old[non_pipe]
+            #sc.var_non_pipe_Qo_old[non_pipe] = sol["var_non_pipe_Qo[%s,%s]" % non_pipe]
         for pipe in co.pipes:
-            sc.var_pipe_Qo_in_old_old[pipe] = sc.var_pipe_Qo_in_old[pipe]
-            sc.var_pipe_Qo_in_old[pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
-            sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
-            sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
+            states[step]['q_in'][pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
+            states[step]['q_out'][pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
+            #sc.var_pipe_Qo_in_old_old[pipe] = sc.var_pipe_Qo_in_old[pipe]
+            #sc.var_pipe_Qo_in_old[pipe] = sol["var_pipe_Qo_in[%s,%s]" % pipe]
+            #sc.var_pipe_Qo_out_old_old[pipe] = sc.var_pipe_Qo_out_old[pipe]
+            #sc.var_pipe_Qo_out_old[pipe] = sol["var_pipe_Qo_out[%s,%s]" % pipe]
         ###############
         ### the following can be is used to generate a new initial state.
         ###############
         if config["new_init_scenario"] and step == int(sys.argv[2]) - 1:
             new_init_scenario = "import gurobipy as gp\nfrom gurobipy import GRB\n"
             if config["new_init_scenario"]:
-                new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)
-                new_init_scenario += "\nvar_node_p_old = " + str(sc.var_node_p_old)
-                new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(sc.var_non_pipe_Qo_old_old)
-                new_init_scenario += "\nvar_non_pipe_Qo_old = " + str(sc.var_non_pipe_Qo_old)
-                new_init_scenario += "\nvar_pipe_Qo_in_old_old = " + str(sc.var_pipe_Qo_in_old_old)
-                new_init_scenario += "\nvar_pipe_Qo_in_old = " + str(sc.var_pipe_Qo_in_old)
-                new_init_scenario += "\nvar_pipe_Qo_out_old_old = " + str(sc.var_pipe_Qo_out_old_old)
-                new_init_scenario += "\nvar_pipe_Qo_out_old = " + str(sc.var_pipe_Qo_out_old)
+                new_init_scenario += "\nvar_node_p_old_old = " + str(states[step-1]["p"])
+                #new_init_scenario += "\nvar_node_p_old_old = " + str(sc.var_node_p_old_old)
+                new_init_scenario += "\nvar_node_p_old = " + str(states[step]["p"])
+                #new_init_scenario += "\nvar_node_p_old = " + str(sc.var_node_p_old)
+                new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(states[step-1]["q"])
+                #new_init_scenario += "\nvar_non_pipe_Qo_old_old = " + str(sc.var_non_pipe_Qo_old_old)
+                new_init_scenario += "\nvar_non_pipe_Qo_old = " + str(states[step]["q"])
+                #new_init_scenario += "\nvar_non_pipe_Qo_old = " + str(sc.var_non_pipe_Qo_old)
+                new_init_scenario += "\nvar_pipe_Qo_in_old_old = " + str(states[step-1]["q_in"])
+                #new_init_scenario += "\nvar_pipe_Qo_in_old_old = " + str(sc.var_pipe_Qo_in_old_old)
+                new_init_scenario += "\nvar_pipe_Qo_in_old = " + str(states[step]["q_in"])
+                #new_init_scenario += "\nvar_pipe_Qo_in_old = " + str(sc.var_pipe_Qo_in_old)
+                new_init_scenario += "\nvar_pipe_Qo_out_old_old = " + str(states[step-1]["q_out"])
+                #new_init_scenario += "\nvar_pipe_Qo_out_old_old = " + str(sc.var_pipe_Qo_out_old_old)
+                new_init_scenario += "\nvar_pipe_Qo_out_old = " + str(states[step]["q_out"])
+                #new_init_scenario += "\nvar_pipe_Qo_out_old = " + str(sc.var_pipe_Qo_out_old)
                 f = open(path.join(sys.argv[1],'new_init_scenario.py'), "w")
                 f.write(new_init_scenario)
                 f.close()

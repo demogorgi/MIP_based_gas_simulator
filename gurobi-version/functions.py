@@ -15,6 +15,26 @@ co = importlib.import_module(wd + ".connections")
 from constants import *
 from math import *
 
+def get_init_scenario():
+    states = {}
+    states[-2] = {'p': {}, 'q': {}, 'q_in': {}, 'q_out': {}}
+    states[-1] = {'p': {}, 'q': {}, 'q_in': {}, 'q_out': {}}
+    for node in no.nodes:
+        states[-2]["p"][node]     = sc.var_node_p_old_old[node]
+        states[-1]["p"][node]     = sc.var_node_p_old[node]
+    for non_pipe in co.non_pipes:
+        states[-2]["q"][non_pipe] = sc.var_non_pipe_Qo_old_old[non_pipe]
+        states[-1]["q"][non_pipe] = sc.var_non_pipe_Qo_old[non_pipe]
+    for pipe in co.pipes:
+        states[-2]["q_in"][pipe]  = sc.var_pipe_Qo_in_old_old[pipe]
+        states[-2]["q_out"][pipe] = sc.var_pipe_Qo_out_old_old[pipe]
+        states[-1]["q_in"][pipe]  = sc.var_pipe_Qo_in_old[pipe]
+        states[-1]["q_out"][pipe] = sc.var_pipe_Qo_out_old[pipe]
+    return states
+
+states = get_init_scenario()
+print(states)
+
 # Mean values are used to stabilize simulation
 def stabilizer(a, b):
     if a * b > 1:
@@ -26,20 +46,33 @@ def stabilizer(a, b):
         return ( a + b ) / 2
 
 # pressure stabilizer
-def p_old(n):
-    return stabilizer(sc.var_node_p_old[n], sc.var_node_p_old_old[n])
-    
+def p_old(i,n):
+    return stabilizer(states[i-1]["p"][n], states[i-2]["p"][n])
+
 # flow stabilizer (non-pipes)
-def q_old(non_pipe):
-    return stabilizer(abs(sc.var_non_pipe_Qo_old[non_pipe]), abs(sc.var_non_pipe_Qo_old_old[non_pipe]))
+def q_old(i,non_pipe):
+    return stabilizer(abs(states[i-1]["q"][non_pipe]), abs(states[i-2]["q"][non_pipe]))
     
 # pipe inflow stabilizer
-def q_in_old(pipe):
-    return stabilizer(abs(sc.var_pipe_Qo_in_old[pipe]), abs(sc.var_pipe_Qo_in_old_old[pipe]))
+def q_in_old(i,pipe):
+    return stabilizer(abs(states[i-1]["q_in"][pipe]), abs(states[i-2]["q_in"][pipe]))
     
 # pipe outflow stabilizer
-def q_out_old(pipe):
-    return stabilizer(abs(sc.var_pipe_Qo_out_old[pipe]), abs(sc.var_pipe_Qo_out_old_old[pipe]))
+def q_out_old(i,pipe):
+    return stabilizer(abs(states[i-1]["q_out"][pipe]), abs(states[i-2]["q_out"][pipe]))
+
+#for node in no.nodes:
+#    print(node)
+#    print(p_old(0,node))
+#for non_pipe in co.non_pipes:
+#    print(non_pipe)
+#    print(q_old(0,non_pipe))
+#for pipe in co.pipes:
+#    print(pipe)
+#    print(q_in_old(0,pipe))
+#for pipe in co.pipes:
+#    print(pipe)
+#    print(q_out_old(0,pipe))
 
 # reduced pressure (2.4 Forne)
 def pr(p):
@@ -66,21 +99,21 @@ def lamb(diam, rough):
     return ( 2 * log(diam/rough,10) + 1.138 ) ** -2
     
 # Rs * Tm * zm / A
-def rtza(i,o):
+def rtza(t,i,o):
     #print("rtza(%s,%s) = %f" %(i,o,Rs * Tm * zm(p_old(i),p_old(o)) / A(co.diameter[(i,o)])))
-    return Rs * Tm * zm(p_old(i),p_old(o)) / A(co.diameter[(i,o)])
+    return Rs * Tm * zm(p_old(t,i),p_old(t,o)) / A(co.diameter[(i,o)])
     
 # Inflow velocity
-def vi(i,o):
-    return rtza(i,o) * rho / 3.6 * q_in_old((i,o)) / ( b2p * p_old(i) )
+def vi(t,i,o):
+    return rtza(t,i,o) * rho / 3.6 * q_in_old(t,(i,o)) / ( b2p * p_old(t,i) )
     
 # Outflow velocity
-def vo(i,o):
-    return rtza(i,o) * rho / 3.6 * q_out_old((i,o)) / ( b2p * p_old(o) )
+def vo(t,i,o):
+    return rtza(t,i,o) * rho / 3.6 * q_out_old(t,(i,o)) / ( b2p * p_old(t,o) )
 
 ## Function for resistor model
-def vm(i,o):
-    vm =  rho / 3.6 * ( rtza(i,o) * q_old((i,o)) ) / 2 * 1 / b2p * ( 1 / p_old(i) + 1 / p_old(o) )
+def vm(t,i,o):
+    vm =  rho / 3.6 * ( rtza(t,i,o) * q_old(t,(i,o)) ) / 2 * 1 / b2p * ( 1 / p_old(t,i) + 1 / p_old(t,o) )
     vmm = max(vm, 2)
     #print("i: %s, o: %s, vm: %f, vmm: %f" % (i,o,vm,vmm))
     return vmm

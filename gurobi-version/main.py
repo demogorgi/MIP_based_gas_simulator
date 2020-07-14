@@ -78,6 +78,18 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
+#Creating a csv file containing information regarding trader nominations, dispatcher decisions and penalties
+#which is readable in DE machines
+with open(path.join(data_path, 'output/information.csv'), 'r+') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+') as outfile:
+    reader = csv.reader(infile, delimiter=',')
+    writer = csv.writer(outfile, delimiter=';')
+
+    for row in reader:
+        row = str(row).replace(',',';')
+        row = row.replace('.', ',')
+        res = str(row)[1:-1]
+        res = res.replace("'", '')
+        writer.writerow(res.split(';'))
 
 # generate contour output
 if config["contour_output"]:

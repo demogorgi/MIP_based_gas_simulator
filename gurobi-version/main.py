@@ -33,6 +33,8 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
 agent_decisions = always_merger.merge(agent_decisions,fixed_decisions)
 print("Updated agent decisions:")
 pprint.pprint(agent_decisions)
+if config['ai'] is True:
+    agent_decisions = remove_da_fixed_decisions(agent_decisions)
 
 simulator_step.counter = 0
 for i in range(numSteps):

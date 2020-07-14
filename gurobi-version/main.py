@@ -8,6 +8,7 @@
 from urmel import *
 import pprint
 from deepmerge import always_merger
+import random
 
 #if config["ai"]:
 from ai_part.main_ai import *
@@ -39,6 +40,13 @@ if config['ai'] is True:
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
+
+    # dirty hack to modify nominations
+    if i > 25 and i % 8 == 0:
+      a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
+      agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i] = a
+      agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i] = 1100 - a
+
     # for every i in numSteps a simulator step is performed.
     # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
     # i is the step number (neccessary for naming output files if any).

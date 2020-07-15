@@ -143,10 +143,6 @@ class MCTS(object):
         old_DA = list(v for k, v in dispatcher_dec.items())
         indices = []
         psa_vector = []
-        probabilities = []
-
-        #value_vector = [gas_network.get_action_value(action) for action in possible_decisions]
-        #positive_indices = [i for i, value in enumerate(value_vector) if not value < 0]
 
         for idx, decision in enumerate(possible_decisions):
             indices.append([i for i in range(len(decision)) if old_DA[i] == decision[i]])
@@ -155,10 +151,7 @@ class MCTS(object):
             probability = 0
             for i in range(len(index)):
                 probability += prob_vector[index[i]]
-            probabilities.append(probability)
-        #psa_vector = [prob for i, prob in enumerate(probabilities) if i in positive_indices]
-
-        psa_vector = probabilities
+            psa_vector.append(probability)
 
         if len(psa_vector) != gas_network.action_size:
             if len(psa_vector) < gas_network.action_size:

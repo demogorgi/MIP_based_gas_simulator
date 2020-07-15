@@ -33,23 +33,35 @@ class Gas_Network(object):
 
     #Function to get possible dispatcher decisions
     def dispatcher_decisions(self, old_decisions):
-
+        cs = None
+        zeta = None
+        gas = None
         da_decisions = {}
 
         val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
+        rnd_value = lambda: round(random.uniform(0,1), 2)
+
+        for i, k in trader_dec.items():
+            if re.search('entry_nom', i):
+                res = re.sub('entry_nom\[(\S*)]', r'\1', i)
+                if re.search('EN', res) and k > 0:
+                    cs = 1
+                    gas = rnd_value()
+                if re.search('EH', res) and k > 0:
+                    cs = 0
+                    zeta = rnd_value()*(CFG.zeta_ub-CFG.zeta_lb)+CFG.zeta_lb
+                    #zeta = random.randint(100, 1200) #[100,1200]
 
         for l, v in old_decisions.items():
             if re.match('va', l):
                 da_decisions[l] = val(v)
             elif re.match('zeta', l):
-                zeta = random.randint(100, 1200) #[100,1200]
-                da_decisions[l] = zeta
+                da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
-                gas = round(random.uniform(0.0, 1.0), 2)
-                da_decisions[l] = gas
+                da_decisions[l] = gas if gas is not None else v
             elif re.match('compressor', l):
-                da_decisions[l] = val(v)
+                da_decisions[l] = cs if cs is not None else v
 
         valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
 
@@ -57,7 +69,6 @@ class Gas_Network(object):
         list_valid_decisions = []
         for i in range(len(valid_dispatcher_decisions)):
             list_valid_decisions.append(subsets(valid_dispatcher_decisions,i+1))
-
         valid_decisions = [item for elem in list_valid_decisions for item in elem]
 
         return valid_decisions
@@ -68,7 +79,7 @@ class Gas_Network(object):
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
-        #if step < self.dt:
+
         for key, value in dispatcher_actions.items():
             if re.search('va', key):
                 decisions['va']['VA'][result(key)][step] = value
@@ -103,10 +114,12 @@ class Gas_Network(object):
                     dec[cs] = d[i][1]
                 if dec[cs] == 0: dec[gs] = 0
 
-            if (dec in list_d):# or (dec[0] == 0 and dec[1] == 0):
+            if (dec in list_d) or (dec[0] == 0 and dec[1] == 0):
                 continue
             list_d.append(dec)
-
+        list_d = self.check_decision(list_d)
+        # print(new_list_d)
+        # exit()
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -129,8 +142,16 @@ class Gas_Network(object):
         self.state = extract_from_solution(solution)
         self.exp_penalty = find_penalty(solution)
 
+    def take_old_action(self):
+        solution = simulator_step(Gas_Network.decisions_dict, self.step, "ai")
+        old_dec_penalty = find_penalty(solution)
+        dec_value = self.get_reward(old_dec_penalty)
+
+        return dec_value, old_dec_penalty[0]
+
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
+
         #low penalty rewards high value
         if penalty[0] == 0 or penalty[0] < 10:
             return 10
@@ -140,20 +161,19 @@ class Gas_Network(object):
             return -5
         else: return -10
 
-    def check_steps_over(self, step, value):
-        global value_sum
 
-        value_sum += value
-        if step < num_steps:
-            return False, 0
-        else: return True, value_sum
+    def check_decision(self, list_actions):
+        modified_list_actions = list_actions
+        for i, action in enumerate(list_actions):
 
-    def get_action_value(self, action):
+            decision = self.generate_decision_dict(action)
+            solution = simulator_step(decision, self.step, "ai")
 
-        decision = self.generate_decision_dict(action)
-        solution = simulator_step(self.config, decision, self.compressors, self.step, self.dt, "ai")
+            penalty = find_penalty(solution)
 
-        penalty = find_penalty(solution)
+            value = self.get_reward(penalty)
 
-        value = self.get_reward(penalty)
-        return value
+            if value < 0:
+                del modified_list_actions[i]
+
+        return modified_list_actions

@@ -10,7 +10,7 @@ class Train(object):
     def __init__(self, gas_network, nnet):
         self.gas_network = gas_network
         self.net = nnet
-        self.eval_net = NeuralNetworkWrapper(gas_network)
+        #self.eval_net = NeuralNetworkWrapper(gas_network)
 
     def start(self):
         #Main training function
@@ -29,17 +29,9 @@ class Train(object):
         new_agent_decision = self.get_decision()
 
         #Evaluating the decisions
-        if Gas_Network.penalties:
-            evaluator = Evaluate()
-            win_ratio = evaluator.evaluate(Gas_Network.penalties)
-
-            print("Win rate: ", win_ratio)
-            if win_ratio > 0.55:
-                print("New model saved as the best model")
-                self.net.save_model("best_model")
-            else:
-                print("New model is not the best model.")
-                self.net.load_model()
+        if Gas_Network.penalties and Gas_Network.step == numSteps-1:
+            evaluator = Evaluate(self.net)
+            evaluator.evaluate(Gas_Network.penalties)
 
         return new_agent_decision
 
@@ -49,11 +41,6 @@ class Train(object):
         self_play_data = []
 
         node = TreeNode()
-
-        #iteration_over = False
-        step = 0
-
-        #while not iteration_over:
 
         best_child = mcts.search(gas_network, node, CFG.temperature)
 
@@ -65,13 +52,8 @@ class Train(object):
 
         value = gas_network.get_reward(gas_network.exp_penalty)
 
-            #Considering 5 future steps to make a decision
-            # v = gas_network.get_action_value(action)
-            # iteration_over, value = gas_network.check_steps_over(step, v)
-            # step += 1
-
-            #best_child.parent = None
-            #node = best_child    #Make the child node the root node
+            # best_child.parent = None
+            # node = best_child    #Make the child node the root node
 
         # Update v as the value of the game result
         for state_value in self_play_data:
@@ -84,24 +66,22 @@ class Train(object):
     def get_decision(self):
         mcts = MCTS(self.net)
         gas_network = self.gas_network.clone()
-        feasible = False
         node = TreeNode()
 
-        dec_penalty = {}
+        best_child = mcts.search(gas_network, node, CFG.temperature)
+        action = best_child.action
+        gas_network.take_action(action)
 
-        for i in range(CFG.num_evaluation_plays):
+        value = gas_network.get_reward(gas_network.exp_penalty)
+        p1 = gas_network.exp_penalty[0]
 
-            best_child = mcts.search(gas_network, node, CFG.temperature)
-            best_action = best_child.action
-            #print(best_action)
-            gas_network.take_action(best_action)
+        old_dec_value, p2 = gas_network.take_old_action()
 
-            dec_penalty[i] = [best_action, gas_network.exp_penalty[0]]
+            #best_child.parent = None
+            #node = best_child    #Make the child node the root node
 
-        d = dec_penalty[min(dec_penalty, key=dec_penalty.get)]
-        best_decision = gas_network.generate_decision_dict(d[0])
-
-        if d[1] < 10:
+        if p1 < p2:
+            best_decision = gas_network.generate_decision_dict(action)
             return best_decision
         else:
             return None

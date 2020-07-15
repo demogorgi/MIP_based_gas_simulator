@@ -28,3 +28,7 @@ class CFG(object):
     flow_wt_factor = 0.1
 
     num_evaluation_plays = 5 # Number of evaluation plays
+
+    #Upper and lower limit for generating a drag factor value for RE
+    zeta_ub = 1200
+    zeta_lb = 100

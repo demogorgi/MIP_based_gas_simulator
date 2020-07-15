@@ -4,9 +4,8 @@ from .configs import *
 class Evaluate(object):
     #Class to evaluate the trained model
 
-    # def __init__(self, eval_mcts):
-    #     self.eval_mcts = eval_mcts
-    #     self.gas_network = gas_network
+    def __init__(self, net):
+        self.nnet = net
 
     def evaluate(self, penalty):
 
@@ -15,7 +14,7 @@ class Evaluate(object):
 
         for i in range(len(penalty)):
 
-            if penalty[i][0] < penalty[i][1] or penalty[i][0] == 0 or penalty[i][0] < 10:
+            if penalty[i][0] < penalty[i][1] or penalty[i][0] < 20:
                 wins += 1
             elif penalty[i][0] > penalty[i][1] or penalty[i][0] > 100:
                 losses += 1
@@ -28,4 +27,12 @@ class Evaluate(object):
         else:
             win_ratio = wins / num_games
 
-        return win_ratio
+        print("Win rate: ", win_ratio)
+        if win_ratio > 0.55:
+            print("New model saved as the best model")
+            self.nnet.save_model("best_model")
+        else:
+            print("New model is not the best model.")
+            self.nnet.load_model()
+
+        #return win_ratio

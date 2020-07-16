@@ -78,17 +78,22 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-#Creating a csv file containing information regarding trader nominations, dispatcher decisions and penalties
-#which is readable in DE machines
-with open(path.join(data_path, 'output/information.csv'), 'r+') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+') as outfile:
-    reader = csv.reader(infile, delimiter=',')
-    writer = csv.writer(outfile, delimiter=';')
 
-    for row in reader:
+#Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
+with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:
+    reader = csv.reader(infile, delimiter = ',')
+    writer = csv.writer(outfile, delimiter = ';')
+    header = next(reader)
+    newrow = [''.join('^' if c is ',' else c for c in entry) for entry in header]
+    newrow = str(newrow)[1:-1]
+    newrow = newrow.replace("'", '')
+    writer.writerow(newrow.split(','))
+    rows = [r for r in reader]
+    for row in rows:
         row = str(row).replace(',',';')
         row = row.replace('.', ',')
-        res = str(row)[1:-1]
-        res = res.replace("'", '')
+        res = row[1:-1]
+        res = res.replace("'", r'').replace(' ', r'')
         writer.writerow(res.split(';'))
 
 # generate contour output

@@ -42,10 +42,10 @@ for i in range(numSteps):
     print("step %d" % i)
 
     # dirty hack to modify nominations
-    if i > 25 and i % 8 == 0:
+    if i > 20 and i % 8 == 0 and (i+8) < numSteps:
       a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
-      agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i] = a
-      agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i] = 1100 - a
+      agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+8] = a
+      agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+8] = 1100 - a
 
     # for every i in numSteps a simulator step is performed.
     # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
@@ -81,20 +81,8 @@ for i in range(numSteps):
 
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:
-    reader = csv.reader(infile, delimiter = ',')
-    writer = csv.writer(outfile, delimiter = ';')
-    header = next(reader)
-    newrow = [''.join('^' if c is ',' else c for c in entry) for entry in header]
-    newrow = str(newrow)[1:-1]
-    newrow = newrow.replace("'", '')
-    writer.writerow(newrow.split(','))
-    rows = [r for r in reader]
-    for row in rows:
-        row = str(row).replace(',',';')
-        row = row.replace('.', ',')
-        res = row[1:-1]
-        res = res.replace("'", r'').replace(' ', r'')
-        writer.writerow(res.split(';'))
+    csv2csv_de(infile,outfile)
+
 
 # generate contour output
 if config["contour_output"]:

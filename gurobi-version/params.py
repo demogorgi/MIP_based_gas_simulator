@@ -3,6 +3,7 @@ from os import path
 import os
 import yaml
 import re
+import csv
 
 from datetime import datetime, timedelta
 
@@ -66,3 +67,19 @@ def remove_da_fixed_decisions(agent_decisions):
                             del value_2[i]
                             break
     return agent_decisions
+
+def csv2csv_de(infile, outfile):
+    reader = csv.reader(infile, delimiter = ',')
+    writer = csv.writer(outfile, delimiter = ';')
+    header = next(reader)
+    newrow = [''.join('^' if c is ',' else c for c in entry) for entry in header]
+    newrow = str(newrow)[1:-1]
+    newrow = newrow.replace("'", '')
+    writer.writerow(newrow.split(','))
+    rows = [r for r in reader]
+    for row in rows:
+        row = str(row).replace(',',';')
+        row = row.replace('.', ',')
+        res = row[1:-1]
+        res = res.replace("'", r'').replace(' ', r'')
+        writer.writerow(res.split(';'))

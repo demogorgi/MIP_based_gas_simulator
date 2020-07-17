@@ -2,6 +2,7 @@ import math
 from copy import deepcopy
 
 from .sol2statepenalty import *
+from .configs import *
 
 class TreeNode(object):
     #Class represents a state (of network) and stores statistics for action(decision) at the state
@@ -38,7 +39,7 @@ class TreeNode(object):
 
     def select_child(self):
 
-        c_puct = CFG.c_puct
+        c_puct = configs.c_puct
         highest_puct = 0
         highest_index = 0
 
@@ -81,9 +82,9 @@ class MCTS(object):
         self.root = node
         self.gas_network = gas_network
 
-        for i in range(CFG.num_mcts_sims):
+        for i in range(configs.num_mcts_sims):
             node = self.root
-            gas_network = self.gas_network.clone()
+            gas_network = deepcopy(self.gas_network)
 
             while node.is_not_leaf():
                 node = node.select_child()
@@ -94,7 +95,7 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = gas_network.get_decisions(gas_network.agent_decisions)
+            possible_decisions = gas_network.get_decisions(gas_network.get_da_decision())
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 
@@ -105,7 +106,7 @@ class MCTS(object):
 
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector, valid_decisions = possible_decisions)
 
-            wsa = gas_network.get_reward(gas_network.exp_penalty)
+            wsa = gas_network.get_reward(gas_network.n_penalty)
 
             while node is not None:
                 wsa = -wsa
@@ -126,7 +127,7 @@ class MCTS(object):
 
     def add_dirichlet_noise(self, gas_network, psa_vector):
 
-        dirichlet_input = [CFG.dirichlet_alpha for x in range(gas_network.action_size)]
+        dirichlet_input = [configs.dirichlet_alpha for x in range(gas_network.get_action_size())]
 
         dirichlet_list = np.random.dirichlet(dirichlet_input)
 
@@ -134,7 +135,7 @@ class MCTS(object):
 
         for idx, psa in enumerate(psa_vector):
             noisy_psa_vector.append(
-                (1 - CFG.epsilon) * psa + CFG.epsilon * dirichlet_list[idx])
+                (1 - configs.epsilon) * psa + configs.epsilon * dirichlet_list[idx])
 
         return noisy_psa_vector
 
@@ -153,11 +154,11 @@ class MCTS(object):
                 probability += prob_vector[index[i]]
             psa_vector.append(probability)
 
-        if len(psa_vector) != gas_network.action_size:
-            if len(psa_vector) < gas_network.action_size:
-                d = gas_network.action_size - len(psa_vector)
+        if len(psa_vector) != gas_network.get_action_size():
+            if len(psa_vector) < gas_network.get_action_size():
+                d = gas_network.get_action_size() - len(psa_vector)
                 psa_vector = (psa_vector + [0] * d)
             else:
-                psa_vector = random.sample(psa_vector, gas_network.action_size)
+                psa_vector = random.sample(psa_vector, gas_network.get_action_size())
 
         return psa_vector

@@ -1,20 +1,15 @@
-import importlib
-import sys
-import re
 import numpy as np
 import random
+from .utils import *
 
-from .configs import *
-
-wd = sys.argv[1].replace("/",".")
-wd = re.sub(r'\.$', '', wd)
-
-no = importlib.import_module(wd + ".nodes") #Nodes of the network(entry + exit +inner nodes)
-co = importlib.import_module(wd + ".connections") #Connections of the network
-
-special_pipes = []
-for i in co.special:
-    special_pipes.append(re.sub("\('(\S*)',\s'(\S*)'\)", r'\1,\2', str(i)))
+args = dotdict({
+    #Weights to calculate penalty for both agents
+    'pressure_wt_factor' : 1,
+    'flow_wt_factor' : 0.1,
+    #Upper and lower limit for generating a drag factor value for RE
+    'zeta_ub' : 1200,
+    'zeta_lb' : 100,
+})
 
 original_nodes = []
 for n in no.nodes:
@@ -104,7 +99,7 @@ def find_penalty(solution):
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
 
-    dispatcher_penalty = int(CFG.pressure_wt_factor * pr_violations + CFG.flow_wt_factor * flow_violations)
+    dispatcher_penalty = int(args.pressure_wt_factor * pr_violations + args.flow_wt_factor * flow_violations)
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
@@ -124,14 +119,3 @@ def get_con_pos():
     gas_pos = va+rs
     cs_pos = va+rs+cs
     return rs_pos,gas_pos,cs_pos
-
-def get_bn_pressures_flows(solution):
-    exit_pr_flows = {}
-    for k,v in solution.items():
-        if re.findall(r"var_node_p\[("+'|'.join(no.exits)+r")]",k):
-            exit_pr_flows[k] = v
-        elif re.findall(r"var_node_Qo_in\[("+'|'.join(no.exits)+r")]",k):
-            exit_pr_flows[k] = v
-        elif re.findall(r"var_pipe_Qo_in\[("+'|'.join(special_pipes)+r")]",k):
-            exit_pr_flows[k] = v
-    return exit_pr_flows

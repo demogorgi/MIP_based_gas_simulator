@@ -9,53 +9,60 @@ from urmel import *
 
 class Gas_Network(object):
 
-    #Class level variables
     state = None
+    next_step = 0
     decisions_dict = {}
-    penalty = [0, 0] #[Dispatcher penalty, Trader penalty]
-    exp_penalty = [0,0]
-    step = 0
+    c_penalty = [0, 0] #Current penalty [Dispatcher penalty, Trader penalty]
+    n_penalty = [0, 0] #Penalty expected for new decision
     penalties = []
 
     def __init__(self):
-
         self.row = len(self.state)
-        self.current_agent = CFG.dispatcher_agent
-        self.action_size = self.row
-        self.agent_decisions = dispatcher_dec #{**dispatcher_dec, **trader_dec}
 
-    def clone(self):
+    def get_action_size(self):
+        return self.row
 
-        network_clone = Gas_Network()
-        network_clone.state = deepcopy(self.state)
-        network_clone.decisions_dict = deepcopy(self.decisions_dict)
-        return network_clone
+    def get_state_dimension(self):
+        return (self.row, 1)
+
+    def get_da_decision(self):
+        return dispatcher_dec
+
+    def get_agent_decision(self):
+        return self.decisions_dict
+
+    def set_agent_decision(self, new_decision):
+        self.decisions_dict = new_decision
+
 
     #Function to get possible dispatcher decisions
-    def dispatcher_decisions(self, old_decisions):
+    def get_valid_decisions(self, old_decisions):
         cs = None
         zeta = None
         gas = None
+        va = 0
         da_decisions = {}
 
-        val = lambda b: int(1-b)
+        #val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
         rnd_value = lambda: round(random.uniform(0,1), 2)
 
         for i, k in trader_dec.items():
             if re.search('entry_nom', i):
                 res = re.sub('entry_nom\[(\S*)]', r'\1', i)
-                if re.search('EN', res) and k > 0:
+                if re.search('EN', res) and k > 500:
                     cs = 1
                     gas = rnd_value()
-                if re.search('EH', res) and k > 0:
+                if re.search('EH', res) and k > 500:
                     cs = 0
-                    zeta = rnd_value()*(CFG.zeta_ub-CFG.zeta_lb)+CFG.zeta_lb
+                    zeta = rnd_value()*(args.zeta_ub-args.zeta_lb)+args.zeta_lb
                     #zeta = random.randint(100, 1200) #[100,1200]
+                if k > 500: va += 1
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                da_decisions[l] = val(v)
+                da_decisions[l] = int(va-1) if va > 1 else int(v)
+                va -= 1
             elif re.match('zeta', l):
                 da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
@@ -74,8 +81,8 @@ class Gas_Network(object):
         return valid_decisions
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
-        step = self.step
-        decisions = self.decisions_dict
+        step = self.next_step
+        decisions = self.get_agent_decision()
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
 
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
@@ -94,7 +101,7 @@ class Gas_Network(object):
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
 
-        possible_decisions = self.dispatcher_decisions(agent_decisions)
+        possible_decisions = self.get_valid_decisions(agent_decisions)
         decisions = list(v for k, v in agent_decisions.items())
         rs, gs, cs = get_con_pos()
 
@@ -118,8 +125,6 @@ class Gas_Network(object):
                 continue
             list_d.append(dec)
         list_d = self.check_decision(list_d)
-        # print(new_list_d)
-        # exit()
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -135,15 +140,15 @@ class Gas_Network(object):
     #Apply the chosen decision
     def take_action(self, da_action):
 
-        self.decisions_dict = self.generate_decision_dict(da_action)
+        self.set_agent_decision(self.generate_decision_dict(da_action))
 
-        solution = simulator_step(self.decisions_dict, self.step, "ai")
+        solution = simulator_step(self.get_agent_decision(), self.next_step, "ai")
 
         self.state = extract_from_solution(solution)
-        self.exp_penalty = find_penalty(solution)
+        self.n_penalty = find_penalty(solution)
 
     def take_old_action(self):
-        solution = simulator_step(Gas_Network.decisions_dict, self.step, "ai")
+        solution = simulator_step(Gas_Network.decisions_dict, self.next_step, "ai")
         old_dec_penalty = find_penalty(solution)
         dec_value = self.get_reward(old_dec_penalty)
 
@@ -167,7 +172,7 @@ class Gas_Network(object):
         for i, action in enumerate(list_actions):
 
             decision = self.generate_decision_dict(action)
-            solution = simulator_step(decision, self.step, "ai")
+            solution = simulator_step(decision, self.next_step, "ai")
 
             penalty = find_penalty(solution)
 

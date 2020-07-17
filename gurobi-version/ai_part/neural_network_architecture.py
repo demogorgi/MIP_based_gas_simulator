@@ -1,22 +1,32 @@
-from .configs import *
+
 import tensorflow as tf
 import os
 import numpy as np
+from .configs import *
+
+args = dotdict({
+    'learning_rate':0.001,
+    'epochs':10,
+    'batch_size':64,
+    'num_channels':512,
+    'momentum': 0.9,
+    'resnet_blocks': 5,
+})
 
 class NeuralNetwork(object):
     #Represent Policy and value head
 
     def __init__(self, gas_network):
-        self.row = gas_network.row
-        self.cols = 1
-        self.action_size = gas_network.action_size
+        self.row, self.cols = gas_network.get_state_dimension()
+        self.action_size = gas_network.get_action_size()
+
         self.pi = None
         self.v = None
 
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.states = tf.placeholder(tf.float32,
-                                         shape = [None, self.row, self.cols])
+                                         shape = [None,self.row, self.cols])
             self.training = tf.placeholder(tf.bool)
 
             #Input_Layer
@@ -40,7 +50,7 @@ class NeuralNetwork(object):
             resnet_in_out = relu1
 
             #Residual Tower
-            for i in range(CFG.resnet_blocks):
+            for i in range(args.resnet_blocks):
                 #Residual Block
                 conv2 = tf.layers.conv2d(
                     inputs = resnet_in_out,
@@ -123,8 +133,8 @@ class NeuralNetwork(object):
 
             #Stochastic gradient descent with momentum
             optimizer = tf.train.MomentumOptimizer(
-                learning_rate = CFG.learning_rate,
-                momentum = CFG.momentum,
+                learning_rate = args.learning_rate,
+                momentum = args.momentum,
                 use_nesterov = False)
             self.train_op = optimizer.minimize(self.total_loss)
 
@@ -147,7 +157,6 @@ class NeuralNetworkWrapper(object):
     def policy_value(self, state):
 
         state = state[np.newaxis, :, :]
-
         pi,v = self.sess.run([self.net.pi, self.net.v],
                              feed_dict = {self.net.states: state,
                                           self.net.training: False})
@@ -159,14 +168,14 @@ class NeuralNetworkWrapper(object):
 
         print("\nTraining the network\n")
 
-        for epoch in range(CFG.epochs):
+        for epoch in range(args.epochs):
 
             print("Epoch", epoch+1)
             examples_num = len(training_data)
 
-            for i in range(0, examples_num, CFG.batch_size):
+            for i in range(0, examples_num, args.batch_size):
                 states, pis, vs = map(list,
-                                      zip(*training_data[i:i+CFG.batch_size]))
+                                      zip(*training_data[i:i+args.batch_size]))
 
                 feed_dict = {self.net.states: states,
                              self.net.train_pis: pis,
@@ -182,14 +191,14 @@ class NeuralNetworkWrapper(object):
         print("\n")
 
     def save_model(self, filename = "current_model"):
-        if not os.path.exists(CFG.model_dir):
-            os.mkdir(CFG.model_dir)
+        if not os.path.exists(configs.model_dir):
+            os.mkdir(configs.model_dir)
 
-        file_path = CFG.model_dir + filename
-        #print("Saving model:", filename, "to", CFG.model_dir)
+        file_path = configs.model_dir + filename
+        #print("Saving model:", filename, "to", configs.model_dir)
         self.net.saver.save(self.sess, file_path)
 
     def load_model(self, filename = "current_model"):
-        file_path = CFG.model_dir + filename
-        #print("Loading model:", filename, "from", CFG.model_dir)
+        file_path = configs.model_dir + filename
+        #print("Loading model:", filename, "from", configs.model_dir)
         self.net.saver.restore(self.sess, file_path)

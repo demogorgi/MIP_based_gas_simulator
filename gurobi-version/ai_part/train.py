@@ -1,5 +1,5 @@
 #File contains class to train NN using MCTS
-from .configs import *
+
 from .mcts import *
 from .evaluate import *
 from .neural_network_architecture import *
@@ -17,9 +17,9 @@ class Train(object):
 
         training_data = []
 
-        for i in range(CFG.num_self_plays):
+        for i in range(configs.num_self_plays):
             print("Start Self-play training", i+1)
-            gas_network = self.gas_network.clone()
+            gas_network = deepcopy(self.gas_network)
             self.self_play(gas_network, training_data)
 
         self.net.save_model() #Current model saved
@@ -29,7 +29,7 @@ class Train(object):
         new_agent_decision = self.get_decision()
 
         #Evaluating the decisions
-        if Gas_Network.penalties and Gas_Network.step == numSteps-1:
+        if Gas_Network.penalties: #and Gas_Network.step == numSteps-1
             evaluator = Evaluate(self.net)
             evaluator.evaluate(Gas_Network.penalties)
 
@@ -42,7 +42,7 @@ class Train(object):
 
         node = TreeNode()
 
-        best_child = mcts.search(gas_network, node, CFG.temperature)
+        best_child = mcts.search(gas_network, node, configs.temperature)
 
         self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
 
@@ -50,7 +50,7 @@ class Train(object):
 
         gas_network.take_action(action)
 
-        value = gas_network.get_reward(gas_network.exp_penalty)
+        value = gas_network.get_reward(gas_network.n_penalty)
 
             # best_child.parent = None
             # node = best_child    #Make the child node the root node
@@ -65,20 +65,17 @@ class Train(object):
 
     def get_decision(self):
         mcts = MCTS(self.net)
-        gas_network = self.gas_network.clone()
+        gas_network = deepcopy(self.gas_network)
         node = TreeNode()
 
-        best_child = mcts.search(gas_network, node, CFG.temperature)
+        best_child = mcts.search(gas_network, node, configs.temperature)
         action = best_child.action
         gas_network.take_action(action)
 
-        value = gas_network.get_reward(gas_network.exp_penalty)
-        p1 = gas_network.exp_penalty[0]
+        value = gas_network.get_reward(gas_network.n_penalty)
+        p1 = gas_network.n_penalty[0]
 
         old_dec_value, p2 = gas_network.take_old_action()
-
-            #best_child.parent = None
-            #node = best_child    #Make the child node the root node
 
         if p1 < p2:
             best_decision = gas_network.generate_decision_dict(action)

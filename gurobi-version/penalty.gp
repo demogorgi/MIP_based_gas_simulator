@@ -4,7 +4,9 @@ set title "Quality plot"
 set xlabel "Time"
 set ylabel "Dispatcher penalty"
 if (!exists("filename")) filename='instances/da2/output/information.csv'
-while (1) {
-    plot filename every ::1 using :17 with lines title "Dispatcher penalty"
+f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
+set title f(filename)
+while (5) {
+    plot [0:f(filename)] filename every ::1 using :17 with lines title "Dispatcher penalty"
     pause 1
 }

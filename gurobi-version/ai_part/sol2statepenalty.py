@@ -1,5 +1,9 @@
+import importlib
+import sys
+import re
 import numpy as np
 import random
+
 from .utils import *
 
 args = dotdict({
@@ -10,6 +14,16 @@ args = dotdict({
     'zeta_ub' : 1200,
     'zeta_lb' : 100,
 })
+
+wd = sys.argv[1].replace("/",".")
+wd = re.sub(r'\.$', '', wd)
+
+no = importlib.import_module(wd + ".nodes") #Nodes of the network(entry + exit +inner nodes)
+co = importlib.import_module(wd + ".connections") #Connections of the network
+
+special_pipes = []
+for i in co.special:
+    special_pipes.append(re.sub("\('(\S*)',\s'(\S*)'\)", r'\1,\2', str(i)))
 
 original_nodes = []
 for n in no.nodes:
@@ -119,3 +133,14 @@ def get_con_pos():
     gas_pos = va+rs
     cs_pos = va+rs+cs
     return rs_pos,gas_pos,cs_pos
+
+def get_bn_pressures_flows(solution):
+    exit_pr_flows = {}
+    for k,v in solution.items():
+        if re.findall(r"var_node_p\[("+'|'.join(no.exits)+r")]",k):
+            exit_pr_flows[k] = v
+        elif re.findall(r"var_node_Qo_in\[("+'|'.join(no.exits)+r")]",k):
+            exit_pr_flows[k] = v
+        elif re.findall(r"var_pipe_Qo_in\[("+'|'.join(special_pipes)+r")]",k):
+            exit_pr_flows[k] = v
+    return exit_pr_flows

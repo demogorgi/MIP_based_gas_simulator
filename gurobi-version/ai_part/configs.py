@@ -3,6 +3,8 @@ from .utils import *
 configs = dotdict({
     'model_dir': "./ai_part/models/", #Directory to save models
     'load_model': True, #Flag value for loading a saved model
+    'record_loss': True,
+    'loss_file':"loss.txt",
 
     'c_puct': 4, #level of exploration (1-6) used in MCTS
     'num_mcts_sims': 5,#10 #Number of MCTS simulations 800

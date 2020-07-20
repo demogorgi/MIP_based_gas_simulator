@@ -29,10 +29,7 @@ class Gas_Network(object):
         return dispatcher_dec
 
     def get_agent_decision(self):
-        return self.decisions_dict
-
-    def set_agent_decision(self, new_decision):
-        self.decisions_dict = new_decision
+        return deepcopy(self.decisions_dict)
 
 
     #Function to get possible dispatcher decisions
@@ -40,10 +37,11 @@ class Gas_Network(object):
         cs = None
         zeta = None
         gas = None
-        va = 0
+        va_1 = 0
+        va_2 = 0
         da_decisions = {}
 
-        #val = lambda b: int(1-b)
+        val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
         rnd_value = lambda: round(random.uniform(0,1), 2)
 
@@ -53,16 +51,20 @@ class Gas_Network(object):
                 if re.search('EN', res) and k > 500:
                     cs = 1
                     gas = rnd_value()
+                    va_1 += 1
                 if re.search('EH', res) and k > 500:
                     cs = 0
                     zeta = rnd_value()*(args.zeta_ub-args.zeta_lb)+args.zeta_lb
                     #zeta = random.randint(100, 1200) #[100,1200]
-                if k > 500: va += 1
+                    va_2 += 1
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                da_decisions[l] = int(va-1) if va > 1 else int(v)
-                va -= 1
+                va_name = re.sub('va\[(\S*)]', r'\1', l)
+                if va_name == 'N18^N23_1':
+                    da_decisions[l] = va_1 if va_1 == 1 else val(v)
+                else:
+                    da_decisions[l] = va_2 if va_2 == 1 else val(v)
             elif re.match('zeta', l):
                 da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
@@ -140,9 +142,9 @@ class Gas_Network(object):
     #Apply the chosen decision
     def take_action(self, da_action):
 
-        self.set_agent_decision(self.generate_decision_dict(da_action))
+        decision = self.generate_decision_dict(da_action)
 
-        solution = simulator_step(self.get_agent_decision(), self.next_step, "ai")
+        solution = simulator_step(decision, self.next_step, "ai")
 
         self.state = extract_from_solution(solution)
         self.n_penalty = find_penalty(solution)
@@ -150,9 +152,9 @@ class Gas_Network(object):
     def take_old_action(self):
         solution = simulator_step(Gas_Network.decisions_dict, self.next_step, "ai")
         old_dec_penalty = find_penalty(solution)
-        dec_value = self.get_reward(old_dec_penalty)
+        #dec_value = self.get_reward(old_dec_penalty)
 
-        return dec_value, old_dec_penalty[0]
+        return old_dec_penalty[0]
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):

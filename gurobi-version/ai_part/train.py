@@ -41,6 +41,17 @@ class Train(object):
         self_play_data = []
 
         node = TreeNode()
+        # is_decision_good = True
+        # i = 0
+
+        # while is_decision_good:
+        #     i += 1
+        #     penalty = gas_network.take_old_action()
+        #     if penalty > 20:
+        #         is_decision_good = False
+        # print(i)
+        # exit()
+        # if not is_decision_good:
 
         best_child = mcts.search(gas_network, node, configs.temperature)
 
@@ -57,7 +68,7 @@ class Train(object):
 
         # Update v as the value of the game result
         for state_value in self_play_data:
-            value = -value
+            #value = -value
             state_value[2] =  value
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
@@ -75,10 +86,11 @@ class Train(object):
         value = gas_network.get_reward(gas_network.n_penalty)
         p1 = gas_network.n_penalty[0]
 
-        old_dec_value, p2 = gas_network.take_old_action()
+        p2 = gas_network.take_old_action()
 
         if p1 < p2:
             best_decision = gas_network.generate_decision_dict(action)
+
             return best_decision
         else:
             return None

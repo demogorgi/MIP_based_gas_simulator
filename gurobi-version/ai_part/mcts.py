@@ -62,7 +62,7 @@ class TreeNode(object):
 
 
     def add_child_node(self, parent, action, psa = 0.0):
-        child_node = TreeNode(parent = parent, psa = psa, action = action)
+        child_node = TreeNode(parent = parent, action = action, psa = psa)
         self.children.append(child_node)
         return child_node
 

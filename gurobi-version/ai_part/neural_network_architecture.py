@@ -188,7 +188,17 @@ class NeuralNetworkWrapper(object):
                 pi_loss, v_loss = self.sess.run(
                     [self.net.loss_pi, self.net.loss_v],
                     feed_dict = feed_dict)
-        print("\n")
+
+              # Record pi and v loss to a file.
+                if configs.record_loss:
+                    # Create directory if it doesn't exist.
+                    if not os.path.exists(configs.model_dir):
+                        os.mkdir(configs.model_dir)
+
+                    file_path = configs.model_dir + configs.loss_file
+
+                    with open(file_path, 'a') as loss_file:
+                        loss_file.write('%f|%f\n' % (pi_loss, v_loss))
 
     def save_model(self, filename = "current_model"):
         if not os.path.exists(configs.model_dir):

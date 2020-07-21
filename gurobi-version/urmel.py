@@ -100,9 +100,10 @@ def simulator_step(agent_decisions, step, process_type):
     elif status == GRB.INFEASIBLE:
         if config['write_ilp'] and ( process_type == "sim" or config["debug"] ):
             if config['urmel_console_output']:
-                print("Model is infeasible. %s.ilp written." % config['name'])
+                print("Model is infeasible. %s.lp/ilp written." % config['name'])
             m.computeIIS()
             m.write(step_files_path + ".ilp")
+            m.write(step_files_path + ".lp")
         else:
             if config['urmel_console_output']:
                 print("Model is infeasible.")

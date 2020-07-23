@@ -63,6 +63,7 @@ for i in range(numSteps):
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
+    penalties.append(penalty)
 
     if config["ai"]:
         # Generating new agent_decision for the next iteration from neural network as it learns to generate

@@ -4,12 +4,15 @@ import re
 import numpy as np
 import random
 
+from urmel import *
+
 from .utils import *
 
 args = dotdict({
     #Weights to calculate penalty for both agents
     'pressure_wt_factor' : 1,
-    'flow_wt_factor' : 0.1,
+    's_flow_wt_factor' : 0.1,
+    'x_flow_wt_factor': 0.05,
     #Upper and lower limit for generating a drag factor value for RE
     'zeta_ub' : 1200,
     'zeta_lb' : 100,
@@ -32,28 +35,36 @@ for n in no.nodes:
             if '_ND' not in n:
                 original_nodes.append(n)
 
-pr, flow, dispatcher_dec, trader_dec, state_ = ({} for i in range(5))
+pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
 
-def extract_from_solution(solution):
-    #global pr, dispatcher_dec, trader_dec
-    state = []
-    da_dec = {}
+def get_agents_dict(step, agent_decisions):
+    agents_dict = {}
+    for k1,v1 in agent_decisions.items():
+        for k2, v2 in v1.items():
+            for k3, v3 in v2.items():
+                if re.search('(exit|entry)_nom', k1):
+                    key = k1+"_TA["+k3+"]"
+                else:
+                    key = k1+"_DA["+k3+"]"
+                for i in range(step,-1,-1):
+                    if i in v3:
+                        break
+                agents_dict[key] = v3[i]
+    return agents_dict
 
-    for k, v in solution.items():
+def get_state(step, agent_decisions):
+    global trader_nom, dispatcher_dec
+
+    for k, v in states[step]['p'].items():
         if not re.search('_aux|_HD|_ND', k):
-            if k.startswith('var_node_p'):
-                res = re.sub('var_node_p\[(\S*)]', r'\1', k)
-                pr[res] = round(v, 2)
-            elif k.startswith('var_node_Qo_in'):
-                res = re.sub('var_node_Qo_in\[(\S*)]', r'\1', k)
-                flow[res] = round(v, 2)
-        if re.search('(va|zeta|gas|compressor)_DA', k):
-            dispatcher_dec[k] = v
-        if re.search('nom_TA',k):
-            trader_dec[k] = v
+            pr[k] = round(v,2)
+
+    agents_dict = get_agents_dict(step,agent_decisions)
+    trader_nom = {k:v for k, v in agents_dict.items() if re.search('_TA',k)}
+    dispatcher_dec = {k:v for k, v in agents_dict.items() if re.search('_DA',k)}
 
     da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
-    ta_dec = normalize_trader_dec(trader_dec.copy())
+    ta_dec = normalize_trader_noms(trader_nom.copy())
     pressures = normalize_pressure(pr.copy())
 
     for k, v in da_dec.items(): #Dispatcher decision
@@ -62,15 +73,18 @@ def extract_from_solution(solution):
         state_[k] = [v]
 
     for value in original_nodes:
-        #state_[value] = [pr[value], flow[value]]
         state_[value] = [pressures[value]] # Pressure values
 
-    for key, value in state_.items():
-        state.append(value)
-
-    state =  np.array(state)
+    state = np.array([value for key, value in state_.items()])
 
     return state
+def get_trader_nom(step, agent_decisions):
+    dec_dict = get_agents_dict(step,agent_decisions)
+    trader_noms = {k:v for k, v in dec_dict.items() if re.search('_TA',k)}
+    return trader_noms.copy()
+
+def get_dispatcher_dec():
+    return dispatcher_dec.copy()
 
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
@@ -83,7 +97,7 @@ def normalize_pressure(pressure_dict):
         pressure_dict[label] = (value - no.pressure_limits_lower[label])/(no.pressure_limits_upper[label] - no.pressure_limits_lower[label])
     return pressure_dict
 
-def normalize_trader_dec(decisions):
+def normalize_trader_noms(decisions):
     norm = lambda value, lb, ub: (value - lb)/(ub - lb)
     for label, value in decisions.items():
         key = re.sub('nom\S*_TA\[(\S*)]', r'\1', label)
@@ -100,7 +114,8 @@ def normalize_trader_dec(decisions):
 def find_penalty(solution):
 
     pr_violations = 0 #Dispatcher pressure bound violations
-    flow_violations  = 0 #Dispatcher flow bound violations
+    entry_flow_violations  = 0 #Dispatcher flow bound violations
+    exit_flow_violations = 0
     trader_violations = 0 #Trader nomination violation
 
     for k, v in solution.items():
@@ -108,12 +123,16 @@ def find_penalty(solution):
             key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
             if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
 
-        if re.search('slack_DA', k):
-            flow_violations += abs(v)
+        if re.search('entry_slack_DA', k):
+            entry_flow_violations += abs(v)
+        if re.search('exit_slack_DA', k):
+            exit_flow_violations += abs(v)
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
 
-    dispatcher_penalty = int(args.pressure_wt_factor * pr_violations + args.flow_wt_factor * flow_violations)
+    dispatcher_penalty = int(args.pressure_wt_factor * pr_violations
+                             + args.s_flow_wt_factor * entry_flow_violations
+                             + args.x_flow_wt_factor * exit_flow_violations)
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
@@ -122,7 +141,7 @@ def get_con_pos():
     va = 0
     rs = 0
     cs = 0
-    for k,v in dispatcher_dec.items():
+    for k,v in get_dispatcher_dec().items():
         if re.search('va', k):
             va += 1
         if re.search('zeta', k):

@@ -1,22 +1,23 @@
 from .mcts import *
 from .configs import *
 
+
 class Evaluate(object):
     #Class to evaluate the trained model
 
     def __init__(self, net):
         self.nnet = net
 
-    def evaluate(self, penalty):
+    def evaluate(self):
 
         wins = 0
         losses = 0
 
-        for i in range(len(penalty)):
+        for i in range(len(penalties)):
 
-            if penalty[i][0] < penalty[i][1] or penalty[i][0] < 20:
+            if penalties[i][0] < penalties[i][1] or penalties[i][0] < 50:
                 wins += 1
-            elif penalty[i][0] > penalty[i][1] or penalty[i][0] > 100:
+            elif penalties[i][0] > penalties[i][1] or penalties[i][0] > 100:
                 losses += 1
             else:
                 print("Draw")

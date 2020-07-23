@@ -3,7 +3,7 @@ from .utils import *
 configs = dotdict({
     'model_dir': "./ai_part/models/", #Directory to save models
     'load_model': True, #Flag value for loading a saved model
-    'record_loss': True,
+    'record_loss': False,
     'loss_file':"loss.txt",
 
     'c_puct': 4, #level of exploration (1-6) used in MCTS
@@ -18,3 +18,5 @@ configs = dotdict({
     'num_evaluation_plays' : 5, # Number of evaluation plays
 
 })
+
+penalties = []

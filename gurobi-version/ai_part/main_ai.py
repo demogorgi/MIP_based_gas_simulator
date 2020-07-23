@@ -13,14 +13,13 @@ from .configs import *
 def get_decisions_from_ai(solution, agent_decisions, step, penalty):
 
     if step < numSteps:
+
         Gas_Network.decisions_dict = agent_decisions
         Gas_Network.next_step = step
         Gas_Network.c_penalty = penalty
 
-        Gas_Network.state = extract_from_solution(solution)
+        Gas_Network.state = get_state(step-1, agent_decisions)
 
-        if step-1 > 0:
-            Gas_Network.penalties.append(penalty)
 
         gas_network = Gas_Network()
         net = NeuralNetworkWrapper(gas_network)

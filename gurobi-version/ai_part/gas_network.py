@@ -5,7 +5,7 @@ import itertools
 from copy import deepcopy
 
 from .sol2statepenalty import *
-from urmel import *
+#from urmel import *
 
 class Gas_Network(object):
 
@@ -25,12 +25,8 @@ class Gas_Network(object):
     def get_state_dimension(self):
         return (self.row, 1)
 
-    def get_da_decision(self):
-        return dispatcher_dec
-
     def get_agent_decision(self):
         return deepcopy(self.decisions_dict)
-
 
     #Function to get possible dispatcher decisions
     def get_valid_decisions(self, old_decisions):
@@ -43,24 +39,35 @@ class Gas_Network(object):
 
         val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
-        rnd_value = lambda: round(random.uniform(0,1), 2)
+        rndm_value = lambda l,u: round(random.uniform(l,u), 2)
+        zeta_value = lambda l,u: round(rndm_value(l, u)*(args.zeta_ub-args.zeta_lb)+args.zeta_lb, 2)
 
-        for i, k in trader_dec.items():
+        trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
+
+        for i, k in trader_nom.items():
             if re.search('entry_nom', i):
-                res = re.sub('entry_nom\[(\S*)]', r'\1', i)
-                if re.search('EN', res) and k > 500:
-                    cs = 1
-                    gas = rnd_value()
+                res = re.sub('entry_nom_TA\[(\S*)]', r'\1', i)
+                if re.search('EN', res) and k > 0:
                     va_1 += 1
-                if re.search('EH', res) and k > 500:
-                    cs = 0
-                    zeta = rnd_value()*(args.zeta_ub-args.zeta_lb)+args.zeta_lb
-                    #zeta = random.randint(100, 1200) #[100,1200]
+                    if k > 500:
+                        cs = 1
+                        gas = rndm_value(0.4,1)
+                    else:
+                        gas = rndm_value(0, 0.4)
+
+                if re.search('EH', res) and k > 0:
                     va_2 += 1
+                    if k > 500:
+                        cs = 0
+                        zeta = zeta_value(0, 0.5)
+                        #zeta = random.randint(100, 1200) #[100,1200]
+                    else:
+                        zeta = zeta_value(0.5, 1)
+
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                va_name = re.sub('va\[(\S*)]', r'\1', l)
+                va_name = re.sub('va_DA\[(\S*)]', r'\1', l)
                 if va_name == 'N18^N23_1':
                     da_decisions[l] = va_1 if va_1 == 1 else val(v)
                 else:
@@ -123,16 +130,17 @@ class Gas_Network(object):
                     dec[cs] = d[i][1]
                 if dec[cs] == 0: dec[gs] = 0
 
-            if (dec in list_d) or (dec[0] == 0 and dec[1] == 0):
+            if (dec in list_d) or dec == decisions:
                 continue
             list_d.append(dec)
-        list_d = self.check_decision(list_d)
+        #list_d = self.check_decision(list_d)
+
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
     def decision_to_dict(self, da_action):
         i = 0
-        da_dec = dispatcher_dec.copy()
+        da_dec = get_dispatcher_dec().copy()
 
         for k, v in da_dec.items():
             da_dec[k] = da_action[i]
@@ -146,11 +154,14 @@ class Gas_Network(object):
 
         solution = simulator_step(decision, self.next_step, "ai")
 
-        self.state = extract_from_solution(solution)
+        #self.state = get_state(self.next_step, decision)
         self.n_penalty = find_penalty(solution)
 
-    def take_old_action(self):
-        solution = simulator_step(Gas_Network.decisions_dict, self.next_step, "ai")
+    def take_old_action(self, step=0):
+        if not step:
+            step = self.next_step
+
+        solution = simulator_step(Gas_Network.decisions_dict, step, "ai")
         old_dec_penalty = find_penalty(solution)
         #dec_value = self.get_reward(old_dec_penalty)
 
@@ -184,3 +195,17 @@ class Gas_Network(object):
                 del modified_list_actions[i]
 
         return modified_list_actions
+
+    def apply_prev_action(self):
+        forward_steps = 10
+        for i in range(forward_steps):
+            next = self.next_step+i
+            if next < numSteps:
+                penalty = self.take_old_action(next)
+
+                if penalty > 20:
+                    break
+
+        if next < self.next_step+forward_steps-1:
+
+            return next

@@ -17,7 +17,16 @@ class Train(object):
 
         training_data = []
 
+        # next_step = self.gas_network.apply_prev_action()
+        # if next_step:
+        #     self.gas_network.next_step = next_step
+        #     self.gas_network.state = get_state(next_step-1, self.gas_network.decisions_dict)
+        # else:
+        #     return self.gas_network.next_step+9, None
+
+
         for i in range(configs.num_self_plays):
+
             print("Start Self-play training", i+1)
             gas_network = deepcopy(self.gas_network)
             self.self_play(gas_network, training_data)
@@ -29,9 +38,9 @@ class Train(object):
         new_agent_decision = self.get_decision()
 
         #Evaluating the decisions
-        if Gas_Network.penalties: #and Gas_Network.step == numSteps-1
+        if penalties: #and Gas_Network.step == numSteps-1
             evaluator = Evaluate(self.net)
-            evaluator.evaluate(Gas_Network.penalties)
+            evaluator.evaluate()
 
         return new_agent_decision
 
@@ -41,17 +50,6 @@ class Train(object):
         self_play_data = []
 
         node = TreeNode()
-        # is_decision_good = True
-        # i = 0
-
-        # while is_decision_good:
-        #     i += 1
-        #     penalty = gas_network.take_old_action()
-        #     if penalty > 20:
-        #         is_decision_good = False
-        # print(i)
-        # exit()
-        # if not is_decision_good:
 
         best_child = mcts.search(gas_network, node, configs.temperature)
 
@@ -66,13 +64,14 @@ class Train(object):
             # best_child.parent = None
             # node = best_child    #Make the child node the root node
 
-        # Update v as the value of the game result
+            # Update v as the value of the game result
         for state_value in self_play_data:
             #value = -value
             state_value[2] =  value
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
             training_data.append([state, psa_vector, state_value[2]])
+
 
     def get_decision(self):
         mcts = MCTS(self.net)
@@ -87,7 +86,6 @@ class Train(object):
         p1 = gas_network.n_penalty[0]
 
         p2 = gas_network.take_old_action()
-
         if p1 < p2:
             best_decision = gas_network.generate_decision_dict(action)
 

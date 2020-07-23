@@ -95,7 +95,7 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = gas_network.get_decisions(gas_network.get_da_decision())
+            possible_decisions = gas_network.get_decisions(get_dispatcher_dec())
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 
@@ -116,13 +116,14 @@ class MCTS(object):
 
         highest_nsa = 0
         highest_index = 0
-
+                    
         for idx, child in enumerate(self.root.children):
             temperature_exp = int(1 / temperature)
 
             if child.Nsa ** temperature_exp > highest_nsa:
                 highest_nsa = child.Nsa ** temperature_exp
                 highest_index = idx
+
         return self.root.children[highest_index]
 
     def add_dirichlet_noise(self, gas_network, psa_vector):
@@ -141,7 +142,7 @@ class MCTS(object):
 
     def possible_decision_probabilty(self, gas_network, possible_decisions, prob_vector):
 
-        old_DA = list(v for k, v in dispatcher_dec.items())
+        old_DA = list(v for k, v in get_dispatcher_dec().items())
         indices = []
         psa_vector = []
 

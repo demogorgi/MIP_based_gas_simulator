@@ -196,16 +196,4 @@ class Gas_Network(object):
 
         return modified_list_actions
 
-    def apply_prev_action(self):
-        forward_steps = 10
-        for i in range(forward_steps):
-            next = self.next_step+i
-            if next < numSteps:
-                penalty = self.take_old_action(next)
-
-                if penalty > 20:
-                    break
-
-        if next < self.next_step+forward_steps-1:
-
-            return next
+    

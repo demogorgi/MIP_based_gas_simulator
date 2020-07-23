@@ -17,14 +17,6 @@ class Train(object):
 
         training_data = []
 
-        # next_step = self.gas_network.apply_prev_action()
-        # if next_step:
-        #     self.gas_network.next_step = next_step
-        #     self.gas_network.state = get_state(next_step-1, self.gas_network.decisions_dict)
-        # else:
-        #     return self.gas_network.next_step+9, None
-
-
         for i in range(configs.num_self_plays):
 
             print("Start Self-play training", i+1)

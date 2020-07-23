@@ -88,6 +88,9 @@ def simulate(agent_decisions,compressors,t,dt):
     ub_pressure_violation_DA = m.addVars(no.nodes, lb=-GRB.INFINITY, name="ub_pressure_violation_DA")
     lb_pressure_violation_DA = m.addVars(no.nodes, lb=-GRB.INFINITY, name="lb_pressure_violation_DA")
     
+    ## Auxiliary variable to track smoothed flow over S-pipes
+    smoothed_special_pipe_flow_DA = m.addVars(co.special, lb=-GRB.INFINITY, name="smoothed_special_pipe_flow_DA")
+
     # From here on the constraints have to be added.
     #m.addConstr(va_DA[("N23","N23_1")] == -1, "test")
 
@@ -127,7 +130,8 @@ def simulate(agent_decisions,compressors,t,dt):
     #      forall <l,r> in CS: compressor_DA[l,r] == compressor[l,r];
     m.addConstrs((compressor_DA[cs] == get_agent_decision(agent_decisions["compressor"]["CS"][joiner(cs)],t) for cs in co.compressors), name='cs_mode')
     #
-    #
+    ## constraints to track smoothing of special pipe flows
+    m.addConstrs((smoothed_special_pipe_flow_DA[s] == ( q_in_old(t,s) + q_out_old(t,s) + var_pipe_Qo_in[s] + var_pipe_Qo_out[s] ) / 4 for s in co.special), name='special pipe smoothing')
     #
     ## pressure difference p_out minus p_in
     #subto dp:

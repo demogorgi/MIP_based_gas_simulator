@@ -74,6 +74,7 @@ class Train(object):
 
         best_child = mcts.search(gas_network, node, configs.temperature)
         action = best_child.action
+
         for i in range(8):
             if gas_network.next_step < numSteps:
                 gas_network.take_action(action)
@@ -82,11 +83,11 @@ class Train(object):
                 gas_network.state = get_state(gas_network.next_step, gas_network.decisions_dict)
                 gas_network.next_step += 1
 
-        if cum_penalty < 300:
-
+        if cum_penalty < 500:
             best_decision = gas_network.generate_decision_dict(action)
-            return best_decision
-        # else:
-        #     next_action = next(child.action for child in best_child.parent.children)
-        #     best_decision = gas_network.generate_decision_dict(next_action)
-        #     return best_decision
+
+        else:
+            next_action = next(child.action for child in best_child.parent.children)
+            best_decision = gas_network.generate_decision_dict(next_action)
+
+        return best_decision

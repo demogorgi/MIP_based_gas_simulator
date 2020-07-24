@@ -117,22 +117,40 @@ def find_penalty(solution):
     entry_flow_violations  = 0 #Dispatcher flow bound violations
     exit_flow_violations = 0
     trader_violations = 0 #Trader nomination violation
+    entry_flow_violations_EN = 0
+    entry_flow_violations_EH = 0
+    exit_flow_violations_XN = 0
+    exit_flow_violations_XH = 0
 
     for k, v in solution.items():
         if re.search('(ub|lb)_pressure_violation_DA', k):
             key = re.sub('(ub|lb)_pressure_violation_DA\[(\S*)]',r'\1_\2', k)
             if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
 
-        if re.search('entry_slack_DA', k):
-            entry_flow_violations += v #abs(v)
-        if re.search('exit_slack_DA', k):
-            exit_flow_violations += v #abs(v)
+        if re.search('slack_DA', k):
+            res = re.sub('(\S*)\[(\S*)]', r'\1\2', k)
+            if 'entry' in res:
+                if 'EN' in res:
+                    entry_flow_violations_EN += v
+                else:
+                    entry_flow_violations_EH += v
+            else:
+                if 'XN' in res:
+                    exit_flow_violations_XN += v
+                else:
+                    exit_flow_violations_XH += v
+
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
 
+    entry_flow_violations = abs(entry_flow_violations_EN) + abs(entry_flow_violations_EH)
+    exit_flow_violations = abs(exit_flow_violations_XN) + abs(exit_flow_violations_XH)
+
+
+
     dispatcher_penalty = int(args.pressure_wt_factor * pr_violations
-                             + args.s_flow_wt_factor * abs(entry_flow_violations)
-                             + args.x_flow_wt_factor * abs(exit_flow_violations))
+                             + args.s_flow_wt_factor * entry_flow_violations
+                             + args.x_flow_wt_factor * exit_flow_violations)
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]

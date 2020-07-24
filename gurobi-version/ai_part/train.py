@@ -29,6 +29,7 @@ class Train(object):
 
         new_agent_decision = self.get_decision()
 
+
         #Evaluating the decisions
         if penalties: #and Gas_Network.step == numSteps-1
             evaluator = Evaluate(self.net)
@@ -69,18 +70,23 @@ class Train(object):
         mcts = MCTS(self.net)
         gas_network = deepcopy(self.gas_network)
         node = TreeNode()
+        cum_penalty = 0
 
         best_child = mcts.search(gas_network, node, configs.temperature)
         action = best_child.action
-        gas_network.take_action(action)
+        for i in range(8):
+            if gas_network.next_step < numSteps:
+                gas_network.take_action(action)
 
-        value = gas_network.get_reward(gas_network.n_penalty)
-        p1 = gas_network.n_penalty[0]
+                cum_penalty += gas_network.n_penalty[0]
+                gas_network.state = get_state(gas_network.next_step, gas_network.decisions_dict)
+                gas_network.next_step += 1
 
-        p2 = gas_network.take_old_action()
-        if p1 < p2:
+        if cum_penalty < 300:
+
             best_decision = gas_network.generate_decision_dict(action)
-
             return best_decision
-        else:
-            return None
+        # else:
+        #     next_action = next(child.action for child in best_child.parent.children)
+        #     best_decision = gas_network.generate_decision_dict(next_action)
+        #     return best_decision

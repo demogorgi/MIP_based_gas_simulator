@@ -83,8 +83,8 @@ class Gas_Network(object):
 
         #Find all possible subsets of possible dispatcher decisions
         list_valid_decisions = []
-        for i in range(len(valid_dispatcher_decisions)):
-            list_valid_decisions.append(subsets(valid_dispatcher_decisions,i+1))
+        for i in range(len(valid_dispatcher_decisions), 0,-1):
+            list_valid_decisions.append(subsets(valid_dispatcher_decisions,i))
         valid_decisions = [item for elem in list_valid_decisions for item in elem]
 
         return valid_decisions
@@ -105,6 +105,9 @@ class Gas_Network(object):
                 decisions['gas']['CS'][result(key)][step] = value
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)][step] = value
+
+        remove_duplicate_decision(self.get_agent_decision(), decisions, step)
+
         return decisions
 
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
@@ -133,7 +136,7 @@ class Gas_Network(object):
             if (dec in list_d) or dec == decisions:
                 continue
             list_d.append(dec)
-        #list_d = self.check_decision(list_d)
+        # list_d = self.check_decision(list_d)
 
         return list_d
 
@@ -195,5 +198,3 @@ class Gas_Network(object):
                 del modified_list_actions[i]
 
         return modified_list_actions
-
-    

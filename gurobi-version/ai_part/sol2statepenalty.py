@@ -124,15 +124,15 @@ def find_penalty(solution):
             if not re.search('_aux|_HD|_ND', key): pr_violations += max(0,v)
 
         if re.search('entry_slack_DA', k):
-            entry_flow_violations += abs(v)
+            entry_flow_violations += v #abs(v)
         if re.search('exit_slack_DA', k):
-            exit_flow_violations += abs(v)
+            exit_flow_violations += v #abs(v)
         if re.search('scenario_balance_TA', k):
             trader_violations += abs(v)
 
     dispatcher_penalty = int(args.pressure_wt_factor * pr_violations
-                             + args.s_flow_wt_factor * entry_flow_violations
-                             + args.x_flow_wt_factor * exit_flow_violations)
+                             + args.s_flow_wt_factor * abs(entry_flow_violations)
+                             + args.x_flow_wt_factor * abs(exit_flow_violations))
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
@@ -163,3 +163,16 @@ def get_bn_pressures_flows(solution):
         elif re.findall(r"var_pipe_Qo_in\[("+'|'.join(special_pipes)+r")]",k):
             exit_pr_flows[k] = v
     return exit_pr_flows
+
+#Function to remove duplicate entries from fixed_decisions.yml file
+def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
+    for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
+        if not re.search('(entry|exit)_nom',k1):
+            for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+                for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                    for i in range(step, -1, -1):
+                        if i in value1:
+                            break
+                    if value1[i] == value2[step]:
+                        del value2[step]
+    return new_agent_decisions

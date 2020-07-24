@@ -65,12 +65,11 @@ for i in range(numSteps):
     timestep += timedelta(0,dt)
     penalties.append(penalty)
 
-    if config["ai"]:
+    if config["ai"] and (i == 9 or (i > 20 and (i-8) % 8 == 0)):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
 
         if not agent_decisions: continue
-
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")
     yaml.dump(agent_decisions, f)

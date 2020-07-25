@@ -55,7 +55,7 @@ def get_agents_dict(step, agent_decisions):
 def get_state(step, agent_decisions):
     global trader_nom, dispatcher_dec
 
-    for k, v in states[step]['p'].items():
+    for k, v in states[step-1]['p'].items():
         if not re.search('_aux|_HD|_ND', k):
             pr[k] = round(v,2)
 

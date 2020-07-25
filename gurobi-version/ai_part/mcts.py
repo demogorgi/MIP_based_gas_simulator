@@ -51,10 +51,10 @@ class TreeNode(object):
                 highest_puct = puct
                 highest_index = index
         return self.children[highest_index]
-    def expand_node(self, gas_network, psa_vector, valid_decisions):
+    def expand_node(self, gas_network, psa_vector):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-        #valid_decisions = gas_network.get_decisions(gas_network.agent_decisions)
+        valid_decisions = gas_network.get_valid_decisions()
 
         for idx, move in enumerate(valid_decisions):
             action = deepcopy(move)
@@ -95,7 +95,7 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = gas_network.get_decisions(get_dispatcher_dec())
+            possible_decisions = gas_network.get_valid_decisions()
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 
@@ -104,7 +104,7 @@ class MCTS(object):
             if psa_vector_sum > 0: #Renormalize the psa_vector
                 psa_vector /= psa_vector_sum
 
-            node.expand_node(gas_network = gas_network, psa_vector = psa_vector, valid_decisions = possible_decisions)
+            node.expand_node(gas_network = gas_network, psa_vector = psa_vector)
 
             wsa = gas_network.get_reward(gas_network.n_penalty)
 
@@ -116,15 +116,22 @@ class MCTS(object):
 
         highest_nsa = 0
         highest_index = 0
-                    
-        for idx, child in enumerate(self.root.children):
-            temperature_exp = int(1 / temperature)
+        try:
+            for idx, child in enumerate(self.root.children):
+                temperature_exp = int(1 / temperature)
 
-            if child.Nsa ** temperature_exp > highest_nsa:
-                highest_nsa = child.Nsa ** temperature_exp
-                highest_index = idx
+                if child.Nsa ** temperature_exp > highest_nsa:
+                    highest_nsa = child.Nsa ** temperature_exp
+                    highest_index = idx
 
-        return self.root.children[highest_index]
+            best_child = self.root.children[highest_index]
+        except IndexError:
+            for idx, child in enumerate(self.root.children):
+                print(child.Nsa, child.action)
+                print(highest_index)
+                exit()
+
+        return best_child
 
     def add_dirichlet_noise(self, gas_network, psa_vector):
 

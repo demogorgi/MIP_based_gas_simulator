@@ -78,16 +78,16 @@ class Train(object):
         for i in range(8):
             if gas_network.next_step < numSteps:
                 gas_network.take_action(action)
+                gas_network.decisions_dict = gas_network.generate_decision_dict(action)
 
                 cum_penalty += gas_network.n_penalty[0]
-                gas_network.state = get_state(gas_network.next_step, gas_network.decisions_dict)
                 gas_network.next_step += 1
+                gas_network.state = get_state(gas_network.next_step, gas_network.decisions_dict)
 
-        if cum_penalty < 500:
-            best_decision = gas_network.generate_decision_dict(action)
+        if cum_penalty < 1000:
+            return gas_network.decisions_dict
 
-        else:
-            next_action = next(child.action for child in best_child.parent.children)
-            best_decision = gas_network.generate_decision_dict(next_action)
-
-        return best_decision
+        # else:
+        #     exit()
+        #     next_action = next(child.action for child in best_child.parent.children)
+        #     best_decision = gas_network.generate_decision_dict(next_action)

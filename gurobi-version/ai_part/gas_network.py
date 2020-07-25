@@ -14,10 +14,11 @@ class Gas_Network(object):
     decisions_dict = {}
     c_penalty = [0, 0] #Current penalty [Dispatcher penalty, Trader penalty]
     n_penalty = [0, 0] #Penalty expected for new decision
-    penalties = []
+    possible_decisions = []
 
     def __init__(self):
         self.row = len(self.state)
+        self.possible_decisions = self.get_decisions(get_dispatcher_dec())
 
     def get_action_size(self):
         return self.row
@@ -28,8 +29,11 @@ class Gas_Network(object):
     def get_agent_decision(self):
         return deepcopy(self.decisions_dict)
 
+    def get_possible_decisions(self):
+        return deepcopy(self.possible_decisions)
+
     #Function to get possible dispatcher decisions
-    def get_valid_decisions(self, old_decisions):
+    def get_possible_nexts(self, old_decisions):
         cs = None
         zeta = None
         gas = None
@@ -59,11 +63,10 @@ class Gas_Network(object):
                     va_2 += 1
                     if k > 500:
                         cs = 0
-                        zeta = zeta_value(0, 0.5)
+                        zeta = zeta_value(0, 0.2)
                         #zeta = random.randint(100, 1200) #[100,1200]
                     else:
                         zeta = zeta_value(0.5, 1)
-
 
         for l, v in old_decisions.items():
             if re.match('va', l):
@@ -105,15 +108,15 @@ class Gas_Network(object):
                 decisions['gas']['CS'][result(key)][step] = value
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)][step] = value
-
-        remove_duplicate_decision(self.get_agent_decision(), decisions, step)
+        print(step)
+        decisions = remove_duplicate_decision(self.get_agent_decision(), decisions, step)
 
         return decisions
 
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
     def get_decisions(self, agent_decisions):
 
-        possible_decisions = self.get_valid_decisions(agent_decisions)
+        possible_decisions = self.get_possible_nexts(agent_decisions)
         decisions = list(v for k, v in agent_decisions.items())
         rs, gs, cs = get_con_pos()
 
@@ -198,3 +201,17 @@ class Gas_Network(object):
                 del modified_list_actions[i]
 
         return modified_list_actions
+
+    def get_valid_decisions(self):
+        possible_decisions = self.get_possible_decisions()
+        rs, gs, cs = get_con_pos()
+        trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
+        for k, v in trader_nom.items():
+            if 'EN' in k:
+                if v > 500:
+                    valid_decisions = [valid for key, valid in enumerate(possible_decisions) if not valid[cs] == 0]
+
+            if 'EH' in k:
+                if v > 500:
+                    valid_decisions = [valid for key, valid in enumerate(possible_decisions) if valid[cs] == 0]
+        return valid_decisions

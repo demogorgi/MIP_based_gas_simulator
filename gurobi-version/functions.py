@@ -147,17 +147,15 @@ def intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,L_eta,gas,p_in,p_out):
    L_min_pi * p_in * p_i_min - gas * L_min_pi * p_in * p_i_min + p_i_max * p_out -
     p_i_min * p_out))/(L_min_pi * p_in * (-p_i_max + p_i_min))
 
-# is the pi doable with the compressor?
-def doable_pi(compressor,phi,phimin,phimax,p_in,p_out,pi1,pi2):
-    if compressor == 1 and ulim(phi,phimax,pi1,pi2) >= p_out/p_in:
-        return True
-    else:
-        return False
+# Berechnung des neuen phi (Prüfung, ob im Kennfeld in phi_new)
+def phi_new_tmp(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
+    return min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min),phi_max)
 
-# Berechnung des neuen phi.
+# Prüfung, ob (phi_new_tmp,p_out/p_in) im Kennfeld; falls ja, so ist es das finale phi
 def phi_new(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out):
-    if doable_pi(compressor,intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min,phi_max,p_in,p_out,pi_1,pi_2) == True:
-        return min(max(intercept(L_min_pi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out),phi_min),phi_max)
+    phi = phi_new_tmp(compressor,phi_min,phi_max,pi_1,pi_2,L_min_pi,Lmaxpi,L_min_phi,p_i_min,p_i_max,L_max_pi,eta,gas,p_in,p_out)
+    if compressor == 1 and ulim(phi,phi_max,pi_1,pi_2) >= p_out/p_in:
+        return phi
     else:
         return 0
 

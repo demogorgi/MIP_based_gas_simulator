@@ -59,11 +59,11 @@ for i in range(numSteps):
     with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
         bn_pr_flows = get_bn_pressures_flows(solution)
         penalty = find_penalty(solution)
+        penalties.append(penalty)
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
-    penalties.append(penalty)
 
     if config["ai"] and (i == 9 or (i > 25 and (i-8) % 8 == 7)):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate

@@ -48,16 +48,16 @@
     start point for AI part and returns new agent_decisions dictionary to Simulator
 
 #### configs.py
-    class contains all global values which are used across the modules
+    file contains all global values which are used across the modules
 
 #### gas_network.py
     class represents a gas network logic and its basic rules
 
 #### mcts.py
-    classes for Monte Carlo Tree Search algorithm
+    classes to implement Monte Carlo Tree Search algorithm
 
-#### sol2statepenalty.py
-    functions to extract values from solution output from simulator part
+#### functions_ai.py
+    functions to generate state, find penalty for each timesteps, to remove duplicate entries in agent_decisions dictionary etc.
 
 #### neural_network_architecture.py
     class for neural network model to get policy and value head and a wrapper class for neural network
@@ -67,3 +67,6 @@
 
 #### evaluate.py
     class to evaluate the neural netwok
+
+#### utils.py
+    file contain utility class

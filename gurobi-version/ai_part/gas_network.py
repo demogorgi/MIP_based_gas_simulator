@@ -4,7 +4,7 @@ import itertools
 
 from copy import deepcopy
 
-from .sol2statepenalty import *
+from .functions_ai import *
 #from urmel import *
 
 class Gas_Network(object):
@@ -30,7 +30,9 @@ class Gas_Network(object):
         return deepcopy(self.decisions_dict)
 
     def get_possible_decisions(self):
-        return deepcopy(self.possible_decisions)
+        if self.possible_decisions:
+            return self.possible_decisions
+        return self.get_decisions(get_dispatcher_dec())
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self, old_decisions):
@@ -204,14 +206,15 @@ class Gas_Network(object):
 
     def get_valid_decisions(self):
         possible_decisions = self.get_possible_decisions()
+        print(possible_decisions)
         rs, gs, cs = get_con_pos()
         trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
+        valid_decisions = possible_decisions
         for k, v in trader_nom.items():
-            if 'EN' in k:
-                if v > 500:
+            if v > entry_q_ub/2:
+                if 'EN' in k:
                     valid_decisions = [valid for key, valid in enumerate(possible_decisions) if not valid[cs] == 0]
-
-            if 'EH' in k:
-                if v > 500:
+                if 'EH' in k:
                     valid_decisions = [valid for key, valid in enumerate(possible_decisions) if valid[cs] == 0]
+        print(len(valid_decisions))
         return valid_decisions

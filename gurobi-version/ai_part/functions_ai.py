@@ -7,6 +7,7 @@ import random
 from urmel import *
 
 from .utils import *
+from .configs import penalties
 
 args = dotdict({
     #Weights to calculate penalty for both agents
@@ -35,6 +36,7 @@ for n in no.nodes:
             if '_ND' not in n:
                 original_nodes.append(n)
 
+entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
 
 def get_agents_dict(step, agent_decisions):
@@ -194,3 +196,54 @@ def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
                     if value1[i] == value2[step]:
                         del value2[step]
     return new_agent_decisions
+
+#Create csv to store agent decisions, boundary flows, pressures and agent penalty values
+def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [], bn_pr_flows = {}):
+
+    extracted_ = {}
+    acc_penalty = 0
+    extracted_['Time'] = timestamp
+    for i, j in agent_decisions.items():
+        for k,l in j.items():
+            for m,n in l.items():
+                key = i+"["+m+"]"
+                for p in range(step,-1,-1):
+                    if p in n:
+                        extracted_[key] = n[p]
+                        break
+    if not bn_pr_flows:
+        for i in no.exits:
+            extracted_[f"var_node_p[{i}]"] = None
+        for i in no.exits:
+            extracted_[f"var_node_Qo_in[{i}]"] = None
+        for i in special_pipes:
+            extracted_[f"var_pipe_Qo_in[{i}]"] = None
+    else:
+        for i, j in bn_pr_flows.items():
+            extracted_[i] = round(j,3)
+    if penalty:
+        extracted_['Dispatcher Penalty'] = penalty[0]
+        extracted_['Trader Penalty'] = penalty[1]
+        if not step%8 == 0:
+            i = step
+            while not i%8 == 0:
+                acc_penalty += penalties[i][0]
+                i -= 1
+            acc_penalty += penalties[i][0]
+        else:
+            acc_penalty = penalties[step][0]
+        extracted_['Accumulated'] = acc_penalty
+    else:
+        extracted_['Dispatcher Penalty'] = None
+        extracted_['Trader Penalty'] = None
+        extracted_['Accumulated'] = None
+
+    fieldnames = reordered_headers(list(extracted_.keys()))
+    # fieldnames = list(extracted_.keys())
+
+    return fieldnames, extracted_
+
+def reordered_headers(fieldnames):
+    order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18]
+    fieldnames = [fieldnames[i] for i in order]
+    return fieldnames

@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 
-from .sol2statepenalty import *
+from .functions_ai import *
 from .configs import *
 
 class TreeNode(object):
@@ -116,22 +116,14 @@ class MCTS(object):
 
         highest_nsa = 0
         highest_index = 0
-        try:
-            for idx, child in enumerate(self.root.children):
-                temperature_exp = int(1 / temperature)
+        print(len(self.root.children))
+        for idx, child in enumerate(self.root.children):
+            temperature_exp = int(1 / temperature)
 
-                if child.Nsa ** temperature_exp > highest_nsa:
-                    highest_nsa = child.Nsa ** temperature_exp
-                    highest_index = idx
-
-            best_child = self.root.children[highest_index]
-        except IndexError:
-            for idx, child in enumerate(self.root.children):
-                print(child.Nsa, child.action)
-                print(highest_index)
-                exit()
-
-        return best_child
+            if child.Nsa ** temperature_exp > highest_nsa:
+                highest_nsa = child.Nsa ** temperature_exp
+                highest_index = idx
+        return self.root.children[highest_index]
 
     def add_dirichlet_noise(self, gas_network, psa_vector):
 

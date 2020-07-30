@@ -18,7 +18,7 @@ config = {
     # prefix for output filenames
     "name": "urmel",
     # debug mode with more output
-    "debug": False,
+    "debug": True,
     # write new initial state
     "new_init_scenario": False,
     # write problem files in the lp-format?
@@ -38,7 +38,11 @@ config = {
     # contour output (net- and state-files in contour folder)
     "contour_output": False,
     # is the ai-part active?
-    "ai" : True
+    "ai" : True,
+    # how often ai takes decision (number of timesteps)
+    "decision_freq" : 8,
+    # how often new trader nomination comes (number of timesteps)
+    "nomination_freq" : 32,
 }
 
 # read manual file with configs

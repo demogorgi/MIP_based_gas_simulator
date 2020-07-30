@@ -3,12 +3,17 @@ set grid
 if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
 while (1) {
-    set multiplot layout 2, 1 title "Quality plot"
+    set multiplot layout 3, 1 title "Quality plot"
     #
     set key inside right top
     set xlabel "Time"
     set ylabel "Dispatcher penalty"
     plot [0:f(filename)] filename every ::1 using :17 with lines title "Dispatcher penalty"
+    #
+    set key inside right top
+    set xlabel "Time"
+    set ylabel "Accumulated penalty"
+    plot [0:f(filename)] filename every ::1 using :19 with lines title "Accumulated penalty"
     #
     set key outside right top
     set xlabel "Nomination in 1000 m³/h"

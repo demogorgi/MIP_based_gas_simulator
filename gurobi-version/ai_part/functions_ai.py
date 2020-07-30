@@ -88,6 +88,10 @@ def get_trader_nom(step, agent_decisions):
 def get_dispatcher_dec():
     return dispatcher_dec.copy()
 
+def get_old_action():
+    old_action = list(v for k, v in get_dispatcher_dec().items())
+    return old_action
+
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
         if re.search('zeta_DA', label):

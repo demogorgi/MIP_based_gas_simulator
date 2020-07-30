@@ -2,13 +2,13 @@ from .functions_ai import *
 from .gas_network import Gas_Network
 from .neural_network_architecture import NeuralNetworkWrapper
 from .train import Train
+from .ai_decisions import *
 
 from collections import deque
 import os
 import csv
 from params import *
 from .configs import *
-
 
 def get_decisions_from_ai(solution, agent_decisions, step, penalty):
 
@@ -19,8 +19,7 @@ def get_decisions_from_ai(solution, agent_decisions, step, penalty):
         Gas_Network.c_penalty = penalty
 
         Gas_Network.state = get_state(step, agent_decisions)
-
-
+        
         gas_network = Gas_Network()
         net = NeuralNetworkWrapper(gas_network)
 
@@ -33,8 +32,14 @@ def get_decisions_from_ai(solution, agent_decisions, step, penalty):
         else:
             print("Trained model not loaded. Starting from scratch")
 
-        train  = Train(gas_network, net)
-        new_agent_decision = train.start()
+        if configs.train_model:
+            #Train
+            train  = Train(gas_network, net)
+            new_agent_decision = train.start()
+        else:
+            #Test
+            test = AI_Decisions(gas_network, net)
+            new_agent_decision = test.get_decision()
 
         if new_agent_decision:
             return new_agent_decision

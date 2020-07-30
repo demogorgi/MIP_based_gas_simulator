@@ -15,9 +15,11 @@ class Gas_Network(object):
     c_penalty = [0, 0] #Current penalty [Dispatcher penalty, Trader penalty]
     n_penalty = [0, 0] #Penalty expected for new decision
     possible_decisions = []
+    cum_sum_penalty = 0
 
     def __init__(self):
         self.row = len(self.state)
+        self.tol_penalty = 20
         self.possible_decisions = self.get_decisions(get_dispatcher_dec())
 
     def get_action_size(self):
@@ -33,6 +35,7 @@ class Gas_Network(object):
         if self.possible_decisions:
             return self.possible_decisions
         return self.get_decisions(get_dispatcher_dec())
+
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self, old_decisions):
@@ -55,7 +58,7 @@ class Gas_Network(object):
                 res = re.sub('entry_nom_TA\[(\S*)]', r'\1', i)
                 if re.search('EN', res) and k > 0:
                     va_1 += 1
-                    if k > 500:
+                    if k >= entry_q_ub/2:
                         cs = 1
                         gas = rndm_value(0.4,1)
                     else:
@@ -63,12 +66,11 @@ class Gas_Network(object):
 
                 if re.search('EH', res) and k > 0:
                     va_2 += 1
-                    if k > 500:
+                    if k >= entry_q_ub/2:
                         cs = 0
                         zeta = zeta_value(0, 0.2)
-                        #zeta = random.randint(100, 1200) #[100,1200]
                     else:
-                        zeta = zeta_value(0.5, 1)
+                        zeta = zeta_value(0.6, 1)
 
         for l, v in old_decisions.items():
             if re.match('va', l):
@@ -110,22 +112,21 @@ class Gas_Network(object):
                 decisions['gas']['CS'][result(key)][step] = value
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)][step] = value
-        print(step)
         decisions = remove_duplicate_decision(self.get_agent_decision(), decisions, step)
 
         return decisions
 
     #Get a list of decisions for da2 [va_1,va_2, zeta, gas, compressor]
-    def get_decisions(self, agent_decisions):
+    def get_decisions(self, old_decisions):
 
-        possible_decisions = self.get_possible_nexts(agent_decisions)
-        decisions = list(v for k, v in agent_decisions.items())
+        possible_decisions = self.get_possible_nexts(old_decisions)
+        old_action = get_old_action()
         rs, gs, cs = get_con_pos()
 
         list_d = []
         for d in possible_decisions:
             valve = 0
-            dec = decisions.copy()
+            dec = old_action.copy()
             for i in range(len(d)):
                 if re.search('va', d[i][0]):
                     dec[valve] = d[i][1]
@@ -138,7 +139,7 @@ class Gas_Network(object):
                     dec[cs] = d[i][1]
                 if dec[cs] == 0: dec[gs] = 0
 
-            if (dec in list_d) or dec == decisions:
+            if (dec in list_d) or dec == old_action:
                 continue
             list_d.append(dec)
         # list_d = self.check_decision(list_d)
@@ -155,66 +156,53 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
-    #Apply the chosen decision
-    def take_action(self, da_action):
+    #Functions to apply the chosen decision
+    def take_action(self, da_action, step = 0):
+        if not step:
+            step = self.next_step
 
         decision = self.generate_decision_dict(da_action)
 
-        solution = simulator_step(decision, self.next_step, "ai")
+        solution = simulator_step(decision, step, "ai")
 
         #self.state = get_state(self.next_step, decision)
         self.n_penalty = find_penalty(solution)
 
-    def take_old_action(self, step=0):
-        if not step:
-            step = self.next_step
+    def apply_action(self, action):
+        cum_penalty = 0
+        d = self.generate_decision_dict(action)
+        step = self.next_step
+        for i in range(8):
+            if step < numSteps:
+                self.take_action(action, step)
+                cum_penalty += self.n_penalty[0]
+                step += 1
 
-        solution = simulator_step(Gas_Network.decisions_dict, step, "ai")
-        old_dec_penalty = find_penalty(solution)
-        #dec_value = self.get_reward(old_dec_penalty)
+        self.cum_sum_penalty = cum_penalty
 
-        return old_dec_penalty[0]
 
     #Find the reward value for dispatcher agent
     def get_reward(self, penalty):
 
         #low penalty rewards high value
-        if penalty[0] == 0 or penalty[0] < 10:
+        if penalty == 0 or penalty < 10 :
             return 10
-        elif penalty[0] > 10 and penalty[0] < 50:
+        elif penalty >= 10 and penalty < 50:
             return 5
-        elif penalty[0] > 50 and penalty[0] < 100:
+        elif penalty >= 50 and penalty < 100:
             return -5
         else: return -10
 
-
-    def check_decision(self, list_actions):
-        modified_list_actions = list_actions
-        for i, action in enumerate(list_actions):
-
-            decision = self.generate_decision_dict(action)
-            solution = simulator_step(decision, self.next_step, "ai")
-
-            penalty = find_penalty(solution)
-
-            value = self.get_reward(penalty)
-
-            if value < 0:
-                del modified_list_actions[i]
-
-        return modified_list_actions
-
+    #Choose valid decisions from Action space
     def get_valid_decisions(self):
         possible_decisions = self.get_possible_decisions()
-        print(possible_decisions)
         rs, gs, cs = get_con_pos()
         trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
         valid_decisions = possible_decisions
         for k, v in trader_nom.items():
-            if v > entry_q_ub/2:
+            if v >= entry_q_ub/2:
                 if 'EN' in k:
                     valid_decisions = [valid for key, valid in enumerate(possible_decisions) if not valid[cs] == 0]
                 if 'EH' in k:
                     valid_decisions = [valid for key, valid in enumerate(possible_decisions) if valid[cs] == 0]
-        print(len(valid_decisions))
         return valid_decisions

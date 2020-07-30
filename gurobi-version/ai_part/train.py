@@ -18,20 +18,19 @@ class Train(object):
         training_data = []
 
         for i in range(configs.num_self_plays):
-
+        #Self plays to collect data to train the NN
             print("Start Self-play training", i+1)
             gas_network = deepcopy(self.gas_network)
             self.self_play(gas_network, training_data)
 
-        self.net.save_model() #Current model saved
-
-        self.net.train(training_data)
-
         new_agent_decision = self.get_decision()
 
+        self.net.save_model() #Current model saved
+
+        self.net.train(training_data) # Train the current model
 
         #Evaluating the decisions
-        if penalties: #and Gas_Network.step == numSteps-1
+        if penalties:
             evaluator = Evaluate(self.net)
             evaluator.evaluate()
 
@@ -52,14 +51,10 @@ class Train(object):
 
         gas_network.take_action(action)
 
-        value = gas_network.get_reward(gas_network.n_penalty)
+        value = gas_network.get_reward(gas_network.n_penalty[0])
 
-            # best_child.parent = None
-            # node = best_child    #Make the child node the root node
-
-            # Update v as the value of the game result
+        # Update v as the value of the game result
         for state_value in self_play_data:
-            #value = -value
             state_value[2] =  value
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
@@ -70,24 +65,18 @@ class Train(object):
         mcts = MCTS(self.net)
         gas_network = deepcopy(self.gas_network)
         node = TreeNode()
-        cum_penalty = 0
 
         best_child = mcts.search(gas_network, node, configs.temperature)
         action = best_child.action
+        #gas_network.take_action(action)
+        #penalty = gas_network.n_penalty[0]
+        gas_network.apply_action(action)
+        new_action_c_p = gas_network.cum_sum_penalty
 
-        for i in range(8):
-            if gas_network.next_step < numSteps:
-                gas_network.take_action(action)
-                gas_network.decisions_dict = gas_network.generate_decision_dict(action)
+        old_action = get_old_action()
+        gas_network.apply_action(old_action)
+        old_action_c_p = gas_network.cum_sum_penalty
 
-                cum_penalty += gas_network.n_penalty[0]
-                gas_network.next_step += 1
-                gas_network.state = get_state(gas_network.next_step, gas_network.decisions_dict)
-
-        if cum_penalty < 1000:
-            return gas_network.decisions_dict
-
-        # else:
-        #     exit()
-        #     next_action = next(child.action for child in best_child.parent.children)
-        #     best_decision = gas_network.generate_decision_dict(next_action)
+        if new_action_c_p < old_action_c_p:
+            decision = gas_network.generate_decision_dict(action)
+            return decision

@@ -42,10 +42,10 @@ for i in range(numSteps):
     print("step %d" % i)
 
     # dirty hack to modify nominations
-    if i > 20 and i % 8 == 0 and (i+8) < numSteps:
+    if i > 20 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
       a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
-      agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+8] = a
-      agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+8] = 1100 - a
+      agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
+      agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
 
     # for every i in numSteps a simulator step is performed.
     # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
@@ -65,7 +65,7 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
-    if config["ai"] and (i == 9 or (i > 25 and (i-8) % 8 == 7)):
+    if config["ai"] and (i == 9 or (i > 10 and (i+1) % config['decision_freq'] == 0)):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
 

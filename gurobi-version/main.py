@@ -19,30 +19,18 @@ with open(path.join(data_path, 'init_decisions.yml')) as file:
     agent_decisions = yaml.load(file, Loader=yaml.FullLoader)
     #print(agent_decisions)
 
-# read manual file with prescribed nominations and/or fixed decisions
-with open(path.join(data_path, 'fixed_decisions.yml')) as file:
-    fixed_decisions = yaml.load(file, Loader=yaml.FullLoader)
-    #print(fixed_decisions)
-
 #csv file to store (agent) decisions in a csv file in scenario output folder
 with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f:
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 
-# update agent_decisions with fixed decisions
-agent_decisions = always_merger.merge(agent_decisions,fixed_decisions)
-print("Updated agent decisions:")
-pprint.pprint(agent_decisions)
-if config['ai'] is True:
-    agent_decisions = remove_da_fixed_decisions(agent_decisions)
-
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
 
     # dirty hack to modify nominations
-    if i > 20 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
+    if i > 0 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
       a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
       agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
       agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
@@ -65,7 +53,7 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
-    if config["ai"] and (i == 9 or (i > 10 and (i+1) % config['decision_freq'] == 0)):
+    if config["ai"] and (i > 0 and (i+1) % config['decision_freq'] == 0):
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
 

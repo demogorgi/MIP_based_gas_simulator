@@ -38,11 +38,11 @@ config = {
     # contour output (net- and state-files in contour folder)
     "contour_output": False,
     # is the ai-part active?
-    "ai" : True,
+    "ai": True,
     # how often ai takes decision (number of timesteps)
-    "decision_freq" : 8,
+    "decision_freq": 8,
     # how often new trader nomination comes (number of timesteps)
-    "nomination_freq" : 32,
+    "nomination_freq": 32
 }
 
 # read manual file with configs
@@ -60,17 +60,6 @@ if os.path.exists(os.path.join(data_path, "config.yml")):
 with open(path.join(data_path, 'compressors.yml')) as file:
     compressors = yaml.load(file, Loader=yaml.FullLoader)
     #print(compressors)
-
-def remove_da_fixed_decisions(agent_decisions):
-    for key, value in agent_decisions.items():
-        if re.search('va|zeta|gas|compressor', key):
-            for key_1, value_1 in value.items():
-                for key_2, value_2 in value_1.items():
-                    for i,k in value_2.items():
-                        if i > 0:
-                            del value_2[i]
-                            break
-    return agent_decisions
 
 def csv2csv_de(infile, outfile):
     reader = csv.reader(infile, delimiter = ',')

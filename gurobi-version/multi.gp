@@ -16,7 +16,7 @@ while (1) {
     set y2label "zeta"
     set origin 0, 0.8
     set size 1, 0.2
-    plot [0:r][-0.05:1.05] filename every ::1 using :10 with lines title "va18" axis x1y1, filename every ::1 using :11 with lines title "va17" axis x1y1, filename every ::1 using :12 with lines title "zeta" axis x1y2, filename every ::1 using :13 with lines title "gas" axis x1y1, filename every ::1 using :14 with lines title "compressor" axis x1y1 
+    plot [0:r][-0.05:1.05] filename every ::1 using :10 with steps title "va18" axis x1y1, filename every ::1 using :11 with steps title "va17" axis x1y1, filename every ::1 using :12 with steps lw 2 title "zeta" axis x1y2, filename every ::1 using :13 with steps lw 2 title "gas" axis x1y1, filename every ::1 using :14 with steps lw 2 title "compressor" axis x1y1 
     unset y2label
     unset y2tics
     #

@@ -17,8 +17,7 @@ configs = dotdict({
 
     'num_evaluation_plays' : 5, # Number of evaluation plays
 
-    'train_model': True
-
+    'train_model': True,
 })
 
 penalties = []

@@ -54,12 +54,40 @@ def get_agents_dict(step, agent_decisions):
                 agents_dict[key] = v3[i]
     return agents_dict
 
-def get_state(step, agent_decisions):
+def get_boundary_q_p(solution):
+    # for k, v in states[step-1]['p'].items():
+    #     if not re.search('_aux|_HD|_ND', k):
+    #         pr[k] = round(v,2)
+    # pressures = normalize_pressure(pr.copy())
+    #
+    # return pressures
+    smoothed_flow = {}
+    x_p = {}
+    for k, v in solution.items():
+        if re.search('smoothed_special_pipe_flow_DA', k):
+            smoothed_flow[k] = v
+        if re.search('var_node_p\[(XN|XH)]', k):
+            res = re.sub('var_node_p\[(\S*)]', r'\1', k)
+            x_p[res] = v
+    pressures = normalize_pressure(x_p.copy())
+    smoothed_flows = normalize_smoothed_flows(smoothed_flow.copy())
+    boundary_p_q = {**smoothed_flows, **pressures}
+    return boundary_p_q
+
+
+def normalize_smoothed_flows(smoothed_flow):
+    for label, value in smoothed_flow.items():
+        if 'EH' in label:
+            smoothed_flow[label] = round((value - no.q_lb['EH'])/(no.q_ub['EH'] - no.q_lb['EH']),2)
+        if 'EN' in label:
+            smoothed_flow[label] = round((value - no.q_lb['EN'])/(no.q_ub['EN'] - no.q_lb['EN']),2)
+    return smoothed_flow
+
+def get_state(step, agent_decisions, solution):
     global trader_nom, dispatcher_dec
 
-    for k, v in states[step-1]['p'].items():
-        if not re.search('_aux|_HD|_ND', k):
-            pr[k] = round(v,2)
+
+    pr_q = get_boundary_q_p(solution)
 
     agents_dict = get_agents_dict(step,agent_decisions)
     trader_nom = {k:v for k, v in agents_dict.items() if re.search('_TA',k)}
@@ -67,15 +95,16 @@ def get_state(step, agent_decisions):
 
     da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
     ta_dec = normalize_trader_noms(trader_nom.copy())
-    pressures = normalize_pressure(pr.copy())
+
 
     for k, v in da_dec.items(): #Dispatcher decision
         state_[k] = [v]
     for k, v in ta_dec.items(): #Trader decision
         state_[k] = [v]
-
-    for value in original_nodes:
-        state_[value] = [pressures[value]] # Pressure values
+    for k,v in pr_q.items():
+        state_[k] = [v]
+    # for value in original_nodes:
+    #     state_[value] = [pressures[value]] # Pressure values
 
     state = np.array([value for key, value in state_.items()])
 
@@ -100,7 +129,7 @@ def normalize_dispatcher_dec(decisions):
 
 def normalize_pressure(pressure_dict):
     for label, value in pressure_dict.items():
-        pressure_dict[label] = (value - no.pressure_limits_lower[label])/(no.pressure_limits_upper[label] - no.pressure_limits_lower[label])
+        pressure_dict[label] = round((value - no.pressure_limits_lower[label])/(no.pressure_limits_upper[label] - no.pressure_limits_lower[label]),2)
     return pressure_dict
 
 def normalize_trader_noms(decisions):

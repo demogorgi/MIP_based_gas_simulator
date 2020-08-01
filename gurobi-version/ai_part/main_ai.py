@@ -18,8 +18,8 @@ def get_decisions_from_ai(solution, agent_decisions, step, penalty):
         Gas_Network.next_step = step
         Gas_Network.c_penalty = penalty
 
-        Gas_Network.state = get_state(step, agent_decisions)
-        
+        Gas_Network.state = get_state(step, agent_decisions, solution)
+
         gas_network = Gas_Network()
         net = NeuralNetworkWrapper(gas_network)
 

@@ -15,7 +15,7 @@ class Evaluate(object):
 
         for i in range(len(penalties)):
 
-            if penalties[i][0] < penalties[i][1] or penalties[i][0] <= 10:
+            if  penalties[i][0] <= penalties[i][1] or penalties[i][0] <= 10:
                 wins += 1
             elif penalties[i][0] > penalties[i][1] or penalties[i][0] > 10:
                 losses += 1

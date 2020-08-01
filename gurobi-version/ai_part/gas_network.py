@@ -5,7 +5,6 @@ import itertools
 from copy import deepcopy
 
 from .functions_ai import *
-#from urmel import *
 
 class Gas_Network(object):
 
@@ -19,7 +18,7 @@ class Gas_Network(object):
 
     def __init__(self):
         self.row = len(self.state)
-        self.tol_penalty = 20
+        self.tol_penalty = 20 #Assume allowed penalty
         self.possible_decisions = self.get_decisions(get_dispatcher_dec())
 
     def get_action_size(self):
@@ -42,8 +41,7 @@ class Gas_Network(object):
         cs = None
         zeta = None
         gas = None
-        va_1 = 0
-        va_2 = 0
+
         da_decisions = {}
 
         val = lambda b: int(1-b)
@@ -57,28 +55,34 @@ class Gas_Network(object):
             if re.search('entry_nom', i):
                 res = re.sub('entry_nom_TA\[(\S*)]', r'\1', i)
                 if re.search('EN', res) and k > 0:
-                    va_1 += 1
                     if k >= entry_q_ub/2:
                         cs = 1
                         gas = rndm_value(0.4,1)
                     else:
-                        gas = rndm_value(0, 0.4)
+                        if k >= entry_q_ub/4:
+                            cs = 1
+                            gas = rndm_value(0, 0.4)
+                        else:
+                            cs = 0
 
                 if re.search('EH', res) and k > 0:
-                    va_2 += 1
                     if k >= entry_q_ub/2:
                         cs = 0
-                        zeta = zeta_value(0, 0.2)
+                        zeta = zeta_value(0, 0.1)
                     else:
-                        zeta = zeta_value(0.6, 1)
+                        if k >= entry_q_ub/4:
+                            zeta = zeta_value(0.2, 0.5)
+                        else:
+                            zeta = zeta_value(0.7, 1)
+
 
         for l, v in old_decisions.items():
             if re.match('va', l):
                 va_name = re.sub('va_DA\[(\S*)]', r'\1', l)
                 if va_name == 'N18^N23_1':
-                    da_decisions[l] = va_1 if va_1 == 1 else val(v)
+                    da_decisions[l] = 1
                 else:
-                    da_decisions[l] = va_2 if va_2 == 1 else val(v)
+                    da_decisions[l] = 1
             elif re.match('zeta', l):
                 da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
@@ -172,7 +176,7 @@ class Gas_Network(object):
         cum_penalty = 0
         d = self.generate_decision_dict(action)
         step = self.next_step
-        for i in range(8):
+        for i in range(config['penalty_freq']):
             if step < numSteps:
                 self.take_action(action, step)
                 cum_penalty += self.n_penalty[0]

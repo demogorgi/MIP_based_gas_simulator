@@ -54,8 +54,8 @@ class TreeNode(object):
     def expand_node(self, gas_network, psa_vector):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-        valid_decisions = gas_network.get_valid_decisions()
-
+        valid_decisions = gas_network.get_possible_decisions()
+        
         for idx, move in enumerate(valid_decisions):
             action = deepcopy(move)
             self.add_child_node(parent = self, action = action, psa = psa_vector[idx])
@@ -95,7 +95,7 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = gas_network.get_valid_decisions()
+            possible_decisions = gas_network.get_possible_decisions()
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
 

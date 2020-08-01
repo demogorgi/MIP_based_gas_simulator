@@ -46,49 +46,38 @@ class Gas_Network(object):
 
         val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
-        rndm_value = lambda l,u: round(random.uniform(l,u), 2)
-        zeta_value = lambda l,u: round(rndm_value(l, u)*(args.zeta_ub-args.zeta_lb)+args.zeta_lb, 2)
+        rndm_value = lambda: round(random.uniform(0,1), 2)
+        zeta_value = lambda: round(rndm_value()*(args.zeta_ub-args.zeta_lb)+args.zeta_lb, 2)
 
         trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
 
         for i, k in trader_nom.items():
             if re.search('entry_nom', i):
                 res = re.sub('entry_nom_TA\[(\S*)]', r'\1', i)
-                if re.search('EN', res) and k > 0:
-                    if k >= entry_q_ub/2:
-                        cs = 1
-                        gas = rndm_value(0.4,1)
-                    else:
-                        if k >= entry_q_ub/4:
-                            cs = 1
-                            gas = rndm_value(0, 0.4)
-                        else:
-                            cs = 0
-
-                if re.search('EH', res) and k > 0:
-                    if k >= entry_q_ub/2:
-                        cs = 0
-                        zeta = zeta_value(0, 0.1)
-                    else:
-                        if k >= entry_q_ub/4:
-                            zeta = zeta_value(0.2, 0.5)
-                        else:
-                            zeta = zeta_value(0.7, 1)
-
+                if 'EN' in res: q_EN = k
+                #if 'EH' in res: q_EH = k
+            else:
+                res = re.sub('exit_nom_TA\[(\S*)]', r'\1', i)
+                if 'XN' in res: q_XN = k
+                #if 'XH' in res: q_XH = k
+        if q_EN > q_XN:
+            cs = 1
+            gas = rndm_value()
+            zeta = args.zeta_ub
+        else:
+            cs = 0
+            gas = 0
+            zeta = zeta_value()
 
         for l, v in old_decisions.items():
             if re.match('va', l):
-                va_name = re.sub('va_DA\[(\S*)]', r'\1', l)
-                if va_name == 'N18^N23_1':
-                    da_decisions[l] = 1
-                else:
-                    da_decisions[l] = 1
+                da_decisions[l] = 1
             elif re.match('zeta', l):
                 da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
-                da_decisions[l] = gas if gas is not None else v
+                da_decisions[l] = gas if gas  else v
             elif re.match('compressor', l):
-                da_decisions[l] = cs if cs is not None else v
+                da_decisions[l] = cs if cs  else v
 
         valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
 
@@ -142,12 +131,9 @@ class Gas_Network(object):
                 if re.search('compressor', d[i][0]):
                     dec[cs] = d[i][1]
                 if dec[cs] == 0: dec[gs] = 0
-
             if (dec in list_d) or dec == old_action:
                 continue
             list_d.append(dec)
-        # list_d = self.check_decision(list_d)
-
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -197,16 +183,4 @@ class Gas_Network(object):
             return -5
         else: return -10
 
-    #Choose valid decisions from Action space
-    def get_valid_decisions(self):
-        possible_decisions = self.get_possible_decisions()
-        rs, gs, cs = get_con_pos()
-        trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
-        valid_decisions = possible_decisions
-        for k, v in trader_nom.items():
-            if v >= entry_q_ub/2:
-                if 'EN' in k:
-                    valid_decisions = [valid for key, valid in enumerate(possible_decisions) if not valid[cs] == 0]
-                if 'EH' in k:
-                    valid_decisions = [valid for key, valid in enumerate(possible_decisions) if valid[cs] == 0]
-        return valid_decisions
+    

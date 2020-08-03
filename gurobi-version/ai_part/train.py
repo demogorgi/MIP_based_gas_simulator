@@ -23,7 +23,9 @@ class Train(object):
             gas_network = deepcopy(self.gas_network)
             self.self_play(gas_network, training_data)
 
-        new_agent_decision = self.get_decision()
+        action = [v for k,v in get_dispatcher_dec().items()]
+
+        new_agent_decision = gas_network.generate_decision_dict(action)
 
         self.net.save_model() #Current model saved
 
@@ -49,8 +51,7 @@ class Train(object):
 
         action = best_child.action
 
-        gas_network.take_action(action)
-
+        gas_network.apply_action(action)
         value = gas_network.get_reward(gas_network.n_penalty[0])
 
         # Update v as the value of the game result
@@ -59,24 +60,3 @@ class Train(object):
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
             training_data.append([state, psa_vector, state_value[2]])
-
-
-    def get_decision(self):
-        mcts = MCTS(self.net)
-        gas_network = deepcopy(self.gas_network)
-        node = TreeNode()
-
-        best_child = mcts.search(gas_network, node, configs.temperature)
-        action = best_child.action
-        #gas_network.take_action(action)
-        #penalty = gas_network.n_penalty[0]
-        gas_network.apply_action(action)
-        new_action_c_p = gas_network.cum_sum_penalty
-
-        old_action = get_old_action()
-        gas_network.apply_action(old_action)
-        old_action_c_p = gas_network.cum_sum_penalty
-
-        if new_action_c_p < old_action_c_p:
-            decision = gas_network.generate_decision_dict(action)
-            return decision

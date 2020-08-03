@@ -3,8 +3,9 @@ import tensorflow as tf
 import itertools
 
 from copy import deepcopy
-
 from .functions_ai import *
+
+mean_value = lambda l, u: (l+u)/2
 
 class Gas_Network(object):
 
@@ -15,11 +16,13 @@ class Gas_Network(object):
     n_penalty = [0, 0] #Penalty expected for new decision
     possible_decisions = []
     cum_sum_penalty = 0
+    sol = None
 
     def __init__(self):
         self.row = len(self.state)
         self.tol_penalty = 20 #Assume allowed penalty
-        self.possible_decisions = self.get_decisions(get_dispatcher_dec())
+        self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, self.decisions_dict).items()]
+
 
     def get_action_size(self):
         return self.row
@@ -31,43 +34,28 @@ class Gas_Network(object):
         return deepcopy(self.decisions_dict)
 
     def get_possible_decisions(self):
-        if self.possible_decisions:
-            return self.possible_decisions
-        return self.get_decisions(get_dispatcher_dec())
+        return self.get_possible_nexts(get_dispatcher_dec())
 
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self, old_decisions):
-        cs = None
         zeta = None
         gas = None
+        cs = None
 
         da_decisions = {}
-
-        val = lambda b: int(1-b)
+        #val = lambda b: int(1-b)
         subsets = lambda s,n: list(itertools.combinations(s,n))
-        rndm_value = lambda: round(random.uniform(0,1), 2)
-        zeta_value = lambda: round(rndm_value()*(args.zeta_ub-args.zeta_lb)+args.zeta_lb, 2)
 
-        trader_nom = get_trader_nom(self.next_step, self.decisions_dict)
-
-        for i, k in trader_nom.items():
-            if re.search('entry_nom', i):
-                res = re.sub('entry_nom_TA\[(\S*)]', r'\1', i)
-                if 'EN' in res: q_EN = k
-                #if 'EH' in res: q_EH = k
+        if  self.next_step%config['nomination_freq'] == 0:
+            if self.nom_EN > self.nom_XN:
+                cs = 1
+                gas = round(mean_value(args.gas_lb,args.gas_ub),3)
+                zeta = args.zeta_ub
             else:
-                res = re.sub('exit_nom_TA\[(\S*)]', r'\1', i)
-                if 'XN' in res: q_XN = k
-                #if 'XH' in res: q_XH = k
-        if q_EN > q_XN:
-            cs = 1
-            gas = rndm_value()
-            zeta = args.zeta_ub
-        else:
-            cs = 0
-            gas = 0
-            zeta = zeta_value()
+                cs = 0
+                gas = 0
+                zeta = int(mean_value(args.zeta_lb, args.zeta_ub))
 
         for l, v in old_decisions.items():
             if re.match('va', l):
@@ -75,19 +63,22 @@ class Gas_Network(object):
             elif re.match('zeta', l):
                 da_decisions[l] = zeta if zeta else v
             elif re.match('gas', l):
-                da_decisions[l] = gas if gas  else v
+                da_decisions[l] = gas if gas is not None  else v
             elif re.match('compressor', l):
-                da_decisions[l] = cs if cs  else v
+                da_decisions[l] = cs if cs is not None else v
 
-        valid_dispatcher_decisions = [(k,v) for k, v in da_decisions.items()]
-
-        #Find all possible subsets of possible dispatcher decisions
-        list_valid_decisions = []
-        for i in range(len(valid_dispatcher_decisions), 0,-1):
-            list_valid_decisions.append(subsets(valid_dispatcher_decisions,i))
-        valid_decisions = [item for elem in list_valid_decisions for item in elem]
+        valid_decisions = [v for k,v in da_decisions.items()]
 
         return valid_decisions
+
+    def get_nom_q_difference(self):
+        smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow().items()] #EH, EN
+
+        if self.nom_EN > self.nom_XN:
+            c = round(self.nom_EN - smoothed_EN)
+        else:
+            c = round(self.nom_EH - smoothed_EH)
+        return c
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
         step = self.next_step
@@ -115,7 +106,6 @@ class Gas_Network(object):
         possible_decisions = self.get_possible_nexts(old_decisions)
         old_action = get_old_action()
         rs, gs, cs = get_con_pos()
-
         list_d = []
         for d in possible_decisions:
             valve = 0
@@ -134,6 +124,9 @@ class Gas_Network(object):
             if (dec in list_d) or dec == old_action:
                 continue
             list_d.append(dec)
+        if not list_d:
+            list_d.append(old_action)
+
         return list_d
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -155,19 +148,38 @@ class Gas_Network(object):
 
         solution = simulator_step(decision, step, "ai")
 
-        #self.state = get_state(self.next_step, decision)
+        state = get_state(step, decision, solution)
         self.n_penalty = find_penalty(solution)
 
     def apply_action(self, action):
+
+        rs, gs, cs = get_con_pos()
+        c = 0
         cum_penalty = 0
         d = self.generate_decision_dict(action)
         step = self.next_step
         for i in range(config['penalty_freq']):
             if step < numSteps:
                 self.take_action(action, step)
+                c += self.get_nom_q_difference()
+
                 cum_penalty += self.n_penalty[0]
                 step += 1
 
+        if c > 0:
+            if self.nom_EN > self.nom_XN:
+                action[gs] = round(mean_value(action[gs], args.gas_ub),3)
+            else:
+                action[rs] = int(mean_value(args.zeta_lb, action[rs]))
+
+        else:
+            if c < 0:
+                if self.nom_EN > self.nom_XN:
+                    action[gs] = round(mean_value(args.gas_lb, action[gs]),3)
+                else:
+                    action[rs] = int(mean_value(action[rs], args.zeta_ub))
+
+        set_dispatcher_dec(self.decision_to_dict(action))
         self.cum_sum_penalty = cum_penalty
 
 
@@ -182,5 +194,3 @@ class Gas_Network(object):
         elif penalty >= 50 and penalty < 100:
             return -5
         else: return -10
-
-    

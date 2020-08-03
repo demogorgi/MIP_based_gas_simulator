@@ -54,8 +54,8 @@ class TreeNode(object):
     def expand_node(self, gas_network, psa_vector):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-        valid_decisions = gas_network.get_possible_decisions()
-        
+        valid_decisions = [gas_network.get_possible_decisions()]
+
         for idx, move in enumerate(valid_decisions):
             action = deepcopy(move)
             self.add_child_node(parent = self, action = action, psa = psa_vector[idx])
@@ -86,19 +86,19 @@ class MCTS(object):
             node = self.root
             gas_network = deepcopy(self.gas_network)
 
-            while node.is_not_leaf():
-                node = node.select_child()
-                gas_network.take_action(node.action)
+            # while node.is_not_leaf():
+            #     node = node.select_child()
+            #     gas_network.take_action(node.action)
 
             prob_vector, v = self.net.policy_value(gas_network.state)
 
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = gas_network.get_possible_decisions()
+            possible_decisions = [gas_network.get_possible_decisions()]
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
-
+            #print(psa_vector)
             psa_vector_sum = sum(psa_vector)
 
             if psa_vector_sum > 0: #Renormalize the psa_vector
@@ -111,7 +111,7 @@ class MCTS(object):
             while node is not None:
                 node.back_propagate(wsa, v)
                 node = node.parent
-
+        
         return self.root.select_child()
 
     def add_dirichlet_noise(self, gas_network, psa_vector):

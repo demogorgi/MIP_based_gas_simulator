@@ -11,12 +11,15 @@ from .configs import penalties
 
 args = dotdict({
     #Weights to calculate penalty for both agents
-    'pressure_wt_factor' : 1,
-    's_flow_wt_factor' : 0.1,
+    'pressure_wt_factor': 1,
+    's_flow_wt_factor': 0.1,
     'x_flow_wt_factor': 0.05,
     #Upper and lower limit for generating a drag factor value for RE
-    'zeta_ub' : 1200,
-    'zeta_lb' : 100,
+    'zeta_ub': 1200,
+    'zeta_lb': 100,
+    #Upper and lower limit for gas
+    'gas_ub': 1,
+    'gas_lb': 0,
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -38,6 +41,7 @@ for n in no.nodes:
 
 entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
+smoothed_flow = {}
 
 def get_agents_dict(step, agent_decisions):
     agents_dict = {}
@@ -55,13 +59,7 @@ def get_agents_dict(step, agent_decisions):
     return agents_dict
 
 def get_boundary_q_p(solution):
-    # for k, v in states[step-1]['p'].items():
-    #     if not re.search('_aux|_HD|_ND', k):
-    #         pr[k] = round(v,2)
-    # pressures = normalize_pressure(pr.copy())
-    #
-    # return pressures
-    smoothed_flow = {}
+    #smoothed_flow
     x_p = {}
     for k, v in solution.items():
         if re.search('smoothed_special_pipe_flow_DA', k):
@@ -74,6 +72,8 @@ def get_boundary_q_p(solution):
     boundary_p_q = {**smoothed_flows, **pressures}
     return boundary_p_q
 
+def get_smoothed_flow():
+    return (smoothed_flow.copy())
 
 def normalize_smoothed_flows(smoothed_flow):
     for label, value in smoothed_flow.items():
@@ -85,8 +85,6 @@ def normalize_smoothed_flows(smoothed_flow):
 
 def get_state(step, agent_decisions, solution):
     global trader_nom, dispatcher_dec
-
-
     pr_q = get_boundary_q_p(solution)
 
     agents_dict = get_agents_dict(step,agent_decisions)
@@ -98,11 +96,11 @@ def get_state(step, agent_decisions, solution):
 
 
     for k, v in da_dec.items(): #Dispatcher decision
-        state_[k] = [v]
+        state_[k] = v
     for k, v in ta_dec.items(): #Trader decision
-        state_[k] = [v]
+        state_[k] = v
     for k,v in pr_q.items():
-        state_[k] = [v]
+        state_[k] = v
     # for value in original_nodes:
     #     state_[value] = [pressures[value]] # Pressure values
 
@@ -117,9 +115,14 @@ def get_trader_nom(step, agent_decisions):
 def get_dispatcher_dec():
     return dispatcher_dec.copy()
 
+def set_dispatcher_dec(da_dec):
+    global dispatcher_dec
+    dispatcher_dec = da_dec
+
 def get_old_action():
     old_action = list(v for k, v in get_dispatcher_dec().items())
     return old_action
+
 
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():

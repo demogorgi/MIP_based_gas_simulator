@@ -26,12 +26,12 @@ class NeuralNetwork(object):
         self.graph = tf.Graph()
         with self.graph.as_default():
             self.states = tf.placeholder(tf.float32,
-                                         shape = [None,self.row, self.cols])
+                                         shape = [None,self.row])
             self.training = tf.placeholder(tf.bool)
 
             #Input_Layer
             input_layer = tf.reshape(self.states,
-                                     [-1, self.row, self.cols, 1])
+                                     [-1, self.row, 1, 1])
 
             #Convolutional Block
             conv1 = tf.layers.conv2d(
@@ -87,7 +87,7 @@ class NeuralNetwork(object):
                 training = self.training)
             relu4 = tf.nn.relu(batch_norm4)
 
-            relu4_flat = tf.reshape(relu4, [-1, self.row * self.cols * 2])
+            relu4_flat = tf.reshape(relu4, [-1, self.row * 2])
 
             dense_pi = tf.layers.dense(
                 inputs = relu4_flat,
@@ -156,7 +156,7 @@ class NeuralNetworkWrapper(object):
 
     def policy_value(self, state):
 
-        state = state[np.newaxis, :, :]
+        state = state[np.newaxis, :]
         pi,v = self.sess.run([self.net.pi, self.net.v],
                              feed_dict = {self.net.states: state,
                                           self.net.training: False})

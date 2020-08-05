@@ -71,12 +71,13 @@ class Gas_Network(object):
         return valid_decisions
 
     def get_nom_q_difference(self, solution):
-        smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
+        #smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
+        flow_EH, flow_EN = [round(v,2) for k,v in get_flow(solution).items()] #EH, EN
 
         if self.nom_EN > self.nom_XN:
-            c = round(self.nom_EN - smoothed_EN)
+            c = round(self.nom_EN - flow_EN)
         else:
-            c = round(self.nom_EH - smoothed_EH)
+            c = round(self.nom_EH - flow_EH)
         return c
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
@@ -111,6 +112,7 @@ class Gas_Network(object):
 
 
     def apply_action(self, action):
+        actions = []
         global gs_ub, gs_lb, rs_ub, rs_lb, cum_n_q
         if self.next_step % config['nomination_freq'] == 0:
             gs_ub = args.gas_ub
@@ -140,17 +142,20 @@ class Gas_Network(object):
                     action[gs] = round(mean_value(action[gs], gs_ub),3)
                 else:
                     rs_ub = action[rs]
-                    action[rs] = int(mean_value(rs_lb, action[rs]))
+                    action[rs] = round(mean_value(rs_lb, action[rs]),2)
             else:
                 if c < 0:
                     if self.nom_EN > self.nom_XN:
                         gs_ub = action[gs]
                         action[gs] = round(mean_value(gs_lb, action[gs]),3)
-
                     else:
                         rs_lb = action[rs]
-                        action[rs] = int(mean_value(action[rs], rs_ub))
-
+                        action[rs] = round(mean_value(action[rs], rs_ub),2)
+        #     actions.append([action.copy(), c])
+        # if self.next_step == 8:
+        #     for i in actions:
+        #         print(i)
+        #     exit()
         set_dispatcher_dec(self.decision_to_dict(action))
 
     #Find the reward value for dispatcher agent

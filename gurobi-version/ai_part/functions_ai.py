@@ -42,6 +42,15 @@ for n in no.nodes:
 entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
 smoothed_flow = {}
+qo_in = {}
+def get_flow(solution):
+    qo_in = {}
+    for k, v in solution.items():
+        if re.search('var_pipe_Qo_in', k):
+            res = re.sub('var_pipe_Qo_in\[(\S*)]', r'\1', k)
+            if res == 'EN_aux0,EN' or res == 'EH_aux0,EH':
+                qo_in[k] = v
+    return qo_in
 
 def get_agents_dict(step, agent_decisions):
     agents_dict = {}

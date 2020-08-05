@@ -10,8 +10,8 @@ import pprint
 from deepmerge import always_merger
 import random
 
-#if config["ai"]:
-from ai_part.main_ai import *
+from ai_part.main_ai import*
+# from ai_my_version.main_ai import *
 
 # read manual file with initial gas network control
 # the dictionary changes with every new control
@@ -48,16 +48,16 @@ for i in range(numSteps):
     with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
         bn_pr_flows = get_bn_pressures_flows(solution)
         penalty = find_penalty(solution)
-        penalties.append(penalty)
+        penalties.append(cum_n_q[i%8])
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
     if config["ai"] and (i > 0 and (i+1) % config['decision_freq'] == 0):
+
         # Generating new agent_decision for the next iteration from neural network as it learns to generate
         agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
-
         if not agent_decisions: continue
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")

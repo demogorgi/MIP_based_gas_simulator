@@ -16,7 +16,7 @@ while (1) {
     set y2label "zeta"
     set origin 0, 0.8
     set size 1, 0.2
-    plot [0:r][-0.05:1.05] filename every ::1 using :10 with steps title "va18" axis x1y1, filename every ::1 using :11 with steps title "va17" axis x1y1, filename every ::1 using :12 with steps lw 2 title "zeta" axis x1y2, filename every ::1 using :13 with steps lw 2 title "gas" axis x1y1, filename every ::1 using :14 with steps lw 2 title "compressor" axis x1y1 
+    plot [0:r][-0.05:1.05] filename every ::1 using :10 with steps title "va18" axis x1y1, filename every ::1 using :11 with steps title "va17" axis x1y1, filename every ::1 using :12 with steps lw 2 title "zeta" axis x1y2, filename every ::1 using :13 with steps lw 2 title "gas" axis x1y1, filename every ::1 using :14 with steps lw 2 title "compressor" axis x1y1
     unset y2label
     unset y2tics
     #
@@ -29,17 +29,17 @@ while (1) {
     ##
     set key inside left top
     set xlabel "Time"
-    set ylabel "Accumulated penalty"
+    set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    plot [0:r] filename every ::1 using :19 with lines title "Accumulated penalty"
+    plot [0:r] filename every ::1 using :19 with lines title "Accumulated c values"
     #
     set key inside center bottom
     set xlabel "Time"
     set ylabel "Nominations and flows\nin 1000 m³/h"
     set origin 0, 0.4
     set size 1, 0.2
-    plot [0:r] filename every ::1 using :6 with steps lt 1 lw 2 title "nom(EN)", filename every ::1 using :7 with steps lt 1 dt 2 title "flow(EN)", filename every ::1 using :8 with steps lt 2 lw 2 title "nom(EH)", filename every ::1 using :9 with steps lt 2 dt 2 title "flow(EH)" 
+    plot [0:r] filename every ::1 using :6 with steps lt 1 lw 2 title "nom(EN)", filename every ::1 using :7 with steps lt 1 dt 2 title "flow(EN)", filename every ::1 using :8 with steps lt 2 lw 2 title "nom(EH)", filename every ::1 using :9 with steps lt 2 dt 2 title "flow(EH)"
     #
     set key inside left top vertical
     set xlabel "Nomination in 1000 m³/h"

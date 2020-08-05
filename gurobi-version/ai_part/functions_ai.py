@@ -56,6 +56,7 @@ def get_agents_dict(step, agent_decisions):
                     if i in v3:
                         break
                 agents_dict[key] = v3[i]
+
     return agents_dict
 
 def get_boundary_q_p(solution):
@@ -72,8 +73,12 @@ def get_boundary_q_p(solution):
     boundary_p_q = {**smoothed_flows, **pressures}
     return boundary_p_q
 
-def get_smoothed_flow():
-    return (smoothed_flow.copy())
+def get_smoothed_flow(solution):
+    smoothed_flow = {}
+    for k, v in solution.items():
+        if re.search('smoothed_special_pipe_flow_DA', k):
+            smoothed_flow[k] = v
+    return smoothed_flow
 
 def normalize_smoothed_flows(smoothed_flow):
     for label, value in smoothed_flow.items():
@@ -107,6 +112,7 @@ def get_state(step, agent_decisions, solution):
     state = np.array([value for key, value in state_.items()])
 
     return state
+
 def get_trader_nom(step, agent_decisions):
     dec_dict = get_agents_dict(step,agent_decisions)
     trader_noms = {k:v for k, v in dec_dict.items() if re.search('_TA',k)}
@@ -260,15 +266,15 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     if penalty:
         extracted_['Dispatcher Penalty'] = penalty[0]
         extracted_['Trader Penalty'] = penalty[1]
-        if not step%8 == 0:
-            i = step
-            while not i%8 == 0:
-                acc_penalty += penalties[i][0]
-                i -= 1
-            acc_penalty += penalties[i][0]
-        else:
-            acc_penalty = penalties[step][0]
-        extracted_['Accumulated'] = acc_penalty
+        # if not step%8 == 0:
+        #     i = step
+        #     while not i%8 == 0:
+        #         acc_penalty += penalties[i][0]
+        #         i -= 1
+        #     acc_penalty += penalties[i][0]
+        # else:
+        #     acc_penalty = penalties[step][0]
+        extracted_['Accumulated'] = penalties[step]
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None

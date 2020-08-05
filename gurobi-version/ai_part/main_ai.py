@@ -1,5 +1,5 @@
 from .functions_ai import *
-from .gas_network import Gas_Network
+from .gas_network import *
 from .neural_network_architecture import NeuralNetworkWrapper
 from .train import Train
 from .ai_decisions import *
@@ -18,7 +18,7 @@ def get_decisions_from_ai(solution, agent_decisions, step, penalty):
         Gas_Network.next_step = step
         Gas_Network.c_penalty = penalty
 
-        Gas_Network.state = get_state(step, agent_decisions, solution)
+        Gas_Network.state = get_state(step-1, agent_decisions, solution)
 
         gas_network = Gas_Network()
         net = NeuralNetworkWrapper(gas_network)

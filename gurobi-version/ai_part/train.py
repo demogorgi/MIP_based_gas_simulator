@@ -17,11 +17,11 @@ class Train(object):
 
         training_data = []
 
-        for i in range(configs.num_self_plays):
+        #for i in range(configs.num_self_plays):
         #Self plays to collect data to train the NN
-            print("Start Self-play training", i+1)
-            gas_network = deepcopy(self.gas_network)
-            self.self_play(gas_network, training_data)
+        print("Start Self-play training")
+        gas_network = deepcopy(self.gas_network)
+        self.self_play(gas_network, training_data)
 
         action = [v for k,v in get_dispatcher_dec().items()]
 
@@ -32,9 +32,9 @@ class Train(object):
         self.net.train(training_data) # Train the current model
 
         #Evaluating the decisions
-        if penalties:
-            evaluator = Evaluate(self.net)
-            evaluator.evaluate()
+        # if penalties:
+        #     evaluator = Evaluate(self.net)
+        #     evaluator.evaluate()
 
         return new_agent_decision
 
@@ -52,6 +52,7 @@ class Train(object):
         action = best_child.action
 
         gas_network.apply_action(action)
+
         value = gas_network.get_reward(gas_network.n_penalty[0])
 
         # Update v as the value of the game result

@@ -32,7 +32,7 @@ while (1) {
     set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    plot [0:r] filename every ::1 using :19 with lines title "Accumulated c values"
+    plot [0:r] filename every ::1 using :19 with lines title "Accumulated c values", 0 lt 3 title "Baseline"
     #
     set key inside center bottom
     set xlabel "Time"

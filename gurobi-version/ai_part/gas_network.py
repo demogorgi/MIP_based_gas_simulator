@@ -5,7 +5,7 @@ import itertools
 from copy import deepcopy
 from .functions_ai import *
 
-mean_value = lambda l, u: (l+u)/2
+mean_value = lambda l,u:((u - l)/2 + l)
 gs_ub = 0
 gs_lb = 0
 
@@ -53,7 +53,7 @@ class Gas_Network(object):
             else:
                 cs = 0
                 gas = 0
-                zeta = int(mean_value(args.zeta_lb, args.zeta_ub))
+                zeta = mean_value(args.zeta_lb, args.zeta_ub)
         else:
 
             for l, v in old_decisions.items():
@@ -112,8 +112,9 @@ class Gas_Network(object):
 
 
     def apply_action(self, action):
-        actions = []
+        #actions = []
         global gs_ub, gs_lb, rs_ub, rs_lb, cum_n_q
+
         if self.next_step % config['nomination_freq'] == 0:
             gs_ub = args.gas_ub
             gs_lb = args.gas_lb
@@ -123,39 +124,42 @@ class Gas_Network(object):
 
         rs, gs, cs = get_con_pos()
 
-        for i in range(10):
+        for i in range(9):
             c = 0
             #cum_n_q = [None for _ in range(8)]
             step = self.next_step
-            for i in range(config['penalty_freq']):
+            decision = self.generate_decision_dict(action)
+            for j in range(config['penalty_freq']):
                 if step < numSteps:
-                    decision = self.generate_decision_dict(action)
-
+                    # print(step)
                     solution = simulator_step(decision, step, "ai")
 
-                    c += self.get_nom_q_difference(solution)
-                    cum_n_q[i] = c
+                    a = self.get_nom_q_difference(solution)
+                    c += a
+                    cum_n_q[j] = c
                     step += 1
+
+            #actions.append([action.copy(), c])
+            #if i == 8: break
             if c > 0:
+
                 if self.nom_EN > self.nom_XN:
                     gs_lb = action[gs]
-                    action[gs] = round(mean_value(action[gs], gs_ub),3)
+                    action[gs] = round(mean_value(gs_lb, gs_ub),3)
                 else:
                     rs_ub = action[rs]
-                    action[rs] = round(mean_value(rs_lb, action[rs]),2)
+                    action[rs] = round(mean_value(rs_lb, rs_ub),2)
             else:
                 if c < 0:
                     if self.nom_EN > self.nom_XN:
                         gs_ub = action[gs]
-                        action[gs] = round(mean_value(gs_lb, action[gs]),3)
+                        action[gs] = round(mean_value(gs_lb, gs_ub),3)
                     else:
                         rs_lb = action[rs]
-                        action[rs] = round(mean_value(action[rs], rs_ub),2)
-        #     actions.append([action.copy(), c])
-        # if self.next_step == 8:
-        #     for i in actions:
-        #         print(i)
-        #     exit()
+                        action[rs] = round(mean_value(rs_lb, rs_ub),2)
+
+        #actions.append([action.copy(), c])
+
         set_dispatcher_dec(self.decision_to_dict(action))
 
     #Find the reward value for dispatcher agent

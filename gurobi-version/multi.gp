@@ -5,6 +5,11 @@ if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
 while (1) {
     r = f(filename)
+    if (r <= 280) {
+       set xtics 0, 8
+    }
+    set lmargin 12
+    #set rmargin 12
     set multiplot #layout 3, 1 title "Quality plot"
     #
     set key inside top outside center horizontal
@@ -32,7 +37,7 @@ while (1) {
     set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    plot [0:r] filename every ::1 using :19 with lines title "Accumulated c values", 0 lt 3 title "Baseline"
+    plot [0:r] filename every ::1 using :19 with steps title "Accumulated c values", 0 lt 3 title "Baseline"
     #
     set key inside center bottom
     set xlabel "Time"
@@ -41,6 +46,7 @@ while (1) {
     set size 1, 0.2
     plot [0:r] filename every ::1 using :6 with steps lt 1 lw 2 title "nom(EN)", filename every ::1 using :7 with steps lt 1 dt 2 title "flow(EN)", filename every ::1 using :8 with steps lt 2 lw 2 title "nom(EH)", filename every ::1 using :9 with steps lt 2 dt 2 title "flow(EH)"
     #
+    set xtics autofreq
     set key inside left top vertical
     set xlabel "Nomination in 1000 m³/h"
     set ylabel "Flow in 1000 m³/h"

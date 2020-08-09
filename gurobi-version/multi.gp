@@ -9,7 +9,7 @@ while (1) {
        set xtics 0, 8
     }
     set lmargin 12
-    #set rmargin 12
+    set rmargin 12
     set multiplot #layout 3, 1 title "Quality plot"
     #
     set key inside top outside center horizontal

@@ -43,7 +43,11 @@ entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
 smoothed_flow = {}
 qo_in = {}
-def get_nom_q_diff(solution, nom_EN, nom_EH, nom_XN):
+
+def get_nom_q_diff(solution, step, agent_decisions):
+
+    nom_XN, nom_XH, nom_EN,nom_EH = [abs(v) for k, v in get_trader_nom(step, agent_decisions).items()]
+
     flow_EH, flow_EN = [round(v,2) for k,v in get_flow(solution).items()] #EH, EN
 
     if nom_EN > nom_XN:

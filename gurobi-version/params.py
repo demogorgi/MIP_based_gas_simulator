@@ -40,11 +40,11 @@ config = {
     # is the ai-part active?
     "ai": True,
     # how often ai takes decision (number of timesteps)
-    "decision_freq": 8,
+    "decision_freq": 16,
     # how often new trader nomination comes (number of timesteps)
-    "nomination_freq": 32,
+    "nomination_freq": 16,
     # how many steps to simulate to find the penalty
-    "penalty_freq" : 8,
+    "penalty_freq" : 16,
 }
 
 # read manual file with configs

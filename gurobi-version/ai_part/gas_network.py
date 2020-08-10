@@ -11,7 +11,7 @@ gs_lb = 0
 
 rs_ub = 0
 rs_lb = 0
-cum_n_q = [0 for _ in range(8)]
+cum_n_q = [0 for _ in range(16)]
 
 class Gas_Network(object):
 
@@ -49,6 +49,10 @@ class Gas_Network(object):
             if self.nom_EN > self.nom_XN:
                 cs = 1
                 gas = round(mean_value(args.gas_lb,args.gas_ub),3)
+                zeta = args.zeta_ub
+            elif self.nom_EN == self.nom_XN:
+                cs = 0
+                gas = 0
                 zeta = args.zeta_ub
             else:
                 cs = 0
@@ -124,23 +128,20 @@ class Gas_Network(object):
 
         rs, gs, cs = get_con_pos()
 
-        for i in range(9):
+        for i in range(19):
             c = 0
-            #cum_n_q = [None for _ in range(8)]
             step = self.next_step
             decision = self.generate_decision_dict(action)
             for j in range(config['penalty_freq']):
                 if step < numSteps:
-                    # print(step)
                     solution = simulator_step(decision, step, "ai")
-
-                    a = self.get_nom_q_difference(solution)
-                    c += a
+                    #penalty = find_penalty(solution)
+                    c += self.get_nom_q_difference(solution)
                     cum_n_q[j] = c
                     step += 1
 
             #actions.append([action.copy(), c])
-            #if i == 8: break
+            if i == config['decision_freq']: break
             if c > 0:
 
                 if self.nom_EN > self.nom_XN:
@@ -158,7 +159,17 @@ class Gas_Network(object):
                         rs_lb = action[rs]
                         action[rs] = round(mean_value(rs_lb, rs_ub),2)
 
-        #actions.append([action.copy(), c])
+        if action[gs] < 0.05 and self.nom_EN > self.nom_XN:
+
+            action_ = action.copy()
+            action_[cs] = 0
+            action_[gs] = 0
+            decision = self.generate_decision_dict(action_)
+            solution = simulator_step(decision, self.next_step, "ai")
+            c = self.get_nom_q_difference(solution)
+
+            if abs(c) < abs(cum_n_q[0]):
+                action = action_
 
         set_dispatcher_dec(self.decision_to_dict(action))
 

@@ -50,14 +50,15 @@ class Gas_Network(object):
                 cs = 1
                 gas = round(mean_value(args.gas_lb,args.gas_ub),3)
                 zeta = args.zeta_ub
-            elif self.nom_EN == self.nom_XN:
-                cs = 0
-                gas = 0
-                zeta = args.zeta_ub
+            # elif self.nom_EN == self.nom_XN:
+            #     cs = 0
+            #     gas = 0
+            #     zeta = args.zeta_ub
             else:
                 cs = 0
                 gas = 0
                 zeta = mean_value(args.zeta_lb, args.zeta_ub)
+
         else:
 
             for l, v in old_decisions.items():
@@ -141,12 +142,13 @@ class Gas_Network(object):
                     step += 1
 
             #actions.append([action.copy(), c])
-            if i == config['decision_freq']: break
+            #if i == config['decision_freq']: break
             if c > 0:
 
                 if self.nom_EN > self.nom_XN:
                     gs_lb = action[gs]
                     action[gs] = round(mean_value(gs_lb, gs_ub),3)
+                    action[cs] = 1
                 else:
                     rs_ub = action[rs]
                     action[rs] = round(mean_value(rs_lb, rs_ub),2)
@@ -155,11 +157,12 @@ class Gas_Network(object):
                     if self.nom_EN > self.nom_XN:
                         gs_ub = action[gs]
                         action[gs] = round(mean_value(gs_lb, gs_ub),3)
+                        action[cs] = 1
                     else:
                         rs_lb = action[rs]
                         action[rs] = round(mean_value(rs_lb, rs_ub),2)
 
-        if action[gs] < 0.05 and self.nom_EN > self.nom_XN:
+        if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
 
             action_ = action.copy()
             action_[cs] = 0

@@ -43,8 +43,6 @@ config = {
     "decision_freq": 8,
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 16,
-    # how many steps to simulate to find the penalty
-    "penalty_freq" : 8,
 }
 
 # read manual file with configs

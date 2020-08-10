@@ -6,12 +6,8 @@ from copy import deepcopy
 from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
-gs_ub = 0
-gs_lb = 0
 
-rs_ub = 0
-rs_lb = 0
-cum_n_q = [0 for _ in range(16)]
+cum_n_q = [0 for _ in range(config['decision_freq'])]
 
 class Gas_Network(object):
 
@@ -44,32 +40,14 @@ class Gas_Network(object):
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self, old_decisions):
         va = 1
-
-        if self.next_step%config['nomination_freq'] == 0:
-            if self.nom_EN > self.nom_XN:
-                cs = 1
-                gas = round(mean_value(args.gas_lb,args.gas_ub),3)
-                zeta = args.zeta_ub
-            # elif self.nom_EN == self.nom_XN:
-            #     cs = 0
-            #     gas = 0
-            #     zeta = args.zeta_ub
-            else:
-                cs = 0
-                gas = 0
-                zeta = mean_value(args.zeta_lb, args.zeta_ub)
-
+        if self.nom_EN > self.nom_XN:
+            cs = 1
+            gas = round(mean_value(args.gas_lb,args.gas_ub),3)
+            zeta = args.zeta_ub
         else:
-
-            for l, v in old_decisions.items():
-                if re.match('va', l):
-                    va = v
-                elif re.match('zeta', l):
-                    zeta = v
-                elif re.match('gas', l):
-                    gas = v
-                elif re.match('compressor', l):
-                    cs = v
+            cs = 0
+            gas = 0
+            zeta = mean_value(args.zeta_lb, args.zeta_ub)
 
         valid_decisions = [va, va, zeta, gas, cs]
 
@@ -117,15 +95,14 @@ class Gas_Network(object):
 
 
     def apply_action(self, action):
-        #actions = []
-        global gs_ub, gs_lb, rs_ub, rs_lb, cum_n_q
+        global cum_n_q
 
-        if self.next_step % config['nomination_freq'] == 0:
-            gs_ub = args.gas_ub
-            gs_lb = args.gas_lb
+        #if self.next_step % config['nomination_freq'] == 0:
+        gs_ub = args.gas_ub
+        gs_lb = args.gas_lb
 
-            rs_ub = args.zeta_ub
-            rs_lb = args.zeta_lb
+        rs_ub = args.zeta_ub
+        rs_lb = args.zeta_lb
 
         rs, gs, cs = get_con_pos()
 
@@ -133,16 +110,14 @@ class Gas_Network(object):
             c = 0
             step = self.next_step
             decision = self.generate_decision_dict(action)
-            for j in range(config['penalty_freq']):
+            for j in range(config['decision_freq']):
                 if step < numSteps:
                     solution = simulator_step(decision, step, "ai")
-                    #penalty = find_penalty(solution)
                     c += self.get_nom_q_difference(solution)
                     cum_n_q[j] = c
                     step += 1
 
-            #actions.append([action.copy(), c])
-            #if i == config['decision_freq']: break
+            if i == config['decision_freq']: break
             if c > 0:
 
                 if self.nom_EN > self.nom_XN:

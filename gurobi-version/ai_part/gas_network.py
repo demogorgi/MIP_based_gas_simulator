@@ -40,18 +40,25 @@ class Gas_Network(object):
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self, old_decisions):
         va = 1
+        #rndm_value = lambda l, u: round(random.uniform(l,u), 2)
+        #zeta_value = lambda l, u: int(rndm_value(l,u)*(args.zeta_ub - args.zeta_lb) + args.zeta_lb)
+
         if self.nom_EN > self.nom_XN:
             cs = 1
             gas = round(mean_value(args.gas_lb,args.gas_ub),3)
+            #gas = rndm_value(args.gas_lb, args.gas_ub)
             zeta = args.zeta_ub
         else:
             cs = 0
             gas = 0
             zeta = mean_value(args.zeta_lb, args.zeta_ub)
+            #zeta = zeta_value(0, 1)
 
-        valid_decisions = [va, va, zeta, gas, cs]
 
-        return valid_decisions
+        valid_initial_action = [va, va, zeta, gas, cs]
+
+
+        return valid_initial_action
 
     def get_nom_q_difference(self, solution):
         #smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
@@ -59,6 +66,7 @@ class Gas_Network(object):
 
         if self.nom_EN > self.nom_XN:
             c = round(self.nom_EN - flow_EN)
+
         else:
             c = round(self.nom_EH - flow_EH)
         return c
@@ -93,6 +101,16 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
+    def get_cumulative_c(self, decision, step):
+        c = 0
+        for j in range(config['decision_freq']):
+            if step < numSteps:
+                solution = simulator_step(decision, step, "ai")
+                c += self.get_nom_q_difference(solution)
+                step += 1
+        self.n_penalty = find_penalty(solution)
+        return c
+
 
     def apply_action(self, action):
         global cum_n_q
@@ -107,15 +125,9 @@ class Gas_Network(object):
         rs, gs, cs = get_con_pos()
 
         for i in range(config['num_halvings']-1):
-            c = 0
-            step = self.next_step
+            
             decision = self.generate_decision_dict(action)
-            for j in range(config['decision_freq']):
-                if step < numSteps:
-                    solution = simulator_step(decision, step, "ai")
-                    c += self.get_nom_q_difference(solution)
-                    cum_n_q[j] = c
-                    step += 1
+            c = self.get_cumulative_c(decision, self.next_step)
 
             if i == config['decision_freq']: break
             if c > 0:
@@ -143,10 +155,9 @@ class Gas_Network(object):
             action_[cs] = 0
             action_[gs] = 0
             decision = self.generate_decision_dict(action_)
-            solution = simulator_step(decision, self.next_step, "ai")
-            c = self.get_nom_q_difference(solution)
+            new_c = self.get_cumulative_c(decision, self.next_step)
 
-            if abs(c) < abs(cum_n_q[0]):
+            if abs(new_c) < abs(c):
                 action = action_
 
         set_dispatcher_dec(self.decision_to_dict(action))

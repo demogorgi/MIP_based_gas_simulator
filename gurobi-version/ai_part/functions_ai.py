@@ -7,7 +7,7 @@ import random
 from urmel import *
 
 from .utils import *
-from .configs import penalties
+from .configs import penalties, c_values
 
 args = dotdict({
     #Weights to calculate penalty for both agents
@@ -299,7 +299,7 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
         #     acc_penalty += penalties[i][0]
         # else:
         #     acc_penalty = penalties[step][0]
-        extracted_['Accumulated'] = penalties[step]
+        extracted_['Accumulated'] = c_values[step]
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None

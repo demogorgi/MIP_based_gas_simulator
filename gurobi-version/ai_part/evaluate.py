@@ -15,18 +15,18 @@ class Evaluate(object):
 
         for i in range(len(penalties)):
 
-            if  penalties[i][0] <= penalties[i][1] or penalties[i][0] <= 10:
+            if penalties[i][0] <= penalties[i][1] or penalties[i][0] <= 10:
                 wins += 1
-            elif penalties[i][0] > penalties[i][1] or penalties[i][0] > 10:
+            elif  penalties[i][0] < penalties[i][1] or penalties[i][0] > 10:
                 losses += 1
             else:
                 print("Draw")
             #print("\n")
-        num_games = wins + losses
-        if num_games == 0:
+        num_steps = wins + losses
+        if num_steps == 0:
             win_ratio = 0
         else:
-            win_ratio = wins / num_games
+            win_ratio = wins / num_steps
 
         print("Win rate: ", win_ratio)
         if win_ratio > 0.55:

@@ -10,15 +10,13 @@ configs = dotdict({
     'num_mcts_sims': 10,#10 #Number of MCTS simulations 800
     'dirichlet_alpha': 0.5,
     'epsilon':0.25,
-
-
-    'num_self_plays' : 10, #Number of self-play games
+    
+    'num_self_plays' : 5, #Number of self-play games
     'temperature': 1, #Temperature for MCTS search
-
-    'num_evaluation_plays' : 5, # Number of evaluation plays
 
     'train_model': True,
 
 })
 
-penalties = []
+penalties = [] # store dispatcher and trader penalties
+c_values = [] #To store cumulative sum of nomination flow difference

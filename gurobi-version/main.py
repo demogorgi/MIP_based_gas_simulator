@@ -49,7 +49,8 @@ for i in range(numSteps):
     with open(path.join(data_path, 'output/information.csv'), 'a+', newline = '') as f:
         bn_pr_flows = get_bn_pressures_flows(solution)
         penalty = find_penalty(solution)
-        penalties.append(c)
+        penalties.append(penalty)
+        c_values.append(c)
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)

@@ -43,6 +43,8 @@ config = {
     "decision_freq": 8,
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 16,
+    # Number of times interval halving to be taken
+    "num_halvings": 20,
 }
 
 # read manual file with configs

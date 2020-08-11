@@ -106,7 +106,7 @@ class Gas_Network(object):
 
         rs, gs, cs = get_con_pos()
 
-        for i in range(19):
+        for i in range(config['num_halvings']-1):
             c = 0
             step = self.next_step
             decision = self.generate_decision_dict(action)

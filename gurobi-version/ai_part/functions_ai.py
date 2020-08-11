@@ -52,6 +52,8 @@ def get_nom_q_diff(solution, step, agent_decisions):
 
     if nom_EN > nom_XN:
         c = (nom_EN - flow_EN)
+    elif nom_EN == nom_XN:
+        c = ((nom_EN - flow_EN)+(nom_EH - flow_EH))/2
     else:
         c = (nom_EH - flow_EH)
 

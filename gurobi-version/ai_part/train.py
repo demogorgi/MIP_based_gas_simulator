@@ -5,6 +5,7 @@ from .evaluate import *
 from .neural_network_architecture import *
 from .gas_network import *
 
+training_data = []
 class Train(object):
 
     def __init__(self, gas_network, nnet):
@@ -15,11 +16,11 @@ class Train(object):
     def start(self):
         #Main training function
 
-        training_data = []
+        #training_data = []
 
         for i in range(configs.num_self_plays):
         #Self plays to collect data to train the NN
-            print("Start Self-play training")
+            #print("Start Self-play training")
             gas_network = deepcopy(self.gas_network)
             self.self_play(gas_network, training_data)
 
@@ -47,7 +48,7 @@ class Train(object):
 
         best_child = mcts.search(gas_network, node, configs.temperature)
 
-        self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
+        self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), None, 0])
 
         action = best_child.action
 
@@ -57,7 +58,8 @@ class Train(object):
 
         # Update v as the value of the game result
         for state_value in self_play_data:
-            state_value[2] =  value
+            state_value[2] = [v for k,v in get_dispatcher_dec().items()]
+            state_value[3] =  value
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])
-            training_data.append([state, psa_vector, state_value[2]])
+            training_data.append([state, psa_vector, state_value[2], state_value[3]])

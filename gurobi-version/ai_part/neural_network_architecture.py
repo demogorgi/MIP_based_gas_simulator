@@ -174,9 +174,9 @@ class NeuralNetworkWrapper(object):
             examples_num = len(training_data)
 
             for i in range(0, examples_num, args.batch_size):
-                states, pis, vs = map(list,
+                states, pis, action, vs = map(list,
                                       zip(*training_data[i:i+args.batch_size]))
-
+                
                 feed_dict = {self.net.states: states,
                              self.net.train_pis: pis,
                              self.net.train_vs: vs,

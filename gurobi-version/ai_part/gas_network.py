@@ -101,8 +101,9 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
-    def get_cumulative_c(self, decision, step):
+    def get_cumulative_c(self, action, step):
         c = 0
+        decision = self.generate_decision_dict(action)
         for j in range(config['decision_freq']):
             if step < numSteps:
                 solution = simulator_step(decision, step, "ai")
@@ -125,9 +126,8 @@ class Gas_Network(object):
         rs, gs, cs = get_con_pos()
 
         for i in range(config['num_halvings']-1):
-            
-            decision = self.generate_decision_dict(action)
-            c = self.get_cumulative_c(decision, self.next_step)
+
+            c = self.get_cumulative_c(action, self.next_step)
 
             if i == config['decision_freq']: break
             if c > 0:
@@ -135,7 +135,7 @@ class Gas_Network(object):
                 if self.nom_EN > self.nom_XN:
                     gs_lb = action[gs]
                     action[gs] = round(mean_value(gs_lb, gs_ub),3)
-                    action[cs] = 1
+
                 else:
                     rs_ub = action[rs]
                     action[rs] = round(mean_value(rs_lb, rs_ub),2)
@@ -144,18 +144,16 @@ class Gas_Network(object):
                     if self.nom_EN > self.nom_XN:
                         gs_ub = action[gs]
                         action[gs] = round(mean_value(gs_lb, gs_ub),3)
-                        action[cs] = 1
+
                     else:
                         rs_lb = action[rs]
                         action[rs] = round(mean_value(rs_lb, rs_ub),2)
 
         if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
-
             action_ = action.copy()
             action_[cs] = 0
-            action_[gs] = 0
-            decision = self.generate_decision_dict(action_)
-            new_c = self.get_cumulative_c(decision, self.next_step)
+            #action_[gs] = 0
+            new_c = self.get_cumulative_c(action_, self.next_step)
 
             if abs(new_c) < abs(c):
                 action = action_

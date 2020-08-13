@@ -35,7 +35,6 @@ for i in range(numSteps):
         agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
         agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
 
-
     # for every i in numSteps a simulator step is performed.
     # agent_decisions (init_decisions.yml in scenario folder for the first step) delivers the agents decisions to the simulator and can be modified for every step.
     # i is the step number (neccessary for naming output files if any).
@@ -43,6 +42,7 @@ for i in range(numSteps):
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(agent_decisions, i, "sim")
     c += get_nom_q_diff(solution, i, agent_decisions)
+    c_values.append(c)
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
@@ -50,18 +50,17 @@ for i in range(numSteps):
         bn_pr_flows = get_bn_pressures_flows(solution)
         penalty = find_penalty(solution)
         penalties.append(penalty)
-        c_values.append(c)
         fieldnames, extracted_ = create_dict_for_csv(agent_decisions, i, timestamp, penalty, bn_pr_flows)
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
+
     if (i+1) % config['decision_freq'] == 0:
         c = 0
-    if config["ai"] and (i > 0 and (i+1) % config['decision_freq'] == 0):
-
-        # Generating new agent_decision for the next iteration from neural network as it learns to generate
-        agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
-        if not agent_decisions: continue
+        if config["ai"]:
+            # Generating new agent_decision for the next iteration from neural network as it learns to generate
+            agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
+            if not agent_decisions: continue
 
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")

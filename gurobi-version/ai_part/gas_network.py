@@ -56,9 +56,9 @@ class Gas_Network(object):
 
 
         valid_initial_action = [va, va, zeta, gas, cs]
-
-
-        return valid_initial_action
+        self.apply_halving(valid_initial_action)
+        final_action = [v for k,v in get_dispatcher_dec().items()]
+        return final_action
 
     def get_nom_q_difference(self, solution):
         #smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
@@ -113,7 +113,7 @@ class Gas_Network(object):
         return c
 
 
-    def apply_action(self, action):
+    def apply_halving(self, action):
         global cum_n_q
 
         #if self.next_step % config['nomination_freq'] == 0:

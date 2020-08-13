@@ -52,13 +52,13 @@ class Train(object):
 
         action = best_child.action
 
-        gas_network.apply_action(action)
+        # gas_network.apply_action(action)
 
         value = gas_network.get_reward(gas_network.n_penalty[0])
 
         # Update v as the value of the game result
         for state_value in self_play_data:
-            state_value[2] = [v for k,v in get_dispatcher_dec().items()]
+            state_value[2] = action
             state_value[3] =  value
             state = deepcopy(state_value[0])
             psa_vector = deepcopy(state_value[1])

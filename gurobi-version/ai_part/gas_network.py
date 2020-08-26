@@ -1,7 +1,4 @@
 
-import tensorflow as tf
-import itertools
-
 from copy import deepcopy
 from .functions_ai import *
 
@@ -21,7 +18,6 @@ class Gas_Network(object):
 
     def __init__(self):
         self.row = len(self.state)
-        self.tol_penalty = 20 #Assume allowed penalty
         self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, self.decisions_dict).items()]
 
     def get_action_size(self):
@@ -46,14 +42,11 @@ class Gas_Network(object):
         if self.nom_EN > self.nom_XN:
             cs = 1
             gas = round(mean_value(args.gas_lb,args.gas_ub),3)
-            #gas = rndm_value(args.gas_lb, args.gas_ub)
             zeta = args.zeta_ub
         else:
             cs = 0
             gas = 0
             zeta = mean_value(args.zeta_lb, args.zeta_ub)
-            #zeta = zeta_value(0, 1)
-
 
         valid_initial_action = [va, va, zeta, gas, cs]
         self.apply_halving(valid_initial_action)
@@ -152,22 +145,9 @@ class Gas_Network(object):
         if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
             action_ = action.copy()
             action_[cs] = 0
-            #action_[gs] = 0
             new_c = self.get_cumulative_c(action_, self.next_step)
 
             if abs(new_c) < abs(c):
                 action = action_
 
         set_dispatcher_dec(self.decision_to_dict(action))
-
-    #Find the reward value for dispatcher agent
-    def get_reward(self, penalty):
-
-        #low penalty rewards high value
-        if penalty == 0 or penalty < 10 :
-            return 10
-        elif penalty >= 10 and penalty < 50:
-            return 5
-        elif penalty >= 50 and penalty < 100:
-            return -5
-        else: return -10

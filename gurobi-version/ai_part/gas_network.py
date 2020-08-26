@@ -1,6 +1,5 @@
 
 import tensorflow as tf
-import itertools
 
 from copy import deepcopy
 from .functions_ai import *
@@ -21,8 +20,8 @@ class Gas_Network(object):
 
     def __init__(self):
         self.row = len(self.state)
-        self.tol_penalty = 20 #Assume allowed penalty
         self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, self.decisions_dict).items()]
+        self.possible_decisions = self.get_valid_actions()
 
     def get_action_size(self):
         return self.row
@@ -34,31 +33,63 @@ class Gas_Network(object):
         return deepcopy(self.decisions_dict)
 
     def get_possible_decisions(self):
-        return self.get_possible_nexts(get_dispatcher_dec())
+        if self.possible_decisions:
+            return self.possible_decisions
+        else: self.get_valid_actions()
 
+    def set_possible_decisions(self, new_set_decisions):
+        self.possible_decisions = new_set_decisions
 
     #Function to get possible dispatcher decisions
-    def get_possible_nexts(self, old_decisions):
+    def get_possible_nexts(self):
         va = 1
-        #rndm_value = lambda l, u: round(random.uniform(l,u), 2)
-        #zeta_value = lambda l, u: int(rndm_value(l,u)*(args.zeta_ub - args.zeta_lb) + args.zeta_lb)
-
-        if self.nom_EN > self.nom_XN:
+        cs_path = False
+        re_path = False
+        list_actions= []
+        rs, gs, cs = get_con_pos()
+        if self.nom_EN > self.nom_XN: cs_path = True #Compressor path to be chosen
+        else: re_path = True #Resistor path to be chosen
+        if not self.next_step%config['decision_freq'] == 0: list_actions.append(get_old_action())
+        if cs_path:
             cs = 1
-            gas = round(mean_value(args.gas_lb,args.gas_ub),3)
-            #gas = rndm_value(args.gas_lb, args.gas_ub)
-            zeta = args.zeta_ub
-        else:
+            gas = []
+            for i in range(100):
+                x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
+                if x not in gas:
+                    gas.append(x)
+            for i in range(len(gas)):
+                list_actions.append([va, va, args.zeta_ub, gas[i], cs])
+            list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
+
+        if re_path:
             cs = 0
-            gas = 0
-            zeta = mean_value(args.zeta_lb, args.zeta_ub)
-            #zeta = zeta_value(0, 1)
+            cs_gas = 0
+            zeta = []
+            for i in range(100):
+                x = random.randint(args.zeta_lb, args.zeta_ub)
+                if x not in zeta:
+                    zeta.append(x)
+            for i in range(len(zeta)):
+                list_actions.append([va, va, zeta[i], cs_gas, cs])
 
+        return list_actions
 
-        valid_initial_action = [va, va, zeta, gas, cs]
-        self.apply_halving(valid_initial_action)
-        final_action = [v for k,v in get_dispatcher_dec().items()]
-        return final_action
+    def get_valid_actions(self):
+
+        list_actions = self.get_possible_nexts()
+        p_values = []
+        list_actions_with_c = []
+        for action in list_actions:
+            decision = self.generate_decision_dict(action)
+            solution = simulator_step(decision, self.next_step, "ai")
+            p_values.append(find_penalty(solution)[0])
+            #p_values.append(abs(self.get_nom_q_difference(solution)))
+        for i in range(len(list_actions)):
+            if p_values[i] <= 100: #abs(c_values[i]) <= 100:
+                list_actions_with_c.append([list_actions[i], p_values[i]])
+        list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
+
+        return list_actions_with_c
 
     def get_nom_q_difference(self, solution):
         #smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
@@ -101,8 +132,9 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
-    def get_cumulative_c(self, action, step):
+    def get_cumulative_c(self, action):
         c = 0
+        step = self.next_step
         decision = self.generate_decision_dict(action)
         for j in range(config['decision_freq']):
             if step < numSteps:
@@ -113,61 +145,32 @@ class Gas_Network(object):
         return c
 
 
-    def apply_halving(self, action):
-        global cum_n_q
-
-        #if self.next_step % config['nomination_freq'] == 0:
-        gs_ub = args.gas_ub
-        gs_lb = args.gas_lb
-
-        rs_ub = args.zeta_ub
-        rs_lb = args.zeta_lb
-
-        rs, gs, cs = get_con_pos()
-
-        for i in range(config['num_halvings']-1):
-
-            c = self.get_cumulative_c(action, self.next_step)
-
-            if i == config['decision_freq']: break
-            if c > 0:
-
-                if self.nom_EN > self.nom_XN:
-                    gs_lb = action[gs]
-                    action[gs] = round(mean_value(gs_lb, gs_ub),3)
-
-                else:
-                    rs_ub = action[rs]
-                    action[rs] = round(mean_value(rs_lb, rs_ub),2)
-            else:
-                if c < 0:
-                    if self.nom_EN > self.nom_XN:
-                        gs_ub = action[gs]
-                        action[gs] = round(mean_value(gs_lb, gs_ub),3)
-
-                    else:
-                        rs_lb = action[rs]
-                        action[rs] = round(mean_value(rs_lb, rs_ub),2)
-
-        if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
-            action_ = action.copy()
-            action_[cs] = 0
-            #action_[gs] = 0
-            new_c = self.get_cumulative_c(action_, self.next_step)
-
-            if abs(new_c) < abs(c):
-                action = action_
-
-        set_dispatcher_dec(self.decision_to_dict(action))
-
     #Find the reward value for dispatcher agent
-    def get_reward(self, penalty):
-
+    def get_reward(self, penalty = None):
+        if not penalty: penalty = self.c_penalty[0]
         #low penalty rewards high value
-        if penalty == 0 or penalty < 10 :
-            return 10
+        if penalty == 0:
+            return 1
+        elif penalty > 0 or penalty < 10:
+            return 0.5
         elif penalty >= 10 and penalty < 50:
-            return 5
+            return 0.25
         elif penalty >= 50 and penalty < 100:
-            return -5
-        else: return -10
+            return 0
+        else: return -1
+
+    #Find the cumulative c value and its corresponding reward for NN
+    def get_value(self, action):
+        c = self.get_cumulative_c(action)
+        value = abs(c)-200
+        if c > 0:
+            return -1
+        elif c < 0:
+            return 1
+        else:
+            return 0
+        # if abs(c) == 200:
+        #     return 0
+        # else:
+        #     value = abs(c)-200
+        #     return -value

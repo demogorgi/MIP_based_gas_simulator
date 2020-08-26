@@ -40,9 +40,8 @@ for n in no.nodes:
                 original_nodes.append(n)
 
 entry_q_ub = no.q_ub['EH']
-pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
-smoothed_flow = {}
-qo_in = {}
+pr,dispatcher_dec, trader_nom, state_, smoothed_flow = ({} for i in range(5))
+
 
 def get_nom_q_diff(solution, step, agent_decisions):
 
@@ -291,14 +290,6 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     if penalty:
         extracted_['Dispatcher Penalty'] = penalty[0]
         extracted_['Trader Penalty'] = penalty[1]
-        # if not step%8 == 0:
-        #     i = step
-        #     while not i%8 == 0:
-        #         acc_penalty += penalties[i][0]
-        #         i -= 1
-        #     acc_penalty += penalties[i][0]
-        # else:
-        #     acc_penalty = penalties[step][0]
         extracted_['Accumulated'] = c_values[step]
     else:
         extracted_['Dispatcher Penalty'] = None

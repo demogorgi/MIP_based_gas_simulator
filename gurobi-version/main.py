@@ -25,6 +25,9 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 c = 0
+sum_first_half = 0
+sum_second_half = 0
+s = 0
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
@@ -32,6 +35,7 @@ for i in range(numSteps):
     # dirty hack to modify nominations
     if i > 0 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
         a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
+        #if not a == 550 or a == 600 or a == 400:
         agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
         agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
 
@@ -54,7 +58,15 @@ for i in range(numSteps):
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
-
+    if i+1 == numSteps/2:
+        sum_first_half = s
+        s = 0
+    elif i+1 == numSteps:
+        sum_second_half = s
+    else:
+        if (i+1) % config['decision_freq'] == 0:
+            c = round(c/config['decision_freq'], 2)
+            s += abs(c)
     if (i+1) % config['decision_freq'] == 0:
         c = 0
         if config["ai"]:
@@ -71,6 +83,10 @@ for i in range(numSteps):
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
 
+if sum_first_half > sum_second_half:
+    print('Succeeded')
+print(sum_first_half, sum_second_half)
+print(win_ratios)
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:
     csv2csv_de(infile,outfile)

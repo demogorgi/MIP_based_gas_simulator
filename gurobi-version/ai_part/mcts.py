@@ -54,12 +54,13 @@ class TreeNode(object):
     def expand_node(self, gas_network, psa_vector):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-        valid_decisions = [gas_network.get_possible_decisions()]
+
+        valid_decisions = gas_network.get_possible_decisions()
 
         for idx, move in enumerate(valid_decisions):
-            action = deepcopy(move)
-            self.add_child_node(parent = self, action = action, psa = psa_vector[idx])
-
+            if move[0] is not [0]:
+                action = deepcopy(move[0])
+                self.add_child_node(parent = self, action = action, psa = psa_vector[idx])
 
     def add_child_node(self, parent, action, psa = 0.0):
         child_node = TreeNode(parent = parent, action = action, psa = psa)
@@ -95,10 +96,10 @@ class MCTS(object):
             if node.parent is None:
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
-            possible_decisions = [gas_network.get_possible_decisions()]
+            possible_decisions = gas_network.get_possible_decisions()
 
             psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
-            #print(psa_vector)
+
             psa_vector_sum = sum(psa_vector)
 
             if psa_vector_sum > 0: #Renormalize the psa_vector
@@ -106,12 +107,12 @@ class MCTS(object):
 
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector)
 
-            wsa = gas_network.get_reward(gas_network.tol_penalty)
+            wsa = gas_network.get_reward()
 
             while node is not None:
                 node.back_propagate(wsa, v)
                 node = node.parent
-        
+
         return self.root.select_child()
 
     def add_dirichlet_noise(self, gas_network, psa_vector):
@@ -129,25 +130,29 @@ class MCTS(object):
         return noisy_psa_vector
 
     def possible_decision_probabilty(self, gas_network, possible_decisions, prob_vector):
+        rs, gs, cs = get_con_pos()
 
-        old_DA = get_old_action()
-        indices = []
         psa_vector = []
 
-        for idx, decision in enumerate(possible_decisions):
-            indices.append([i for i in range(len(decision)) if old_DA[i] == decision[i]])
+        if gas_network.nom_EN > gas_network.nom_XN:
+            probability = prob_vector[gs] + prob_vector [cs]
+        else:
+            probability = prob_vector[rs]
+        for i, decision in enumerate(possible_decisions):
+            value = gas_network.get_reward(decision[1])
 
-        for index in indices:
-            probability = 0
-            for i in range(len(index)):
-                probability += prob_vector[index[i]]
-            psa_vector.append(probability)
+            psa_vector.append(value*probability)
 
         if len(psa_vector) != gas_network.get_action_size():
             if len(psa_vector) < gas_network.get_action_size():
                 d = gas_network.get_action_size() - len(psa_vector)
                 psa_vector = (psa_vector + [0] * d)
+                possible_decisions = possible_decisions+[[[0],0]]*d
+                gas_network.set_possible_decisions(possible_decisions)
             else:
-                psa_vector = random.sample(psa_vector, gas_network.get_action_size())
+                psa_vector = psa_vector[0:gas_network.get_action_size()]
+                possible_decisions = possible_decisions[0:gas_network.get_action_size()]
+                gas_network.set_possible_decisions(possible_decisions)
+
 
         return psa_vector

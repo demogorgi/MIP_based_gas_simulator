@@ -1,5 +1,4 @@
 
-import tensorflow as tf
 
 from copy import deepcopy
 from .functions_ai import *

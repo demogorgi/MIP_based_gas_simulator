@@ -86,7 +86,7 @@ for i in range(numSteps):
 if sum_first_half > sum_second_half:
     print('Succeeded')
 print(sum_first_half, sum_second_half)
-print(win_ratios)
+#print(win_ratios)
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:
     csv2csv_de(infile,outfile)

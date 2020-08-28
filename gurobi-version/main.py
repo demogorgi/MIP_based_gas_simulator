@@ -35,7 +35,6 @@ for i in range(numSteps):
     # dirty hack to modify nominations
     if i > 0 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
         a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
-        #if not a == 550 or a == 600 or a == 400:
         agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
         agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
 
@@ -86,11 +85,10 @@ for i in range(numSteps):
 if sum_first_half > sum_second_half:
     print('Succeeded')
 print(sum_first_half, sum_second_half)
-#print(win_ratios)
+
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:
     csv2csv_de(infile,outfile)
-
 
 # generate contour output
 if config["contour_output"]:

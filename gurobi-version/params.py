@@ -45,6 +45,8 @@ config = {
     "nomination_freq": 16,
     # Number of times interval halving to be taken
     "num_halvings": 20,
+    #Threshold accumulated c values
+    "winning_threshold": 400,
 }
 
 # read manual file with configs

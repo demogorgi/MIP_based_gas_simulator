@@ -15,9 +15,9 @@ print "-- NEW DATA --"
 
 i = 1
 while (1) {
-    fit r(x) filename every 8 ::1 using :(abs($19)) via a, b
+    fit r(x) filename every 8::8 using :(abs($19)) via a, b
     print i, ",", a
     i = i + 1
-    plot [0:f(filename)/8] filename every 8 ::1 using :(abs($19)) with steps title "Accumulated C values", r(x) lw 2 t title_r(a,b)
+    plot [0:f(filename)/8] filename every 8::8 using :(abs($19)) with points title "Accumulated C values", r(x) lw 2 t title_r(a,b)
     pause 5
 }

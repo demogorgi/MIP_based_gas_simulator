@@ -11,7 +11,7 @@ m(x) = mean_y
 title_m(mean_y) = sprintf('mean value m(x) = %.5f', mean_y)
 
 #set fit logfile "fit.log"
-set print "slope_evolution.csv" append
+set print "slope_evolution.csv"
 
 print "gnuplot loops,slope of regression line,y-axis interception of regression line,average value"
 

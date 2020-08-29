@@ -1,5 +1,8 @@
 set datafile separator ","
 set grid
+set title "Quality plot"
+set xlabel "Time"
+set ylabel "Accumulated C"
 
 if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))

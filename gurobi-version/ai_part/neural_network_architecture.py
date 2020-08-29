@@ -8,7 +8,6 @@ args = dotdict({
     'learning_rate':0.001,
     'epochs':10,
     'batch_size':64,
-    'num_channels':512,
     'momentum': 0.9,
     'resnet_blocks': 5,
 })
@@ -189,7 +188,7 @@ class NeuralNetworkWrapper(object):
                     [self.net.loss_pi, self.net.loss_v],
                     feed_dict = feed_dict)
 
-              # Record pi and v loss to a file.
+                # Record pi and v loss to a file.
                 if configs.record_loss:
                     # Create directory if it doesn't exist.
                     if not os.path.exists(configs.model_dir):

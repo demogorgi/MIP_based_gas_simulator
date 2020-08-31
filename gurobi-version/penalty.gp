@@ -31,7 +31,7 @@ while (1) {
        set multiplot layout 1,2
        set title "Quality plot"
        set xlabel "Time"
-       set ylabel "Dispatcher penalty"
+       set ylabel "Accumulated C"
        plot [0:f(filename)/8] filename every 8::8 using :(abs($19)) with points lt 22 ps 1 title "Accumulated C values", r(x) lt 7 lw 4 t title_r(a,b), m(x) lt 8 lw 3 t title_m(mean_y) #, "slope_evolution.csv" every ::1 using :2 with lines lt 4 lw 1.5 t "Fitting parameter a evolution", "slope_evolution.csv" every ::1 using :3 with lines lt 5 lw 1 t "Mean value evolution"
        #
        set y2tics

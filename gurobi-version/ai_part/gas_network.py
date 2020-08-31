@@ -161,15 +161,11 @@ class Gas_Network(object):
     #Find the cumulative c value and its corresponding reward for NN
     def get_value(self, action):
         c = self.get_cumulative_c(action)
-        value = abs(c)-200
+        value = abs(c)-(config['winning_threshold']/2)
         if c > 0:
             return -1
         elif c < 0:
             return 1
         else:
             return 0
-        # if abs(c) == 200:
-        #     return 0
-        # else:
-        #     value = abs(c)-200
-        #     return -value
+    

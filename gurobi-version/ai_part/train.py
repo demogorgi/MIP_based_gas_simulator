@@ -28,12 +28,12 @@ class Train(object):
 
         self.net.train(training_data) # Train the current model
 
-        new_agent_decision = self.get_decision(gas_network, self.net)
+        new_agent_decision, c_value = self.get_decision(gas_network, self.net)
 
         #Evaluating the decisions
         if c_values:
             evaluator = Evaluate(self.net)
-            evaluator.evaluate()
+            evaluator.evaluate(c_value)
 
         return new_agent_decision
 
@@ -64,6 +64,6 @@ class Train(object):
         node = TreeNode()
         best_child = mcts.search(gas_network, node, configs.temperature)
         action = best_child.action
-
+        c_value = gas_network.get_value(action)
         new_agent_decisions = gas_network.generate_decision_dict(action)
-        return new_agent_decisions
+        return new_agent_decisions, c_value

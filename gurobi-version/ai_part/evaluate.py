@@ -8,10 +8,14 @@ class Evaluate(object):
     def __init__(self, net):
         self.nnet = net
 
-    def evaluate(self):
+    def evaluate(self, c_value):
 
         wins = 0
         losses = 0
+        if c_value > 0:
+            wins += 1
+        else:
+            losses += 1
 
         for i in range(len(c_values)):
 
@@ -36,5 +40,3 @@ class Evaluate(object):
         else:
             print("New model is not the best model.")
             self.nnet.load_model()
-
-        #return win_ratio

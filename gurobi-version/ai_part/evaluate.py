@@ -19,7 +19,7 @@ class Evaluate(object):
 
         for i in range(len(c_values)):
 
-            if i%config['decision_freq'] == 0:
+            if (i+1)%config['decision_freq'] == 0:
                 if abs(c_values[i]) < config['winning_threshold']:
                     wins += 1
                 elif abs(c_values[i]) > config['winning_threshold']:

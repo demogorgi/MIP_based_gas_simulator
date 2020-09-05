@@ -7,7 +7,7 @@ import random
 from urmel import *
 
 from .utils import *
-from .configs import penalties, c_values
+from .configs import penalties, c_values, win_ratios
 
 args = dotdict({
     #Weights to calculate penalty for both agents
@@ -20,6 +20,10 @@ args = dotdict({
     #Upper and lower limit for gas
     'gas_ub': 1,
     'gas_lb': 0,
+    #Number to control uniform distribution in decision size
+    'decision_size': 200,
+    #Allowed penalty points for the dispatcher agent
+    'max_da_penalty': 100,
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -305,3 +309,8 @@ def reordered_headers(fieldnames):
     order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18]
     fieldnames = [fieldnames[i] for i in order]
     return fieldnames
+
+def write_win_ratio():
+    with open(path.join(data_path, 'output/nn_win_ratio.csv'), 'w+', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(win_ratios)

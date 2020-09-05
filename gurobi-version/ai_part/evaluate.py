@@ -9,7 +9,6 @@ class Evaluate(object):
         self.nnet = net
 
     def evaluate(self, c_value):
-
         wins = 0
         losses = 0
         if c_value > 0:
@@ -32,7 +31,7 @@ class Evaluate(object):
             win_ratio = 0
         else:
             win_ratio = wins / num_steps
-        win_ratios.append(win_ratio)
+        win_ratios.append([win_ratio])
         print("Win rate: ", win_ratio)
         if win_ratio > 0.55:
             print("New model saved as the best model")

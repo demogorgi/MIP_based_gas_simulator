@@ -81,7 +81,7 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-
+write_win_ratio()
 if sum_first_half > sum_second_half:
     print('Succeeded')
 print(sum_first_half, sum_second_half)

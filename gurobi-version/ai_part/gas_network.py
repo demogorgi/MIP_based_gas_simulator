@@ -48,11 +48,11 @@ class Gas_Network(object):
         rs, gs, cs = get_con_pos()
         if self.nom_EN > self.nom_XN: cs_path = True #Compressor path to be chosen
         else: re_path = True #Resistor path to be chosen
-        if not self.next_step%config['decision_freq'] == 0: list_actions.append(get_old_action())
+        if not self.next_step%args.decision_size == 0: list_actions.append(get_old_action())
         if cs_path:
             cs = 1
             gas = []
-            for i in range(100):
+            for i in range(args.decision_size):
                 x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
                 if x not in gas:
                     gas.append(x)
@@ -64,7 +64,7 @@ class Gas_Network(object):
             cs = 0
             cs_gas = 0
             zeta = []
-            for i in range(100):
+            for i in range(args.decision_size):
                 x = random.randint(args.zeta_lb, args.zeta_ub)
                 if x not in zeta:
                     zeta.append(x)
@@ -84,7 +84,7 @@ class Gas_Network(object):
             p_values.append(find_penalty(solution)[0])
             #p_values.append(abs(self.get_nom_q_difference(solution)))
         for i in range(len(list_actions)):
-            if p_values[i] <= 100: #abs(c_values[i]) <= 100:
+            if p_values[i] <= args.max_da_penalty: #abs(c_values[i]) <= 100:
                 list_actions_with_c.append([list_actions[i], p_values[i]])
         list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
 
@@ -149,23 +149,20 @@ class Gas_Network(object):
         if not penalty: penalty = self.c_penalty[0]
         #low penalty rewards high value
         if penalty == 0:
-            return 1
-        elif penalty > 0 or penalty < 10:
-            return 0.5
-        elif penalty >= 10 and penalty < 50:
-            return 0.25
-        elif penalty >= 50 and penalty < 100:
-            return 0
-        else: return -1
+            return 1 #Dispatcher won
+        elif penalty > 0 or penalty < args.max_da_penalty/2:
+            return 0.5    #Dispatcher won with half reward
+        elif penalty >= args.max_da_penalty/2 and penalty < args.max_da_penalty:
+            return 0 #Draw
+        else: return -1 #Loss
 
     #Find the cumulative c value and its corresponding reward for NN
     def get_value(self, action):
         c = self.get_cumulative_c(action)
         value = abs(c)-(config['winning_threshold']/2)
-        if c > 0:
+        if value > 0:
             return -1
-        elif c < 0:
+        elif value < 0:
             return 1
         else:
             return 0
-    

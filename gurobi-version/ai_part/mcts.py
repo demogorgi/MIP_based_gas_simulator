@@ -97,8 +97,8 @@ class MCTS(object):
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
             possible_decisions = gas_network.get_possible_decisions()
-
-            psa_vector = self.possible_decision_probabilty(gas_network, possible_decisions, prob_vector)
+    
+            psa_vector = self.possible_decision_probability(gas_network, possible_decisions, prob_vector)
 
             psa_vector_sum = sum(psa_vector)
 
@@ -129,7 +129,7 @@ class MCTS(object):
 
         return noisy_psa_vector
 
-    def possible_decision_probabilty(self, gas_network, possible_decisions, prob_vector):
+    def possible_decision_probability(self, gas_network, possible_decisions, prob_vector):
         rs, gs, cs = get_con_pos()
 
         psa_vector = []

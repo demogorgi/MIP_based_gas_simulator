@@ -43,8 +43,6 @@ config = {
     "decision_freq": 8,
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 16,
-    #Threshold accumulated c values
-    "winning_threshold": 400,
 }
 
 # read manual file with configs

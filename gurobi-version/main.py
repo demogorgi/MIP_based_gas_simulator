@@ -25,9 +25,7 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
 c = 0
-sum_first_half = 0
-sum_second_half = 0
-s = 0
+
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
@@ -44,7 +42,8 @@ for i in range(numSteps):
     # If the last argument "porcess_type" is "sim" files (sol, lp, ... ) will be written if their option is set.
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(agent_decisions, i, "sim")
-    c += get_nom_q_diff(solution, i, agent_decisions)
+
+    c += sum(get_nom_q_diff(solution))
     c_values.append(c)
 
     #Store each new (agent) decisions value from ai_part to csv
@@ -57,20 +56,13 @@ for i in range(numSteps):
         thewriter = csv.DictWriter(f, fieldnames=fieldnames)
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
-    if i+1 == numSteps/2:
-        sum_first_half = s
-        s = 0
-    elif i+1 == numSteps:
-        sum_second_half = s
-    else:
-        if (i+1) % config['decision_freq'] == 0:
-            c = round(c/config['decision_freq'], 2)
-            s += abs(c)
+
     if (i+1) % config['decision_freq'] == 0:
+        current_acc_c = c
         c = 0
         if config["ai"]:
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
-            agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
+            agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1)
             if not agent_decisions: continue
 
     #Write agent decisions in output folder
@@ -82,9 +74,6 @@ for i in range(numSteps):
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
 write_win_ratio()
-if sum_first_half > sum_second_half:
-    print('Succeeded')
-print(sum_first_half, sum_second_half)
 
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:

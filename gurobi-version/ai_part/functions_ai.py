@@ -21,9 +21,9 @@ args = dotdict({
     'gas_ub': 1,
     'gas_lb': 0,
     #Number to control uniform distribution in decision size
-    'decision_size': 200,
-    #Allowed penalty points for the dispatcher agent
-    'max_da_penalty': 100,
+    'decision_size': 100,
+    #Threshold accumulated c values
+    'max_da_c': 1000,
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -46,30 +46,31 @@ for n in no.nodes:
 entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_, smoothed_flow = ({} for i in range(5))
 
+def get_nom_q_diff(solution):
+    nom_q_diff = {}
 
-def get_nom_q_diff(solution, step, agent_decisions):
-
-    nom_XN, nom_XH, nom_EN,nom_EH = [abs(v) for k, v in get_trader_nom(step, agent_decisions).items()]
-
-    flow_EH, flow_EN = [round(v,2) for k,v in get_flow(solution).items()] #EH, EN
-
-    if nom_EN > nom_XN:
-        c = (nom_EN - flow_EN)
-    elif nom_EN == nom_XN:
-        c = ((nom_EN - flow_EN)+(nom_EH - flow_EH))/2
-    else:
-        c = (nom_EH - flow_EH)
-
-    return c
-
-def get_flow(solution):
-    qo_in = {}
     for k, v in solution.items():
-        if re.search('var_pipe_Qo_in', k):
-            res = re.sub('var_pipe_Qo_in\[(\S*)]', r'\1', k)
+        if re.search('nom_entry_slack_DA', k):
+            res = re.sub('nom_entry_slack_DA\[(\S*)]', r'\1', k)
             if res == 'EN_aux0,EN' or res == 'EH_aux0,EH':
-                qo_in[k] = v
-    return qo_in
+                nom_q_diff[k] = v
+
+    nom_q_diff_EH, nom_q_diff_EN = [v for k,v in nom_q_diff.items()]
+
+    return nom_q_diff_EH, nom_q_diff_EN
+
+def get_c(decision, num_steps, start_step):
+    accumulated_cs = {}
+    c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
+    for i in range(num_steps):
+        if start_step+i < numSteps:
+            solution = simulator_step(decision, start_step+i, "ai")
+            c_EH, c_EN = get_nom_q_diff(solution)
+            c_eh += c_EH
+            c_en += c_EN
+            accumulated_cs[i] = [c_eh, c_en]
+
+    return accumulated_cs
 
 def get_agents_dict(step, agent_decisions):
     agents_dict = {}
@@ -138,7 +139,6 @@ def get_state(step, agent_decisions, solution):
     #     state_[value] = [pressures[value]] # Pressure values
 
     state = np.array([value for key, value in state_.items()])
-
     return state
 
 def get_trader_nom(step, agent_decisions):
@@ -255,23 +255,32 @@ def get_bn_pressures_flows(solution):
     return exit_pr_flows
 
 #Function to remove duplicate entries from fixed_decisions.yml file
-def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step):
+def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step, label = None):
     for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
-        if not re.search('(entry|exit)_nom',k1):
-            for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
-                for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                    for i in range(step, -1, -1):
-                        if i in value1:
-                            break
-                    if value1[i] == value2[step]:
-                        del value2[step]
+        if not label:
+            if not re.search('(entry|exit)_nom',k1):
+                for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+                    for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                        for i in range(step-1, -1, -1):
+                            if i in value1:
+                                break
+                        if value1[i] == value2[step]:
+                            del value2[step]
+        else:
+            if re.search('entry_nom',k1):
+                for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+                    for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                        for i in range(step-1, -1, -1):
+                            if i in value1:
+                                break
+                        if value1[i] == value2[step]:
+                            del value2[step]
     return new_agent_decisions
 
 #Create csv to store agent decisions, boundary flows, pressures and agent penalty values
 def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [], bn_pr_flows = {}):
 
     extracted_ = {}
-    acc_penalty = 0
     extracted_['Time'] = timestamp
     for i, j in agent_decisions.items():
         for k,l in j.items():

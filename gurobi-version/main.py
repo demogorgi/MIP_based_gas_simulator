@@ -24,7 +24,7 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
-c = 0
+c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 
 simulator_step.counter = 0
 for i in range(numSteps):
@@ -43,8 +43,10 @@ for i in range(numSteps):
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(agent_decisions, i, "sim")
 
-    c += sum(get_nom_q_diff(solution))
-    c_values.append(c)
+    c_EH, c_EN = get_nom_q_diff(solution)
+    c_eh += c_EH
+    c_en += c_EN
+    c_values.append([c_eh, c_en])
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
@@ -58,8 +60,9 @@ for i in range(numSteps):
     timestep += timedelta(0,dt)
 
     if (i+1) % config['decision_freq'] == 0:
-        current_acc_c = c
-        c = 0
+        current_acc_c = abs(c_eh)+abs(c_en)
+        c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
+
         if config["ai"]:
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
             agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1)
@@ -73,7 +76,7 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-write_win_ratio()
+    write_win_ratio()
 
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:

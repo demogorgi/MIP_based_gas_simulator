@@ -135,8 +135,6 @@ def get_state(step, agent_decisions, solution):
         state_[k] = v
     for k,v in pr_q.items():
         state_[k] = v
-    # for value in original_nodes:
-    #     state_[value] = [pressures[value]] # Pressure values
 
     state = np.array([value for key, value in state_.items()])
     return state
@@ -218,8 +216,6 @@ def find_penalty(solution):
     entry_flow_violations = abs(entry_flow_violations_EN) + abs(entry_flow_violations_EH)
     exit_flow_violations = abs(exit_flow_violations_XN) + abs(exit_flow_violations_XH)
 
-
-
     dispatcher_penalty = int(args.pressure_wt_factor * pr_violations
                              + args.s_flow_wt_factor * entry_flow_violations
                              + args.x_flow_wt_factor * exit_flow_violations)
@@ -228,9 +224,7 @@ def find_penalty(solution):
     return [dispatcher_penalty, trader_penalty]
 
 def get_con_pos():
-    va = 0
-    rs = 0
-    cs = 0
+    va, rs, cs = [0 for _ in range(3)]
     for k,v in get_dispatcher_dec().items():
         if re.search('va', k):
             va += 1
@@ -256,25 +250,17 @@ def get_bn_pressures_flows(solution):
 
 #Function to remove duplicate entries from fixed_decisions.yml file
 def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step, label = None):
+    key_label ='entry_nom' if label else '(va|zeta|gas|compressor)'
     for (k1,v1), (k2,v2) in zip(prev_agent_decisions.items(), new_agent_decisions.items()):
-        if not label:
-            if not re.search('(entry|exit)_nom',k1):
-                for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
-                    for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                        for i in range(step-1, -1, -1):
-                            if i in value1:
-                                break
-                        if value1[i] == value2[step]:
-                            del value2[step]
-        else:
-            if re.search('entry_nom',k1):
-                for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
-                    for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                        for i in range(step-1, -1, -1):
-                            if i in value1:
-                                break
-                        if value1[i] == value2[step]:
-                            del value2[step]
+        if re.search(rf"{key_label}",k1):
+            for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
+                for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
+                    for i in range(step-1, -1, -1):
+                        if i in value1:
+                            break
+                    if value1[i] == value2[step]:
+                        del value2[step]
+
     return new_agent_decisions
 
 #Create csv to store agent decisions, boundary flows, pressures and agent penalty values
@@ -303,11 +289,13 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     if penalty:
         extracted_['Dispatcher Penalty'] = penalty[0]
         extracted_['Trader Penalty'] = penalty[1]
-        extracted_['Accumulated'] = c_values[step]
+        extracted_['Accumulated C_EH'] = c_values[step][0]
+        extracted_['Accumulated C_EN'] = c_values[step][1]
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None
-        extracted_['Accumulated'] = None
+        extracted_['Accumulated C_EH'] = None
+        extracted_['Accumulated C_EN'] = None
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())
@@ -315,7 +303,7 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     return fieldnames, extracted_
 
 def reordered_headers(fieldnames):
-    order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18]
+    order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18,19]
     fieldnames = [fieldnames[i] for i in order]
     return fieldnames
 

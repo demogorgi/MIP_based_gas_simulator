@@ -15,13 +15,14 @@ class Gas_Network(object):
     possible_decisions = []
     ex_nom_EH = 0
     ex_nom_EN = 0
+    ex_dec_pool = []
 
 
     def __init__(self):
         self.row = len(self.state)
         self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, self.decisions_dict.copy()).items()]
         self.possible_decisions = self.get_valid_actions()
-        self.save_nominations(self.nom_EH, self.nom_EN)
+        self.save_nominations(self.nom_EH, self.nom_EN, self.possible_decisions.copy())
 
     def get_action_size(self):
         return self.row
@@ -40,12 +41,13 @@ class Gas_Network(object):
     def set_possible_decisions(self, new_set_decisions):
         self.possible_decisions = new_set_decisions
 
-    def save_nominations(self, old_EH, old_EN):
+    def save_nominations(self, old_EH, old_EN, old_decision_pool):
         self.ex_nom_EH = old_EH
         self.ex_nom_EN = old_EN
+        self.ex_dec_pool = old_decision_pool
 
     def get_saved_nominations(self):
-        return self.ex_nom_EH, self.ex_nom_EN
+        return self.ex_nom_EH, self.ex_nom_EN, self.ex_dec_pool
 
     def set_nominations(self, new_EH):
         decisions = self.get_agent_decision()

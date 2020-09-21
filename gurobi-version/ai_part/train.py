@@ -9,7 +9,7 @@ class Train(object):
     def __init__(self, gas_network, nnet):
         self.gas_network = gas_network
         self.net = nnet
-        #self.eval_net = NeuralNetworkWrapper(gas_network)
+        self.eval_net = NeuralNetworkWrapper(gas_network)
 
     def start(self):
         #Main training function
@@ -18,33 +18,26 @@ class Train(object):
 
         for i in range(configs.num_self_plays):
         #Self plays to collect data to train the NN
-            print("Start Self-play training")
+            print("Start Self-play training", i+1)
             gas_network = deepcopy(self.gas_network)
-            decisions = self.gas_network.decisions_dict.copy()
-            self.self_play(gas_network, decisions, training_data)
+            self.self_play(gas_network, training_data)
 
         self.net.save_model() #Current model saved
+
+        self.eval_net.load_model() # current model is loaded
 
         self.net.train(training_data) # Train the current model
 
         #Initialize MCTS for both networks
         current_mcts =  MCTS(self.net)
-
+        eval_mcts = MCTS(self.eval_net)
         #Evaluating the Model
         evaluator = Evaluate(current_mcts = current_mcts,
-                             decisions = self.gas_network.decisions_dict.copy(),
+                             eval_mcts = eval_mcts,
                              gas_network = self.gas_network)
         wins, losses = evaluator.evaluate()
 
-        num_steps = wins + losses
-        if num_steps == 0:
-            win_ratio = 0
-        else:
-            win_ratio = wins / num_steps
-        win_ratios.append([win_ratio])
-
-        print("Win rate: ", win_ratio)
-        if win_ratio > 0.55:
+        if wins >= losses:
             print("New model saved as the best model")
             self.net.save_model("best_model")
         else:
@@ -54,11 +47,10 @@ class Train(object):
 
         return new_agent_decision
 
-    def self_play(self, gas_network, decisions, training_data):
-        global accumulated_cs
-        mcts = MCTS(self.net)
+    def self_play(self, gas_network, training_data):
         self_play_data = []
-
+        mcts = MCTS(self.net)
+        decisions = deepcopy(gas_network.decisions_dict)
         node = TreeNode()
         i = 0
 
@@ -73,7 +65,6 @@ class Train(object):
             decisions = gas_network.generate_decision_dict(action, decisions)
 
             value = gas_network.get_value(decisions, i)
-
             i += 2
 
         # Update v as the value of the game result
@@ -86,21 +77,15 @@ class Train(object):
     def get_decision(self):
         mcts = MCTS(self.net)
         node = TreeNode()
-        gas_network = self.gas_network
-        step = gas_network.next_step
-
-        gas_network.nom_EH, gas_network.nom_EN = gas_network.get_saved_nominations()
-        decisions = gas_network.set_nominations(gas_network.nom_EH)
-        gas_network.possible_decisions = self.gas_network.get_valid_actions()
+        gas_network = deepcopy(self.gas_network)
         i = 0
+        gas_network.possible_decisions = gas_network.ex_dec_pool
+        decisions = deepcopy(gas_network.decisions_dict)
 
         while(i+2 <= config['decision_freq']):
-
             best_child = mcts.search(self.gas_network, node, configs.temperature)
-
             action = best_child.action
             decisions = self.gas_network.generate_decision_dict(action, decisions)
-
             value = self.gas_network.get_value(decisions, i)
             i += 2
 

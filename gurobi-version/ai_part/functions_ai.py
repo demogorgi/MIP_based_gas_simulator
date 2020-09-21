@@ -3,11 +3,12 @@ import sys
 import re
 import numpy as np
 import random
+import math
 
 from urmel import *
 
 from .utils import *
-from .configs import penalties, c_values, win_ratios
+from .configs import penalties, c_values
 
 args = dotdict({
     #Weights to calculate penalty for both agents
@@ -23,7 +24,7 @@ args = dotdict({
     #Number to control uniform distribution in decision size
     'decision_size': 100,
     #Threshold accumulated c values
-    'max_da_c': 1000,
+    'max_da_c': 500,
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -60,15 +61,16 @@ def get_nom_q_diff(solution):
     return nom_q_diff_EH, nom_q_diff_EN
 
 def get_c(decision, num_steps, start_step):
+    end_step = start_step+num_steps
     accumulated_cs = {}
     c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
-    for i in range(num_steps):
-        if start_step+i < numSteps:
-            solution = simulator_step(decision, start_step+i, "ai")
+    for i in range(start_step, end_step):
+        if i < numSteps:
+            solution = simulator_step(decision, i, "ai")
             c_EH, c_EN = get_nom_q_diff(solution)
             c_eh += c_EH
             c_en += c_EN
-            accumulated_cs[i] = [c_eh, c_en]
+            accumulated_cs[i%config['decision_freq']] = [c_eh, c_en]
 
     return accumulated_cs
 
@@ -93,10 +95,10 @@ def get_boundary_q_p(solution):
     x_p = {}
     for k, v in solution.items():
         if re.search('smoothed_special_pipe_flow_DA', k):
-            smoothed_flow[k] = v
+            smoothed_flow[k] = math.floor(v)
         if re.search('var_node_p\[(XN|XH)]', k):
             res = re.sub('var_node_p\[(\S*)]', r'\1', k)
-            x_p[res] = v
+            x_p[res] = math.floor(v)
     pressures = normalize_pressure(x_p.copy())
     smoothed_flows = normalize_smoothed_flows(smoothed_flow.copy())
     boundary_p_q = {**smoothed_flows, **pressures}
@@ -159,7 +161,7 @@ def get_old_action():
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
         if re.search('zeta_DA', label):
-            decisions[label] = value/10000
+            decisions[label] = (value-args.zeta_lb)/(args.zeta_ub-args.zeta_lb)
     return decisions
 
 def normalize_pressure(pressure_dict):
@@ -255,12 +257,11 @@ def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step, l
         if re.search(rf"{key_label}",k1):
             for (l1,v_1),(l2,v_2) in zip(v1.items(),v2.items()):
                 for (label1, value1), (label2, value2) in zip(v_1.items(), v_2.items()):
-                    for i in range(step-1, -1, -1):
+                    for i in range(step, -1, -1):
                         if i in value1:
                             break
                     if value1[i] == value2[step]:
                         del value2[step]
-
     return new_agent_decisions
 
 #Create csv to store agent decisions, boundary flows, pressures and agent penalty values
@@ -289,13 +290,13 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     if penalty:
         extracted_['Dispatcher Penalty'] = penalty[0]
         extracted_['Trader Penalty'] = penalty[1]
-        extracted_['Accumulated C_EH'] = c_values[step][0]
-        extracted_['Accumulated C_EN'] = c_values[step][1]
+        extracted_['Accumulated C'] = sum(c_values[step])
+        #extracted_['Accumulated C_EN'] = c_values[step][1]
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None
-        extracted_['Accumulated C_EH'] = None
-        extracted_['Accumulated C_EN'] = None
+        extracted_['Accumulated C'] = None
+        #extracted_['Accumulated C_EN'] = None
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())
@@ -303,11 +304,6 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
     return fieldnames, extracted_
 
 def reordered_headers(fieldnames):
-    order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18,19]
+    order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18]
     fieldnames = [fieldnames[i] for i in order]
     return fieldnames
-
-def write_win_ratio():
-    with open(path.join(data_path, 'output/nn_win_ratio.csv'), 'w+', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(win_ratios)

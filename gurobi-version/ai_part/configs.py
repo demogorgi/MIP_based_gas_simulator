@@ -17,11 +17,11 @@ configs = dotdict({
     'train_model': True,
 
     'nums_eval_plays':10, #Number of plays for the evaluation of the model
+    'num_players':2, #Number of players for evaluation
 
 })
 
 penalties = [] # store dispatcher and trader penalties
 c_values = [] #To store cumulative sum of nomination flow difference
-win_ratios = []
 
 current_acc_c = 0

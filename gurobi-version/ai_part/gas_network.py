@@ -20,9 +20,9 @@ class Gas_Network(object):
 
     def __init__(self):
         self.row = len(self.state)
-        self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, self.decisions_dict.copy()).items()]
+        self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, deepcopy(self.decisions_dict)).items()]
         self.possible_decisions = self.get_valid_actions()
-        self.save_nominations(self.nom_EH, self.nom_EN, self.possible_decisions.copy())
+        self.save_nominations(self.nom_EH, self.nom_EN, deepcopy(self.possible_decisions))
 
     def get_action_size(self):
         return self.row
@@ -31,7 +31,7 @@ class Gas_Network(object):
         return (self.row, 1)
 
     def get_agent_decision(self):
-        return self.decisions_dict.copy()
+        return deepcopy(self.decisions_dict)
 
     def get_possible_decisions(self):
         if self.possible_decisions:
@@ -49,14 +49,15 @@ class Gas_Network(object):
     def get_saved_nominations(self):
         return self.ex_nom_EH, self.ex_nom_EN, self.ex_dec_pool
 
-    def set_nominations(self, new_EH):
-        decisions = self.get_agent_decision()
+    def set_nominations(self, new_EN):
+        decisions = deepcopy(self.get_agent_decision())
         step = self.next_step
-        decisions["entry_nom"]["S"]["EN_aux0^EN"][step] = 1100 - new_EH
-        decisions["entry_nom"]["S"]["EH_aux0^EH"][step] = new_EH
-        new_decisions = remove_duplicate_decision(self.get_agent_decision(), decisions, step, label = 'nom')
-
-        return new_decisions
+        self.nom_EH = 1100-new_EN
+        self.nom_EN = new_EN
+        decisions["entry_nom"]["S"]["EN_aux0^EN"][step] = self.nom_EN
+        decisions["entry_nom"]["S"]["EH_aux0^EH"][step] = self.nom_EH
+        self.decisions_dict = remove_duplicate_decision(deepcopy(self.get_agent_decision()), decisions, step, label = 'nom')
+        
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self):
@@ -111,13 +112,12 @@ class Gas_Network(object):
             list_actions_with_c.append([action, c])
 
         list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
-
         return list_actions_with_c
 
     def generate_decision_dict(self, dispatcher_action, decisions = {}): #Generate new agent_decision dictionary
         step = self.next_step
         if not decisions:
-            decisions = self.get_agent_decision()
+            decisions = deepcopy(self.get_agent_decision())
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
         result = lambda key: re.sub('\S*_DA\[(\S*)]', r'\1', key).replace(',', '^')
 
@@ -130,7 +130,7 @@ class Gas_Network(object):
                 decisions['gas']['CS'][result(key)][step] = value
             elif re.search('compressor', key):
                 decisions['compressor']['CS'][result(key)][step] = value
-        new_decisions = remove_duplicate_decision(self.get_agent_decision(), decisions, step)
+        new_decisions = remove_duplicate_decision(deepcopy(self.get_agent_decision()), decisions, step)
         return new_decisions
 
     #Make decision as a 'dict' type {va_DA[VA]:_, zeta_DA[RE]:_, gas_DA[CS]:_, compressor_DA[CS]:_}
@@ -147,12 +147,13 @@ class Gas_Network(object):
         global accumulated_cs
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
-        #decision = self.generate_decision_dict(action)
         accumulated_cs = get_c(decision, config['decision_freq']-i, step)
+
         for key, values in accumulated_cs.items():
-            c1 += values[0]
-            c2 += values[1]
+            c1 = values[0]
+            c2 = values[1]
         c = abs(c1)+abs(c2)
+
         return c
 
     #Find the reward value for dispatcher agent

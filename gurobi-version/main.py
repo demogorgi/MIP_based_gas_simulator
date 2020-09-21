@@ -76,7 +76,6 @@ for i in range(numSteps):
     # The solution should contain all information you need to compute penalties.
     # And you can adjust the agent_decisions-dictionary here.
     ##############################################################################
-    write_win_ratio()
 
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:

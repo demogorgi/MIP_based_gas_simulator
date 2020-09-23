@@ -57,37 +57,34 @@ class Gas_Network(object):
         decisions["entry_nom"]["S"]["EN_aux0^EN"][step] = self.nom_EN
         decisions["entry_nom"]["S"]["EH_aux0^EH"][step] = self.nom_EH
         self.decisions_dict = remove_duplicate_decision(deepcopy(self.get_agent_decision()), decisions, step, label = 'nom')
-        
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self):
         va = 1
-        cs_path = False
-        re_path = False
         list_actions= []
-        rs, gs, cs = get_con_pos()
-        if self.nom_EN > self.nom_XN: cs_path = True #Compressor path to be chosen
-        else: re_path = True #Resistor path to be chosen
-        if cs_path:
-            cs = 1
-            gas = []
-            for i in range(args.decision_size):
-                x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
-                if x not in gas:
-                    gas.append(x)
-            for i in range(len(gas)):
-                list_actions.append([va, va, args.zeta_ub, gas[i], cs])
-            list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
+        #cs_path = False
+        #re_path = False
+        #if self.nom_EN > self.nom_XN: cs_path = True #Compressor path to be chosen
+        #else: re_path = True #Resistor path to be chosen
+        #if cs_path:
+        cs = 1
+        gas = []
+        while len(gas) < args.decision_size:
+            x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
+            if x not in gas: gas.append(x)
+        for i in range(len(gas)):
+            list_actions.append([va, va, args.zeta_ub, gas[i], cs])
 
-        if re_path:
-            cs = 0
-            zeta = []
-            for i in range(args.decision_size):
-                x = random.randint(args.zeta_lb, args.zeta_ub)
-                if x not in zeta:
-                    zeta.append(x)
-            for i in range(len(zeta)):
-                list_actions.append([va, va, zeta[i], args.gas_lb, cs])
+        #if re_path:
+        cs = 0
+        zeta = []
+        while len(zeta) < args.decision_size:
+            x = random.randint(args.zeta_lb, args.zeta_ub)
+            if x not in zeta: zeta.append(x)
+        for i in range(len(zeta)):
+            list_actions.append([va, va, zeta[i], args.gas_lb, cs])
+
+        list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
         if not self.next_step%args.decision_size == 0: list_actions.append(get_old_action())
 
         return list_actions

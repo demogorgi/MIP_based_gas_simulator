@@ -59,7 +59,7 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
-    if (i+1) % config['decision_freq'] == 0:
+    if (i+1) % config['number_of_decisions'] == 0:
         current_acc_c = abs(c_eh)+abs(c_en)
         c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 

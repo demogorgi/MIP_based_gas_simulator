@@ -3,7 +3,6 @@ from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
 
-cum_n_q = [0 for _ in range(config['decision_freq'])]
 accumulated_cs = {}
 
 class Gas_Network(object):
@@ -99,7 +98,7 @@ class Gas_Network(object):
         for action in list_actions:
             decision = self.generate_decision_dict(action)
 
-            accumulated_cs = get_c(decision, config['decision_freq'], self.next_step)
+            accumulated_cs = get_c(decision, config['number_of_decisions'], self.next_step)
 
             for key, values in accumulated_cs.items():
                 c1 = values[0]
@@ -144,7 +143,7 @@ class Gas_Network(object):
         global accumulated_cs
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
-        accumulated_cs = get_c(decision, config['decision_freq']-i, step)
+        accumulated_cs = get_c(decision, config['number_of_decisions']-i, step)
 
         for key, values in accumulated_cs.items():
             c1 = values[0]

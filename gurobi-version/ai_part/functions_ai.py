@@ -70,7 +70,7 @@ def get_c(decision, num_steps, start_step):
             c_EH, c_EN = get_nom_q_diff(solution)
             c_eh += c_EH
             c_en += c_EN
-            accumulated_cs[i%config['decision_freq']] = [c_eh, c_en]
+            accumulated_cs[i%config['number_of_decisions']] = [c_eh, c_en]
 
     return accumulated_cs
 

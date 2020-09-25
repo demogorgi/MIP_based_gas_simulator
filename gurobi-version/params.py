@@ -40,7 +40,7 @@ config = {
     # is the ai-part active?
     "ai": True,
     # how often ai takes decision (number of timesteps)
-    "decision_freq": 8,
+    "number_of_decisions": 8,
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 16,
 }

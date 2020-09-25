@@ -20,7 +20,7 @@ class Evaluate(object):
             node = TreeNode()
             gas_network = deepcopy(self.gas_network)
             c_value_da2 = 0
-            a = random.randrange(0, 1100, 50)
+            a = random.randrange(*config["randrange"])
 
             gas_network.set_nominations(a)
             gas_network.possible_decisions = gas_network.get_valid_actions()

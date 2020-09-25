@@ -158,16 +158,16 @@ class Gas_Network(object):
         #low penalty rewards high value
         if acc_c == 0:
             return 1 #Dispatcher won
-        elif acc_c > 0 or acc_c < args.max_da_c/2:
+        elif acc_c > 0 or acc_c < config['winning_threshold']/2:
             return 0.5    #Dispatcher won with half reward
-        elif acc_c >= args.max_da_c/2 and acc_c < args.max_da_c:
+        elif acc_c >= config['winning_threshold']/2 and acc_c < config['winning_threshold']:
             return 0 #Draw
         else: return -1 #Loss
 
     #Find the cumulative c value and its corresponding reward for NN
     def get_value(self, decision, i = 0):
         c = self.get_cumulative_c(decision, i)
-        value = c-args.max_da_c/2
+        value = c-config['winning_threshold']/2
         if value > 0:
             return  -1
         elif value < 0:

@@ -22,9 +22,7 @@ args = dotdict({
     'gas_ub': 1,
     'gas_lb': 0,
     #Number to control uniform distribution in decision size
-    'decision_size': 50,
-    #Threshold accumulated c values
-    'max_da_c': 500,
+    'decision_size': 50
 })
 
 wd = sys.argv[1].replace("/",".")

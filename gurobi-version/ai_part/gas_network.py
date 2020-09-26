@@ -85,7 +85,7 @@ class Gas_Network(object):
 
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
         if not self.next_step%args.decision_size == 0: list_actions.append(get_old_action())
-
+        random.shuffle(list_actions)
         return list_actions
 
 

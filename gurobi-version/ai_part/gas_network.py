@@ -107,7 +107,7 @@ class Gas_Network(object):
 
             list_actions_with_c.append([action, c])
 
-        list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
+        #list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
         return list_actions_with_c
 
     def generate_decision_dict(self, dispatcher_action, decisions = {}): #Generate new agent_decision dictionary

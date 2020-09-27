@@ -40,11 +40,11 @@ config = {
     # is the ai-part active?
     "ai": True,
     # how often ai takes decision (number of timesteps)
-    "number_of_decisions": 8,
+    "decision_freq": 4,
     # how often new trader nomination comes (number of timesteps)
-    "nomination_freq": 16,
+    "nomination_freq": 8,
     # Threshold accumulated c values
-    "winning_threshold": 500,
+    "winning_threshold": 200,
     # controlling random nomination values [start(opt),stop,step(opt)]
     "randrange": [0,1100,50]
 }

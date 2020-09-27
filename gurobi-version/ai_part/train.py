@@ -54,7 +54,7 @@ class Train(object):
         node = TreeNode()
         i = 0
 
-        while(i+2 <= config['number_of_decisions']):
+        while(i+2 <= config['decision_freq']):
 
             best_child = mcts.search(gas_network, node, configs.temperature)
 
@@ -82,7 +82,7 @@ class Train(object):
         gas_network.possible_decisions = gas_network.ex_dec_pool
         decisions = deepcopy(gas_network.decisions_dict)
 
-        while(i+2 <= config['number_of_decisions']):
+        while(i+2 <= config['decision_freq']):
             best_child = mcts.search(self.gas_network, node, configs.temperature)
             action = best_child.action
             decisions = self.gas_network.generate_decision_dict(action, decisions)

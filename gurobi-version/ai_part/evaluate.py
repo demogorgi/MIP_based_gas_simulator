@@ -34,7 +34,7 @@ class Evaluate(object):
                     c_value_da2 = c_value
                     mcts = self.nnet
 
-                while(k+2 <= config['decision_freq']):
+                while(k+2 <= gas_network.num_steps):
                     best_child = mcts.search(gas_network, node, configs.temperature)
                     action = best_child.action
                     decisions = gas_network.generate_decision_dict(action, decisions)

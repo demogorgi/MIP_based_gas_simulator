@@ -10,6 +10,8 @@ from urmel import *
 from .utils import *
 from .configs import penalties, c_values
 
+accumulated_cs = {}
+pos = config['nomination_freq']-1
 args = dotdict({
     #Weights to calculate penalty for both agents
     'pressure_wt_factor': 1,
@@ -22,7 +24,7 @@ args = dotdict({
     'gas_ub': 1,
     'gas_lb': 0,
     #Number to control uniform distribution in decision size
-    'decision_size': 50
+    'decision_size': 25
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -60,7 +62,7 @@ def get_nom_q_diff(solution):
 
 def get_c(decision, num_steps, start_step):
     end_step = start_step+num_steps
-    accumulated_cs = {}
+    global accumulated_cs
     c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
     for i in range(start_step, end_step):
         if i < numSteps:
@@ -68,7 +70,7 @@ def get_c(decision, num_steps, start_step):
             c_EH, c_EN = get_nom_q_diff(solution)
             c_eh += c_EH
             c_en += c_EN
-            accumulated_cs[i%config['decision_freq']] = [c_eh, c_en]
+            accumulated_cs[i%config['nomination_freq']] = [c_eh, c_en]
 
     return accumulated_cs
 

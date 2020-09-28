@@ -97,7 +97,7 @@ class MCTS(object):
                 prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
 
             possible_decisions = gas_network.get_possible_decisions()
-    
+
             psa_vector = self.possible_decision_probability(gas_network, possible_decisions, prob_vector)
 
             psa_vector_sum = sum(psa_vector)
@@ -131,28 +131,30 @@ class MCTS(object):
 
     def possible_decision_probability(self, gas_network, possible_decisions, prob_vector):
         rs, gs, cs = get_con_pos()
-
+        re_wt = 1
         psa_vector = []
 
-        if gas_network.nom_EN > gas_network.nom_XN:
-            probability = prob_vector[gs] + prob_vector [cs]
-        else:
-            probability = prob_vector[rs]
+        if gas_network.nom_EH > gas_network.nom_XH:
+            re_wt += 1
+
+        prob_cs = prob_vector[gs] + prob_vector [cs]
+        prob_re = prob_vector[rs]
         for i, decision in enumerate(possible_decisions):
+
             value = gas_network.get_reward(decision[1])
 
-            psa_vector.append(value*probability)
-
-        if len(psa_vector) != gas_network.get_action_size():
-            if len(psa_vector) < gas_network.get_action_size():
-                d = gas_network.get_action_size() - len(psa_vector)
-                psa_vector = (psa_vector + [0] * d)
-                possible_decisions = possible_decisions+[[[0],0]]*d
-                gas_network.set_possible_decisions(possible_decisions)
+            if decision[0][cs] == 0:
+                psa_vector.append(re_wt*value*prob_re)
             else:
-                psa_vector = psa_vector[0:gas_network.get_action_size()]
-                possible_decisions = possible_decisions[0:gas_network.get_action_size()]
-                gas_network.set_possible_decisions(possible_decisions)
+                psa_vector.append(value*prob_cs)
 
+
+        if len(psa_vector) > gas_network.get_action_size():
+
+            pos_values = random.sample(range(0, len(psa_vector)), gas_network.get_action_size())
+
+            psa_vector = [psa_vector[i] for i in pos_values]
+            possible_decisions = [possible_decisions[i] for i in pos_values]
+            gas_network.set_possible_decisions(possible_decisions)
 
         return psa_vector

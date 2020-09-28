@@ -3,8 +3,6 @@ from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
 
-accumulated_cs = {}
-
 class Gas_Network(object):
 
     state = None
@@ -15,6 +13,7 @@ class Gas_Network(object):
     ex_nom_EH = 0
     ex_nom_EN = 0
     ex_dec_pool = []
+    num_steps = 0
 
 
     def __init__(self):
@@ -84,29 +83,26 @@ class Gas_Network(object):
             list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
-        if not self.next_step%args.decision_size == 0: list_actions.append(get_old_action())
+        if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
         random.shuffle(list_actions)
         return list_actions
 
 
     def get_valid_actions(self):
-
+        global accumulated_cs
         list_actions = self.get_possible_nexts()
         list_actions_with_c = []
         c1, c2, c = [0 for _ in range(3)]
 
         for action in list_actions:
             decision = self.generate_decision_dict(action)
-
-            accumulated_cs = get_c(decision, config['decision_freq'], self.next_step)
-
-            for key, values in accumulated_cs.items():
-                c1 = values[0]
-                c2 = values[1]
+            accumulated_cs = get_c(decision, self.num_steps, self.next_step)
+            c1 = accumulated_cs[pos][0]
+            c2 = accumulated_cs[pos][1]
             c = abs(c1)+abs(c2)
 
             list_actions_with_c.append([action, c])
-
+            random.shuffle(list_actions)
         #list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
         return list_actions_with_c
 
@@ -143,34 +139,37 @@ class Gas_Network(object):
         global accumulated_cs
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
-        accumulated_cs = get_c(decision, config['decision_freq']-i, step)
+        accumulated_cs = get_c(decision, self.num_steps-i, step)
 
-        for key, values in accumulated_cs.items():
-            c1 = values[0]
-            c2 = values[1]
+        c1 = accumulated_cs[pos][0]
+        c2 = accumulated_cs[pos][1]
+        if not i==0:
+            c1 += accumulated_cs[self.num_steps-i-1][0]
+            c2 += accumulated_cs[self.num_steps-i-1][1]
         c = abs(c1)+abs(c2)
 
         return c
 
-    #Find the reward value for dispatcher agent
+    #Find the weight value for dispatcher agent
     def get_reward(self, acc_c = None):
+
         if not acc_c: acc_c = self.c_penalty
         #low penalty rewards high value
         if acc_c == 0:
-            return 1 #Dispatcher won
-        elif acc_c > 0 or acc_c < config['winning_threshold']/2:
-            return 0.5    #Dispatcher won with half reward
+            return 1
+        elif acc_c > 0 and acc_c < config['winning_threshold']/2:
+            return 0.75
         elif acc_c >= config['winning_threshold']/2 and acc_c < config['winning_threshold']:
-            return 0 #Draw
-        else: return -1 #Loss
+            return 0.5
+        else: return 0.1
 
     #Find the cumulative c value and its corresponding reward for NN
     def get_value(self, decision, i = 0):
         c = self.get_cumulative_c(decision, i)
         value = c-config['winning_threshold']/2
         if value > 0:
-            return  -1
+            return  -1 #Loss
         elif value < 0:
-            return  1
+            return  1 #Won
         else:
-            return  0
+            return  0 #Draw

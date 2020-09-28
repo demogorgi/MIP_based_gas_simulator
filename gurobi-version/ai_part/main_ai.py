@@ -16,7 +16,8 @@ def get_decisions_from_ai(solution, agent_decisions, step):
         Gas_Network.decisions_dict = agent_decisions
         Gas_Network.next_step = step
         Gas_Network.c_penalty = current_acc_c
-
+        Gas_Network.num_steps = config['nomination_freq'] - step%config['nomination_freq']
+        
         Gas_Network.state = get_state(step-1, agent_decisions, solution)
 
         gas_network = Gas_Network()

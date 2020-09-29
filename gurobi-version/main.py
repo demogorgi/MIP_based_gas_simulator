@@ -23,6 +23,11 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
+with open(path.join(data_path, 'output/acc_c.csv'), 'w+', newline='') as f:
+    fieldnames = range(0, config['nomination_freq'])
+    tw = csv.DictWriter(f, fieldnames = fieldnames)
+    tw.writeheader()
+
 c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 
 simulator_step.counter = 0
@@ -68,6 +73,12 @@ for i in range(numSteps):
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
             agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1)
             if not agent_decisions: continue
+
+            with open(path.join(data_path, 'output/acc_c.csv'), 'a+', newline = '') as f:
+                fieldnames = range(0, config['nomination_freq'])
+                tw = csv.DictWriter(f, fieldnames = fieldnames)
+                acc_c = {i:abs(cs[0])+abs(cs[1]) for i, cs in accumulated_cs.items()}
+                tw.writerow(acc_c)
 
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")

@@ -1,11 +1,12 @@
 print "#########################################"
 print "Invocation example:"
-print ">gnuplot -e \"nomination_freq=8;append='true';filename='example.csv'\" penalty.gp"
+print ">gnuplot -e \"nomination_freq=8;append='true';filename='example.csv';i=42\" penalty.gp"
 print "- nomination_freq is mandatory"
 print "- if append is not set 'slope_evolution.csv' will be overwritten"
 print "  (This file is used for the right plot)"
 print "- if filename is not set 'instances/da2/output/information.csv' will be used"
 print "  (This file is used for the left plot)"
+print "- if i is set it will be used for the iteration number in the frist column of slope_evolution.csv"
 print "#########################################"
 set datafile separator ","
 set grid
@@ -33,7 +34,7 @@ if (append eq 'true') {
 }
 
 
-i = 1
+if (!exists("i")) i=1
 k = f(filename)
 while (1) {
     if (k + nomination_freq <= f(filename) && f(filename) >= 2 * nomination_freq) {
@@ -55,7 +56,7 @@ while (1) {
        #set xlabel "Number of gnuplot iterations"
        set ylabel "Regression line slope"
        set y2label "Mean value"
-       plot "slope_evolution.csv" every ::1 using :2 with linespoints axes x1y1 t "Fitting parameter 'a' evolution", "slope_evolution.csv" every ::1 using :4 with linespoints axes x1y2 t "Mean value evolution"
+       plot [*:*][-10:10] "slope_evolution.csv" every ::1 using :2 with linespoints axes x1y1 t "Fitting parameter 'a' evolution", "slope_evolution.csv" every ::1 using :4 with linespoints axes x1y2 t "Mean value evolution"
        unset y2tics
        k = f(filename)
     } else {

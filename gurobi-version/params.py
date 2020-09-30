@@ -42,7 +42,7 @@ config = {
     # how often ai takes decision (number of timesteps)
     "decision_freq": 2,
     # how often new trader nomination comes (number of timesteps)
-    "nomination_freq": 4,
+    "nomination_freq": 8,
     # Threshold accumulated c values
     "winning_threshold": 500,
     # controlling random nomination values [start(opt),stop,step(opt)]

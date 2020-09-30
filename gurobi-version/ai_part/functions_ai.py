@@ -291,12 +291,10 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
         extracted_['Dispatcher Penalty'] = penalty[0]
         extracted_['Trader Penalty'] = penalty[1]
         extracted_['Accumulated C'] = abs(c_values[step][0])+abs(c_values[step][1])
-        #extracted_['Accumulated C_EN'] = c_values[step][1]
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None
         extracted_['Accumulated C'] = None
-        #extracted_['Accumulated C_EN'] = None
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())

@@ -26,7 +26,7 @@ class Evaluate(object):
             gas_network.possible_decisions = gas_network.get_valid_actions()
 
             for player in range(configs.num_players):
-                k = 0
+
                 decisions = deepcopy(gas_network.decisions_dict)
                 if player == 0:
                     mcts = self.eval_net
@@ -34,12 +34,10 @@ class Evaluate(object):
                     c_value_da2 = c_value
                     mcts = self.nnet
 
-                while(k+2 <= gas_network.num_steps):
-                    best_child = mcts.search(gas_network, node, configs.temperature)
-                    action = best_child.action
-                    decisions = gas_network.generate_decision_dict(action, decisions)
-                    c_value = gas_network.get_value(decisions, k)
-                    k += 2
+                best_child = mcts.search(gas_network, node, configs.temperature)
+                action = best_child.action
+                decisions = gas_network.generate_decision_dict(action, decisions)
+                c_value = gas_network.get_value(decisions)
 
             if c_value == 1:
                 wins_da1 += 1

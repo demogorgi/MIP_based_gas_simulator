@@ -52,20 +52,16 @@ class Train(object):
         mcts = MCTS(self.net)
         decisions = deepcopy(gas_network.decisions_dict)
         node = TreeNode()
-        i = 0
 
-        while(i+2 <= config['decision_freq']):
+        best_child = mcts.search(gas_network, node, configs.temperature)
 
-            best_child = mcts.search(gas_network, node, configs.temperature)
+        self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
 
-            self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
+        action = best_child.action
 
-            action = best_child.action
+        decisions = gas_network.generate_decision_dict(action, decisions)
 
-            decisions = gas_network.generate_decision_dict(action, decisions)
-
-            value = gas_network.get_value(decisions, i)
-            i += 2
+        value = gas_network.get_value(decisions)
 
         # Update v as the value of the game result
         for state_value in self_play_data:
@@ -78,15 +74,13 @@ class Train(object):
         mcts = MCTS(self.net)
         node = TreeNode()
         gas_network = deepcopy(self.gas_network)
-        i = 0
+
         gas_network.possible_decisions = gas_network.ex_dec_pool
         decisions = deepcopy(gas_network.decisions_dict)
 
-        while(i+2 <= config['decision_freq']):
-            best_child = mcts.search(self.gas_network, node, configs.temperature)
-            action = best_child.action
-            decisions = self.gas_network.generate_decision_dict(action, decisions)
-            value = self.gas_network.get_value(decisions, i)
-            i += 2
+        best_child = mcts.search(self.gas_network, node, configs.temperature)
+        action = best_child.action
+        decisions = self.gas_network.generate_decision_dict(action, decisions)
+        value = self.gas_network.get_value(decisions)
 
         return decisions

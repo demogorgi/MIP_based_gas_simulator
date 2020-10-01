@@ -9,10 +9,15 @@ print "#########################################"
 set datafile separator ","
 set grid
 if (!exists("start")) start=0
+if (!exists("end")) {
+   x=1
+} else {
+   x=0
+}
 if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
 while (1) {
-    if (!exists("end")) {end=f(filename)}
+    if (x) {end=f(filename)}
     if (end <= 280) {
        set xtics 0, 8
     }

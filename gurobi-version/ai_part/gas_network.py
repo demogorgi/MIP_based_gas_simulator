@@ -5,22 +5,28 @@ mean_value = lambda l,u:((u - l)/2 + l)
 
 class Gas_Network(object):
 
-    state = None
+    initial_state = None
+    initial_decisions_dict = {}
     next_step = 0
-    decisions_dict = {}
-    c_penalty = 0 #Current accumulated c value from solution
     possible_decisions = []
+
     ex_nom_EH = 0
     ex_nom_EN = 0
     ex_dec_pool = []
-    num_steps = 0
+    num_steps = config['nomination_freq']
 
 
     def __init__(self):
-        self.row = len(self.state)
-        self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, deepcopy(self.decisions_dict)).items()]
-        self.possible_decisions = self.get_valid_actions()
-        self.save_nominations(self.nom_EH, self.nom_EN, deepcopy(self.possible_decisions))
+        self.row = len(self.initial_state)
+        self.nom_XN, self.nom_XH, self.nom_EN, self.nom_EH = [abs(v) for k, v in get_trader_nom(self.next_step, deepcopy(self.initial_decisions_dict)).items()]
+        self.possible_nexts = self.get_possible_nexts()
+        self.save_nominations(self.nom_EH, self.nom_EN)
+        self.reset()
+
+    def reset(self):
+        self.current_state = deepcopy(self.initial_state)
+        self.current_decisions = deepcopy(self.initial_decisions_dict)
+        self.current_step = self.next_step
 
     def get_action_size(self):
         return self.row
@@ -29,68 +35,68 @@ class Gas_Network(object):
         return (self.row, 1)
 
     def get_agent_decision(self):
-        return deepcopy(self.decisions_dict)
+        return deepcopy(self.current_decisions)
 
     def get_possible_decisions(self):
-        if self.possible_decisions:
-            return self.possible_decisions
-        else: self.get_valid_actions()
+        return self.possible_decisions
 
-    def set_possible_decisions(self, new_set_decisions):
+    def set_possible_decisions(self, new_set_decisions = []):
+        if not new_set_decisions:
+            new_set_decisions = self.get_valid_actions()
         self.possible_decisions = new_set_decisions
 
-    def save_nominations(self, old_EH, old_EN, old_decision_pool):
+    def save_nominations(self, old_EH, old_EN):
         self.ex_nom_EH = old_EH
         self.ex_nom_EN = old_EN
-        self.ex_dec_pool = old_decision_pool
+
 
     def get_saved_nominations(self):
-        return self.ex_nom_EH, self.ex_nom_EN, self.ex_dec_pool
+        return self.ex_nom_EH, self.ex_nom_EN
 
     def set_nominations(self, new_EN):
         decisions = deepcopy(self.get_agent_decision())
-        step = self.next_step
+        step = self.current_step
         self.nom_EH = 1100-new_EN
         self.nom_EN = new_EN
         decisions["entry_nom"]["S"]["EN_aux0^EN"][step] = self.nom_EN
         decisions["entry_nom"]["S"]["EH_aux0^EH"][step] = self.nom_EH
-        self.decisions_dict = remove_duplicate_decision(deepcopy(self.get_agent_decision()), decisions, step, label = 'nom')
+        self.current_decisions = remove_duplicate_decision(deepcopy(self.get_agent_decision()), decisions, step, label = 'nom')
 
     #Function to get possible dispatcher decisions
     def get_possible_nexts(self):
         va = 1
         list_actions= []
-        #cs_path = False
-        #re_path = False
-        #if self.nom_EN > self.nom_XN: cs_path = True #Compressor path to be chosen
-        #else: re_path = True #Resistor path to be chosen
-        #if cs_path:
+
         cs = 1
         gas = []
         while len(gas) < args.decision_size:
             x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
-            if x not in gas: gas.append(x)
+            if x not in gas:
+                gas.append(x)
         for i in range(len(gas)):
             list_actions.append([va, va, args.zeta_ub, gas[i], cs])
 
-        #if re_path:
         cs = 0
         zeta = []
         while len(zeta) < args.decision_size:
             x = random.randint(args.zeta_lb, args.zeta_ub)
-            if x not in zeta: zeta.append(x)
+            if x not in zeta:
+                zeta.append(x)
         for i in range(len(zeta)):
             list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
         if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
         random.shuffle(list_actions)
+        pos_values = random.sample(range(0, len(list_actions)), self.get_action_size())
+        list_actions = [list_actions[i] for i in pos_values]
+
         return list_actions
 
 
     def get_valid_actions(self):
         global accumulated_cs
-        list_actions = self.get_possible_nexts()
+        list_actions = self.possible_nexts
         list_actions_with_c = []
         c1, c2, c = [0 for _ in range(3)]
 
@@ -102,12 +108,12 @@ class Gas_Network(object):
             c = abs(c1)+abs(c2)
 
             list_actions_with_c.append([action, c])
-            random.shuffle(list_actions)
+
         #list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
         return list_actions_with_c
 
     def generate_decision_dict(self, dispatcher_action, decisions = {}): #Generate new agent_decision dictionary
-        step = self.next_step
+        step = self.current_step
         if not decisions:
             decisions = deepcopy(self.get_agent_decision())
         dispatcher_actions= self.decision_to_dict(dispatcher_action)
@@ -137,15 +143,14 @@ class Gas_Network(object):
 
     def get_cumulative_c(self, decision, i = 0):
         global accumulated_cs
+        i *= config['decision_freq']
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
         accumulated_cs = get_c(decision, self.num_steps-i, step)
-
+        
         c1 = accumulated_cs[pos][0]
         c2 = accumulated_cs[pos][1]
-        if not i==0:
-            c1 += accumulated_cs[self.num_steps-i-1][0]
-            c2 += accumulated_cs[self.num_steps-i-1][1]
+
         c = abs(c1)+abs(c2)
 
         return c
@@ -153,7 +158,7 @@ class Gas_Network(object):
     #Find the weight value for dispatcher agent
     def get_reward(self, acc_c = None):
 
-        if not acc_c: acc_c = self.c_penalty
+        if not acc_c: acc_c = config['winning_threshold']/2
         #low penalty rewards high value
         if acc_c == 0:
             return 1
@@ -173,3 +178,11 @@ class Gas_Network(object):
             return  1 #Won
         else:
             return  0 #Draw
+    def apply_action(self, decisions):
+        for i in range(config['decision_freq']):
+            step = self.current_step+i
+            solution = simulator_step(decisions, step, "ai")
+
+        self.current_decisions = decisions
+        self.current_state = get_state(step, decisions, solution)
+        self.current_step = step+1

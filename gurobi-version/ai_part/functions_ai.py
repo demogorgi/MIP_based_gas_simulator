@@ -11,7 +11,8 @@ from .utils import *
 from .configs import penalties, c_values
 
 accumulated_cs = {}
-pos = config['nomination_freq']-1
+pos = config['nomination_freq']-1 #End position of accumulated_cs dictionary
+num_rounds = config['nomination_freq']/config['decision_freq']
 args = dotdict({
     #Weights to calculate penalty for both agents
     'pressure_wt_factor': 1,
@@ -305,3 +306,10 @@ def reordered_headers(fieldnames):
     order = [0,1,12,2,13,3,15,4,14,5,6,7,8,9,10,11,16,17,18]
     fieldnames = [fieldnames[i] for i in order]
     return fieldnames
+
+def write_acc_c():
+    with open(path.join(data_path, 'output/acc_c.csv'), 'a+', newline = '') as f:
+        fieldnames = range(0, config['nomination_freq'])
+        tw = csv.DictWriter(f, fieldnames = fieldnames)
+        acc_c = {i:abs(cs[0])+abs(cs[1]) for i, cs in accumulated_cs.items()}
+        tw.writerow(acc_c)

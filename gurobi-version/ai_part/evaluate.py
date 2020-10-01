@@ -23,25 +23,32 @@ class Evaluate(object):
             a = random.randrange(*config["randrange"])
 
             gas_network.set_nominations(a)
-            gas_network.possible_decisions = gas_network.get_valid_actions()
+            gas_network.set_possible_decisions()
 
             for player in range(configs.num_players):
-
-                decisions = deepcopy(gas_network.decisions_dict)
+                round = 0
                 if player == 0:
                     mcts = self.eval_net
                 else:
                     c_value_da2 = c_value
                     mcts = self.nnet
+                while(round < num_rounds):
+                    best_child = mcts.search(gas_network, node, configs.temperature)
+                    action = best_child.action
 
-                best_child = mcts.search(gas_network, node, configs.temperature)
-                action = best_child.action
-                decisions = gas_network.generate_decision_dict(action, decisions)
-                c_value = gas_network.get_value(decisions)
+                    decisions = gas_network.generate_decision_dict(action)
+
+                    gas_network.apply_action(decisions)
+
+                    c_value = gas_network.get_value(decisions)
+                    round += 1
+                gas_network.reset()
+                gas_network.set_nominations(a)
 
             if c_value == 1:
                 wins_da1 += 1
             if c_value_da2 == 1:
                 wins_da2 += 1
+        
         print("evaluation finished")
         return wins_da1, wins_da2

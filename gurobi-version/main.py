@@ -63,22 +63,18 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
-    if (i+1) % config['decision_freq'] == 0:
+    #if (i+1) % config['decision_freq'] == 0:
 
-        if (i+1)%config['nomination_freq'] == 0:
-            current_acc_c = abs(c_eh)+abs(c_en)
-            c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
+    if (i+1)%config['nomination_freq'] == 0:
+        #current_acc_c = abs(c_eh)+abs(c_en)
+        c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 
         if config["ai"] and (i+1) >= config['nomination_freq']:
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
             agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1)
             if not agent_decisions: continue
 
-            with open(path.join(data_path, 'output/acc_c.csv'), 'a+', newline = '') as f:
-                fieldnames = range(0, config['nomination_freq'])
-                tw = csv.DictWriter(f, fieldnames = fieldnames)
-                acc_c = {i:abs(cs[0])+abs(cs[1]) for i, cs in accumulated_cs.items()}
-                tw.writerow(acc_c)
+            
 
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")

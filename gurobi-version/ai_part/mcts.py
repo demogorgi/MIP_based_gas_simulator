@@ -54,7 +54,6 @@ class TreeNode(object):
     def expand_node(self, gas_network, psa_vector):
         #Expanding current node by adding valid moves as children
         self.child_psas = deepcopy(psa_vector)
-
         valid_decisions = gas_network.get_possible_decisions()
 
         for idx, move in enumerate(valid_decisions):
@@ -88,13 +87,14 @@ class MCTS(object):
             gas_network = deepcopy(self.gas_network)
 
             # while node.is_not_leaf():
+            #     print("Not a leaf")
             #     node = node.select_child()
-            #     gas_network.take_action(node.action)
+            #     gas_network.apply_action(node.action)
 
-            prob_vector, v = self.net.policy_value(gas_network.state)
+            prob_vector, v = self.net.policy_value(gas_network.current_state)
 
             if node.parent is None:
-                prob_vector = self.add_dirichlet_noise(gas_network, prob_vector)
+                prob_vector = self.add_dirichlet_noise(prob_vector)
 
             possible_decisions = gas_network.get_possible_decisions()
 
@@ -104,7 +104,6 @@ class MCTS(object):
 
             if psa_vector_sum > 0: #Renormalize the psa_vector
                 psa_vector /= psa_vector_sum
-
             node.expand_node(gas_network = gas_network, psa_vector = psa_vector)
 
             wsa = gas_network.get_reward()
@@ -115,10 +114,9 @@ class MCTS(object):
 
         return self.root.select_child()
 
-    def add_dirichlet_noise(self, gas_network, psa_vector):
+    def add_dirichlet_noise(self, psa_vector):
 
-        dirichlet_input = [configs.dirichlet_alpha for x in range(gas_network.get_action_size())]
-
+        dirichlet_input = [configs.dirichlet_alpha for x in range(self.gas_network.get_action_size())]
         dirichlet_list = np.random.dirichlet(dirichlet_input)
 
         noisy_psa_vector = []
@@ -147,14 +145,5 @@ class MCTS(object):
                 psa_vector.append(re_wt*value*prob_re)
             else:
                 psa_vector.append(value*prob_cs)
-
-
-        if len(psa_vector) > gas_network.get_action_size():
-
-            pos_values = random.sample(range(0, len(psa_vector)), gas_network.get_action_size())
-
-            psa_vector = [psa_vector[i] for i in pos_values]
-            possible_decisions = [possible_decisions[i] for i in pos_values]
-            gas_network.set_possible_decisions(possible_decisions)
 
         return psa_vector

@@ -50,18 +50,27 @@ class Train(object):
     def self_play(self, gas_network, training_data):
         self_play_data = []
         mcts = MCTS(self.net)
-        decisions = deepcopy(gas_network.decisions_dict)
         node = TreeNode()
+        round = 0
 
-        best_child = mcts.search(gas_network, node, configs.temperature)
+        while(round < num_rounds):
 
-        self_play_data.append([deepcopy(gas_network.state), deepcopy(best_child.parent.child_psas), 0])
+            gas_network.set_possible_decisions(gas_network.get_valid_actions())
 
-        action = best_child.action
+            best_child = mcts.search(gas_network, node, configs.temperature)
 
-        decisions = gas_network.generate_decision_dict(action, decisions)
+            self_play_data.append([deepcopy(gas_network.current_state), deepcopy(best_child.parent.child_psas), 0])
+            action = best_child.action
 
-        value = gas_network.get_value(decisions)
+            decisions = gas_network.generate_decision_dict(action)
+
+            gas_network.apply_action(decisions)
+
+            value = gas_network.get_value(decisions, round)
+
+            round += 1
+
+        gas_network.reset()
 
         # Update v as the value of the game result
         for state_value in self_play_data:
@@ -74,13 +83,17 @@ class Train(object):
         mcts = MCTS(self.net)
         node = TreeNode()
         gas_network = deepcopy(self.gas_network)
-
-        gas_network.possible_decisions = gas_network.ex_dec_pool
-        decisions = deepcopy(gas_network.decisions_dict)
-
-        best_child = mcts.search(self.gas_network, node, configs.temperature)
-        action = best_child.action
-        decisions = self.gas_network.generate_decision_dict(action, decisions)
-        value = self.gas_network.get_value(decisions)
-
+        gas_network.reset()
+        round = 0
+        gas_network.possible_nexts = gas_network.get_possible_nexts()
+        gas_network.set_possible_decisions()
+        while round < num_rounds:
+            best_child = mcts.search(gas_network, node, configs.temperature)
+            action = best_child.action
+            decisions = gas_network.generate_decision_dict(action)
+            gas_network.apply_action(decisions)
+            value = gas_network.get_value(decisions, round)
+            write_acc_c()
+            random.shuffle(gas_network.possible_decisions)
+            round += 1
         return decisions

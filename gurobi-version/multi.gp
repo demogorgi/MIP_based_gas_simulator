@@ -9,7 +9,6 @@ print "#########################################"
 #set terminal wxt size 960, 1080
 set datafile separator ","
 set grid
-if (!exists("threshold")) threshold=-10
 if (!exists("start")) start=0
 if (!exists("end")) {
    x=1
@@ -53,7 +52,11 @@ while (1) {
     set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values", threshold t title_t(threshold)
+    if (!exists("threshold")) {
+	    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values"
+    } else {
+	    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values", threshold t title_t(threshold)
+    }
     #
     set key inside center bottom
     set xlabel "Time"

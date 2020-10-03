@@ -1,13 +1,15 @@
 print "#########################################"
 print "Invocation example:"
-print ">gnuplot -e \"start=10;end=20;filename='example.csv'\" multi.gp"
+print ">gnuplot -e \"threshold=666;start=10;end=20;filename='example.csv'\" multi.gp"
 print "- if filename is not set 'instances/da2/output/information.csv' will be used"
 print "- start: first line in information.csv that will be used for plotting"
 print "- end: last line in information.csv that will be used for plotting"
+print "- threshold: if threshold is set, a straight line at threshold is drawn in second plot"
 print "#########################################"
 #set terminal wxt size 960, 1080
 set datafile separator ","
 set grid
+if (!exists("threshold")) threshold=-10
 if (!exists("start")) start=0
 if (!exists("end")) {
    x=1
@@ -16,6 +18,7 @@ if (!exists("end")) {
 }
 if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
+title_t(threshold) = sprintf('threshold %.1f', threshold)
 while (1) {
     if (x) {end=f(filename)}
     if (end <= 280) {
@@ -50,7 +53,7 @@ while (1) {
     set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    plot [start:end] filename every ::1 using :19 with steps title "Accumulated c values", 0 lt 3 title "Baseline"
+    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values", threshold t title_t(threshold)
     #
     set key inside center bottom
     set xlabel "Time"

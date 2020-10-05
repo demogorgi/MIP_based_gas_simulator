@@ -42,31 +42,35 @@ for n in no.nodes:
 entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_ = ({} for i in range(4))
 smoothed_flow = {}
-qo_in = {}
+accumulated_cs = {}
+pos = config['nomination_freq']-1 #End position of accumulated_cs dictionary
 
-def get_nom_q_diff(solution, step, agent_decisions):
+def get_nom_q_diff(solution):
+    nom_q_diff = {}
 
-    nom_XN, nom_XH, nom_EN,nom_EH = [abs(v) for k, v in get_trader_nom(step, agent_decisions).items()]
-
-    flow_EH, flow_EN = [round(v,2) for k,v in get_flow(solution).items()] #EH, EN
-
-    if nom_EN > nom_XN:
-        c = (nom_EN - flow_EN)
-    elif nom_EN == nom_XN:
-        c = ((nom_EN - flow_EN)+(nom_EH - flow_EH))/2
-    else:
-        c = (nom_EH - flow_EH)
-
-    return c
-
-def get_flow(solution):
-    qo_in = {}
     for k, v in solution.items():
-        if re.search('var_pipe_Qo_in', k):
-            res = re.sub('var_pipe_Qo_in\[(\S*)]', r'\1', k)
+        if re.search('nom_entry_slack_DA', k):
+            res = re.sub('nom_entry_slack_DA\[(\S*)]', r'\1', k)
             if res == 'EN_aux0,EN' or res == 'EH_aux0,EH':
-                qo_in[k] = v
-    return qo_in
+                nom_q_diff[k] = v
+
+    nom_q_diff_EH, nom_q_diff_EN = [v for k,v in nom_q_diff.items()]
+
+    return nom_q_diff_EH, nom_q_diff_EN
+
+def get_c(decision, num_steps, start_step):
+    end_step = start_step+num_steps
+    global accumulated_cs
+    c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
+    for i in range(start_step, end_step):
+        if i < numSteps:
+            solution = simulator_step(decision, i, "ai")
+            c_EH, c_EN = get_nom_q_diff(solution)
+            c_eh += c_EH
+            c_en += c_EN
+            accumulated_cs[i%config['nomination_freq']] = [c_eh, c_en]
+
+    return accumulated_cs
 
 def get_agents_dict(step, agent_decisions):
     agents_dict = {}
@@ -299,11 +303,11 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
         #     acc_penalty += penalties[i][0]
         # else:
         #     acc_penalty = penalties[step][0]
-        extracted_['Accumulated'] = c_values[step]
+        extracted_['Accumulated_C'] = abs(c_values[step][0])+abs(c_values[step][1])
     else:
         extracted_['Dispatcher Penalty'] = None
         extracted_['Trader Penalty'] = None
-        extracted_['Accumulated'] = None
+        extracted_['Accumulated_C'] = None
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())

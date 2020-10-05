@@ -24,7 +24,7 @@ with open(path.join(data_path, 'output/information.csv'), 'w+', newline='') as f
     fieldnames, extracted_ = create_dict_for_csv(agent_decisions)
     thewriter = csv.DictWriter(f, fieldnames=fieldnames)
     thewriter.writeheader()
-c = 0
+c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 simulator_step.counter = 0
 for i in range(numSteps):
     print("step %d" % i)
@@ -41,8 +41,11 @@ for i in range(numSteps):
     # If the last argument "porcess_type" is "sim" files (sol, lp, ... ) will be written if their option is set.
     # If the last argument "porcess_type" is not "sim" files will only be written if their option is set and if config["debug"] is True.
     solution = simulator_step(agent_decisions, i, "sim")
-    c += get_nom_q_diff(solution, i, agent_decisions)
-    c_values.append(c)
+
+    c_EH, c_EN = get_nom_q_diff(solution)
+    c_eh += c_EH
+    c_en += c_EN
+    c_values.append([c_eh, c_en])
 
     #Store each new (agent) decisions value from ai_part to csv
     timestamp = timestep.strftime("%H:%M:%S")
@@ -55,9 +58,9 @@ for i in range(numSteps):
         thewriter.writerow(extracted_)
     timestep += timedelta(0,dt)
 
-    if (i+1) % config['decision_freq'] == 0:
-        c = 0
-        if config["ai"]:
+    if (i+1) % config['nomination_freq'] == 0:
+        c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
+        if config["ai"]:# and (i+1) >= config['nomination_freq']:
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
             agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1, penalty)
             if not agent_decisions: continue

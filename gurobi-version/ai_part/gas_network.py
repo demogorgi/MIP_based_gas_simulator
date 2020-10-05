@@ -4,8 +4,6 @@ from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
 
-cum_n_q = [0 for _ in range(config['decision_freq'])]
-
 class Gas_Network(object):
 
     state = None
@@ -14,7 +12,7 @@ class Gas_Network(object):
     c_penalty = [0, 0] #Current penalty [Dispatcher penalty, Trader penalty]
     n_penalty = [0, 0] #Penalty expected for new decision
     possible_decisions = []
-
+    num_steps = 0
 
     def __init__(self):
         self.row = len(self.state)
@@ -30,15 +28,12 @@ class Gas_Network(object):
         return deepcopy(self.decisions_dict)
 
     def get_possible_decisions(self):
-        return self.get_possible_nexts(get_dispatcher_dec())
+        return self.get_possible_nexts()
 
 
     #Function to get possible dispatcher decisions
-    def get_possible_nexts(self, old_decisions):
+    def get_possible_nexts(self):
         va = 1
-        #rndm_value = lambda l, u: round(random.uniform(l,u), 2)
-        #zeta_value = lambda l, u: int(rndm_value(l,u)*(args.zeta_ub - args.zeta_lb) + args.zeta_lb)
-
         if self.nom_EN > self.nom_XN:
             cs = 1
             gas = round(mean_value(args.gas_lb,args.gas_ub),3)
@@ -53,16 +48,6 @@ class Gas_Network(object):
         final_action = [v for k,v in get_dispatcher_dec().items()]
         return final_action
 
-    def get_nom_q_difference(self, solution):
-        #smoothed_EH, smoothed_EN = [round(v,2) for k,v in get_smoothed_flow(solution).items()] #EH, EN
-        flow_EH, flow_EN = [round(v,2) for k,v in get_flow(solution).items()] #EH, EN
-
-        if self.nom_EN > self.nom_XN:
-            c = round(self.nom_EN - flow_EN)
-
-        else:
-            c = round(self.nom_EH - flow_EH)
-        return c
 
     def generate_decision_dict(self, dispatcher_action): #Generate new agent_decision dictionary
         step = self.next_step
@@ -94,20 +79,14 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
-    def get_cumulative_c(self, action, step):
-        c = 0
+    def get_cumulative_c(self, action):
         decision = self.generate_decision_dict(action)
-        for j in range(config['decision_freq']):
-            if step < numSteps:
-                solution = simulator_step(decision, step, "ai")
-                c += self.get_nom_q_difference(solution)
-                step += 1
-        self.n_penalty = find_penalty(solution)
-        return c
+        accumulated_cs = get_c(decision, self.num_steps, self.next_step)
+
+        return accumulated_cs[pos][0], accumulated_cs[pos][1]
 
 
     def apply_halving(self, action):
-        global cum_n_q
 
         #if self.next_step % config['nomination_freq'] == 0:
         gs_ub = args.gas_ub
@@ -118,34 +97,33 @@ class Gas_Network(object):
 
         rs, gs, cs = get_con_pos()
 
-        for i in range(config['num_halvings']-1):
+        for i in range(config['num_halvings']):
+            c_EH, c_EN = self.get_cumulative_c(action)
+            c = abs(c_EH)+abs(c_EN)
+            if i == config['num_halvings']-1: break
 
-            c = self.get_cumulative_c(action, self.next_step)
-
-            if i == config['decision_freq']: break
-            if c > 0:
-
-                if self.nom_EN > self.nom_XN:
+            if self.nom_EN > self.nom_XN:
+                if c_EN > 0:
                     gs_lb = action[gs]
                     action[gs] = round(mean_value(gs_lb, gs_ub),3)
-
                 else:
-                    rs_ub = action[rs]
-                    action[rs] = round(mean_value(rs_lb, rs_ub),2)
-            else:
-                if c < 0:
-                    if self.nom_EN > self.nom_XN:
+                    if c_EN < 0:
                         gs_ub = action[gs]
                         action[gs] = round(mean_value(gs_lb, gs_ub),3)
-
-                    else:
+            else:
+                if c_EH > 0:
+                    rs_ub = action[rs]
+                    action[rs] = round(mean_value(rs_lb, rs_ub),2)
+                else:
+                    if c_EH < 0:
                         rs_lb = action[rs]
                         action[rs] = round(mean_value(rs_lb, rs_ub),2)
 
         if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
             action_ = action.copy()
             action_[cs] = 0
-            new_c = self.get_cumulative_c(action_, self.next_step)
+            new_c_EH, new_c_EN = self.get_cumulative_c(action_)
+            new_c = abs(new_c_EH)+abs(new_c_EN)
 
             if abs(new_c) < abs(c):
                 action = action_

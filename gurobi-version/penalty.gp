@@ -9,6 +9,7 @@ print "  (This file is used for the left plot)"
 print "- if i is set it will be used for the iteration number in the frist column of slope_evolution.csv"
 print "- if i threshold is set, a straight line at threshold is drawn in left plot"
 print "#########################################"
+set terminal qt 0 font "Sans,12"
 set datafile separator ","
 set grid
 set title "Quality plot"

@@ -6,7 +6,7 @@ print "- start: first line in information.csv that will be used for plotting"
 print "- end: last line in information.csv that will be used for plotting"
 print "- threshold: if threshold is set, a straight line at threshold is drawn in second plot"
 print "#########################################"
-#set terminal wxt size 960, 1080
+set terminal qt 0 font "Sans,12"
 set datafile separator ","
 set grid
 if (!exists("start")) start=0

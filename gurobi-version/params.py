@@ -40,7 +40,7 @@ config = {
     # is the ai-part active?
     "ai": True,
     # decisions are taken randomly (to generate bad labelled data)
-    "random_decisions": False
+    "random_decisions": False,
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 4,
     # Number of times interval halving to be taken

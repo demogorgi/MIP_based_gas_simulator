@@ -86,6 +86,11 @@ class Gas_Network(object):
         return accumulated_cs[pos][0], accumulated_cs[pos][1]
 
 
+    #def perturbed_halving(self, action):
+    #    sgn = random.randrange(-1,2,2) # values are -1 and 1 uniformly distributed
+    #    p = random.randint(10,100) # if perturbation is bigger than 10% action should be somehow bad
+    #    pert_action = action + sgn * p * action
+
     def apply_halving(self, action):
 
         #if self.next_step % config['nomination_freq'] == 0:
@@ -97,35 +102,49 @@ class Gas_Network(object):
 
         rs, gs, cs = get_con_pos()
 
-        for i in range(config['num_halvings']):
-            c_EH, c_EN = self.get_cumulative_c(action)
-            c = abs(c_EH)+abs(c_EN)
-            if i == config['num_halvings']-1: break
+        if config['random_decisions']:
+                action[gs] = random.randrange(100*gs_lb,100*gs_ub,1)/100
+                action[cs] = random.randint(0,1)
+                action[rs] = random.randrange(rs_lb,rs_ub,1)
+                #b = bool(random.getrandbits(1))
+                #if b:
+                #    action[gs] = random.randrange(100*gs_lb,100*gs_ub,1)/100
+                #    action[rs] = 1200
+                #else:
+                #    action[gs] = 0.0
+                #    action[cs] = 0
+                #    action[rs] = random.randrange(rs_lb,rs_ub,1)
+                #print("b: " + str(o) + " gs: " + str(action[gs]) + " rs: " + str(action[rs]))
+        else:
+            for i in range(config['num_halvings']):
+                c_EH, c_EN = self.get_cumulative_c(action)
+                c = abs(c_EH)+abs(c_EN)
+                if i == config['num_halvings']-1: break
 
-            if self.nom_EN > self.nom_XN:
-                if c_EN > 0:
-                    gs_lb = action[gs]
-                    action[gs] = round(mean_value(gs_lb, gs_ub),3)
-                else:
-                    if c_EN < 0:
-                        gs_ub = action[gs]
+                if self.nom_EN > self.nom_XN:
+                    if c_EN > 0:
+                        gs_lb = action[gs]
                         action[gs] = round(mean_value(gs_lb, gs_ub),3)
-            else:
-                if c_EH > 0:
-                    rs_ub = action[rs]
-                    action[rs] = round(mean_value(rs_lb, rs_ub),2)
+                    else:
+                        if c_EN < 0:
+                            gs_ub = action[gs]
+                            action[gs] = round(mean_value(gs_lb, gs_ub),3)
                 else:
-                    if c_EH < 0:
-                        rs_lb = action[rs]
+                    if c_EH > 0:
+                        rs_ub = action[rs]
                         action[rs] = round(mean_value(rs_lb, rs_ub),2)
+                    else:
+                        if c_EH < 0:
+                            rs_lb = action[rs]
+                            action[rs] = round(mean_value(rs_lb, rs_ub),2)
 
-        if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
-            action_ = action.copy()
-            action_[cs] = 0
-            new_c_EH, new_c_EN = self.get_cumulative_c(action_)
-            new_c = abs(new_c_EH)+abs(new_c_EN)
+            if action[gs] < 0.005 and self.nom_EN > self.nom_XN:
+                action_ = action.copy()
+                action_[cs] = 0
+                new_c_EH, new_c_EN = self.get_cumulative_c(action_)
+                new_c = abs(new_c_EH)+abs(new_c_EN)
 
-            if abs(new_c) < abs(c):
-                action = action_
+                if abs(new_c) < abs(c):
+                    action = action_
 
         set_dispatcher_dec(self.decision_to_dict(action))

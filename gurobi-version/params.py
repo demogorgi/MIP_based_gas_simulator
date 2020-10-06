@@ -39,8 +39,8 @@ config = {
     "contour_output": False,
     # is the ai-part active?
     "ai": True,
-    # how often ai takes decision (number of timesteps)
-    "decision_freq": 2,
+    # decisions are taken randomly (to generate bad labelled data)
+    "random_decisions": False
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 4,
     # Number of times interval halving to be taken

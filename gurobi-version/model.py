@@ -131,7 +131,7 @@ def simulate(agent_decisions,compressors,t,dt):
     m.addConstrs((compressor_DA[cs] == get_agent_decision(agent_decisions["compressor"]["CS"][joiner(cs)],t) for cs in co.compressors), name='cs_mode')
     #
     ## constraints to track smoothing of special pipe flows
-    m.addConstrs((smoothed_special_pipe_flow_DA[s] == ( q_in_old(t,s) + q_out_old(t,s) + var_pipe_Qo_in[s] + var_pipe_Qo_out[s] ) / 4 for s in co.special), name='special pipe smoothing')
+    m.addConstrs((smoothed_special_pipe_flow_DA[s] == ( q_in_old(t,s) + q_out_old(t,s) + var_pipe_Qo_in[s] + var_pipe_Qo_out[s] ) / 4 for s in co.special), name='special_pipe_smoothing')
     #
     ## pressure difference p_out minus p_in
     #subto dp:

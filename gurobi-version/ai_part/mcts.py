@@ -128,22 +128,9 @@ class MCTS(object):
         return noisy_psa_vector
 
     def possible_decision_probability(self, gas_network, possible_decisions, prob_vector):
-        rs, gs, cs = get_con_pos()
-        re_wt = 1
         psa_vector = []
-
-        if gas_network.nom_EH > gas_network.nom_XH:
-            re_wt += 1
-
-        prob_cs = prob_vector[gs] + prob_vector [cs]
-        prob_re = prob_vector[rs]
         for i, decision in enumerate(possible_decisions):
-
             value = gas_network.get_reward(decision[1])
-
-            if decision[0][cs] == 0:
-                psa_vector.append(re_wt*value*prob_re)
-            else:
-                psa_vector.append(value*prob_cs)
+            psa_vector.append(value*prob_vector[i])
 
         return psa_vector

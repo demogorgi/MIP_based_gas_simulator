@@ -4,6 +4,7 @@ import re
 import numpy as np
 import random
 import math
+from copy import deepcopy
 
 from urmel import *
 
@@ -24,8 +25,6 @@ args = dotdict({
     #Upper and lower limit for gas
     'gas_ub': 1,
     'gas_lb': 0,
-    #Number to control uniform distribution in decision size
-    'decision_size': 25
 })
 
 wd = sys.argv[1].replace("/",".")
@@ -127,24 +126,20 @@ def get_state(step, agent_decisions, solution):
     agents_dict = get_agents_dict(step,agent_decisions)
     trader_nom = {k:v for k, v in agents_dict.items() if re.search('_TA',k)}
     dispatcher_dec = {k:v for k, v in agents_dict.items() if re.search('_DA',k)}
+    trader_nom_new = get_trader_nom(step+1, agent_decisions)
 
-    da_dec = normalize_dispatcher_dec(dispatcher_dec.copy())
-    ta_dec = normalize_trader_noms(trader_nom.copy())
+    da_dec = normalize_dispatcher_dec(deepcopy(dispatcher_dec))
+    ta_dec = normalize_trader_noms(deepcopy(trader_nom))
+    ta_dec_new = normalize_trader_noms(deepcopy(trader_nom_new))
 
-
-    for k, v in da_dec.items(): #Dispatcher decision
-        state_[k] = v
-    for k, v in ta_dec.items(): #Trader decision
-        state_[k] = v
-    for k,v in pr_q.items():
-        state_[k] = v
-
+    state_ = {**da_dec, **ta_dec, **pr_q, **ta_dec_new}
     state = np.array([value for key, value in state_.items()])
+
     return state
 
 def get_trader_nom(step, agent_decisions):
     dec_dict = get_agents_dict(step,agent_decisions)
-    trader_noms = {k:v for k, v in dec_dict.items() if re.search('_TA',k)}
+    trader_noms = {k+'_1':v for k, v in dec_dict.items() if re.search('_TA',k)}
     return trader_noms.copy()
 
 def get_dispatcher_dec():
@@ -162,7 +157,7 @@ def get_old_action():
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
         if re.search('zeta_DA', label):
-            decisions[label] = (value-args.zeta_lb)/(args.zeta_ub-args.zeta_lb)
+            decisions[label] = round((value-args.zeta_lb)/(args.zeta_ub-args.zeta_lb),2)
     return decisions
 
 def normalize_pressure(pressure_dict):
@@ -171,7 +166,7 @@ def normalize_pressure(pressure_dict):
     return pressure_dict
 
 def normalize_trader_noms(decisions):
-    norm = lambda value, lb, ub: (value - lb)/(ub - lb)
+    norm = lambda value, lb, ub: round((value - lb)/(ub - lb), 2)
     for label, value in decisions.items():
         key = re.sub('nom\S*_TA\[(\S*)]', r'\1', label)
         if re.search('XH', key):

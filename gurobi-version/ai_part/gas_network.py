@@ -1,4 +1,3 @@
-from copy import deepcopy
 from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
@@ -66,27 +65,27 @@ class Gas_Network(object):
     def get_possible_nexts(self):
         va = 1
         list_actions= []
-
-        cs = 1
-        gas = []
-        while len(gas) < args.decision_size:
-            x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
-            if x not in gas:
-                gas.append(x)
-        for i in range(len(gas)):
-            list_actions.append([va, va, args.zeta_ub, gas[i], cs])
-
-        cs = 0
-        zeta = []
-        while len(zeta) < args.decision_size:
-            x = random.randint(args.zeta_lb, args.zeta_ub)
-            if x not in zeta:
-                zeta.append(x)
-        for i in range(len(zeta)):
-            list_actions.append([va, va, zeta[i], args.gas_lb, cs])
+        if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
+        if self.nom_EN > self.nom_XN:
+            cs = 1
+            gas = []
+            while len(gas) < self.get_action_size():
+                x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
+                if x not in gas:
+                    gas.append(x)
+            for i in range(len(gas)):
+                list_actions.append([va, va, args.zeta_ub, gas[i], cs])
+        else:
+            cs = 0
+            zeta = []
+            while len(zeta) < self.get_action_size():
+                x = random.randint(args.zeta_lb, args.zeta_ub)
+                if x not in zeta:
+                    zeta.append(x)
+            for i in range(len(zeta)):
+                list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
-        if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
         random.shuffle(list_actions)
         pos_values = random.sample(range(0, len(list_actions)), self.get_action_size())
         list_actions = [list_actions[i] for i in pos_values]
@@ -147,7 +146,7 @@ class Gas_Network(object):
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
         accumulated_cs = get_c(decision, self.num_steps-i, step)
-        
+
         c1 = accumulated_cs[pos][0]
         c2 = accumulated_cs[pos][1]
 
@@ -179,10 +178,12 @@ class Gas_Network(object):
         else:
             return  0 #Draw
     def apply_action(self, decisions):
+        solution = None
         for i in range(config['decision_freq']):
             step = self.current_step+i
-            solution = simulator_step(decisions, step, "ai")
-
-        self.current_decisions = decisions
-        self.current_state = get_state(step, decisions, solution)
-        self.current_step = step+1
+            if step < numSteps:
+                solution = simulator_step(decisions, step, "ai")
+        if solution:
+            self.current_decisions = decisions
+            self.current_state = get_state(step, decisions, solution)
+            self.current_step = step+1

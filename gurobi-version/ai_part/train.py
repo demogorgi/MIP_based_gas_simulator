@@ -53,7 +53,7 @@ class Train(object):
         node = TreeNode()
         round = 0
 
-        while(round < num_rounds):
+        while round < num_rounds:
 
             gas_network.set_possible_decisions(gas_network.get_valid_actions())
 
@@ -94,6 +94,5 @@ class Train(object):
             gas_network.apply_action(decisions)
             value = gas_network.get_value(decisions, round)
             write_acc_c()
-            random.shuffle(gas_network.possible_decisions)
             round += 1
         return decisions

@@ -44,7 +44,7 @@ config = {
     # how often new trader nomination comes (number of timesteps)
     "nomination_freq": 8,
     # Threshold accumulated c values
-    "winning_threshold": 500,
+    "winning_threshold": 1000,
     # controlling random nomination values [start(opt),stop,step(opt)]
     "randrange": [0,1100,50]
 }

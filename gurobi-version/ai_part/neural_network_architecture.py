@@ -7,9 +7,9 @@ from .configs import *
 args = dotdict({
     'learning_rate':0.001,
     'epochs':10,
-    'batch_size':64,
+    'batch_size':32,
     'momentum': 0.9,
-    'resnet_blocks': 5,
+    'resnet_blocks': 1,
 })
 
 class NeuralNetwork(object):

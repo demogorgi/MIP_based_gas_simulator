@@ -69,12 +69,12 @@ for i in range(numSteps):
         #current_acc_c = abs(c_eh)+abs(c_en)
         c_EH, c_EN, c_eh, c_en = [0 for _ in range(4)]
 
-        if config["ai"] and (i+1) >= config['nomination_freq']:
+        if config["ai"]:
             # Generating new agent_decision for the next iteration from neural network as it learns to generate
             agent_decisions = get_decisions_from_ai(solution, agent_decisions, i+1)
             if not agent_decisions: continue
 
-            
+
 
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")

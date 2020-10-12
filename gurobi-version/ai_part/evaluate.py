@@ -23,6 +23,7 @@ class Evaluate(object):
             a = random.randrange(*config["randrange"])
 
             gas_network.set_nominations(a)
+            gas_network.possible_nexts = gas_network.get_possible_nexts()
             gas_network.set_possible_decisions()
 
             for player in range(configs.num_players):
@@ -32,7 +33,7 @@ class Evaluate(object):
                 else:
                     c_value_da2 = c_value
                     mcts = self.nnet
-                while(round < num_rounds):
+                while round < num_rounds:
                     best_child = mcts.search(gas_network, node, configs.temperature)
                     action = best_child.action
 
@@ -49,6 +50,6 @@ class Evaluate(object):
                 wins_da1 += 1
             if c_value_da2 == 1:
                 wins_da2 += 1
-        
+
         print("evaluation finished")
         return wins_da1, wins_da2

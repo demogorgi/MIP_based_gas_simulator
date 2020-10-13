@@ -10,13 +10,14 @@ from params import *
 from .configs import *
 
 def get_decisions_from_ai(solution, agent_decisions, step):
-
+    global pos
     if step < numSteps:
 
         Gas_Network.initial_decisions_dict = agent_decisions
         Gas_Network.next_step = step
         Gas_Network.initial_state = get_state(step-1, agent_decisions, solution)
-
+        if not ((numSteps-step) >= config['nomination_freq'] or (numSteps-step)%config['nomination_freq'] == 0):
+            pos = numSteps-step-1
         gas_network = Gas_Network()
         net = NeuralNetworkWrapper(gas_network)
 

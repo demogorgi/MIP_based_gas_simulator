@@ -46,7 +46,7 @@ config = {
     # Threshold accumulated c values
     "winning_threshold": 1000,
     # controlling random nomination values [start(opt),stop,step(opt)]
-    "randrange": [0,1100,50]
+    "randrange": [0,1101,50]
 }
 
 # read manual file with configs

@@ -11,12 +11,12 @@ class Evaluate(object):
         self.eval_net = eval_mcts
         self.gas_network = gas_network
 
+    #Find the best model 
     def evaluate(self):
         wins_da1 = 0
         wins_da2 = 0
 
         for i in range(configs.nums_eval_plays):
-
             node = TreeNode()
             gas_network = deepcopy(self.gas_network)
             c_value_da2 = 0
@@ -25,6 +25,8 @@ class Evaluate(object):
             gas_network.set_nominations(a)
             gas_network.possible_nexts = gas_network.get_possible_nexts()
             gas_network.set_possible_decisions()
+
+            gas_network.current_state = update_state(gas_network.current_step, deepcopy(gas_network.current_decisions), deepcopy(gas_network.current_state))
 
             for player in range(configs.num_players):
                 round = 0

@@ -1,7 +1,7 @@
 from .functions_ai import *
 
 mean_value = lambda l,u:((u - l)/2 + l)
-
+cumulative_c = None
 class Gas_Network(object):
 
     initial_state = None
@@ -11,7 +11,6 @@ class Gas_Network(object):
 
     ex_nom_EH = 0
     ex_nom_EN = 0
-    ex_dec_pool = []
     num_steps = config['nomination_freq']
 
 
@@ -92,7 +91,7 @@ class Gas_Network(object):
 
         return list_actions
 
-
+    #Find accumulated c for all decisions in the pool
     def get_valid_actions(self):
         global accumulated_cs
         list_actions = self.possible_nexts
@@ -111,7 +110,8 @@ class Gas_Network(object):
         #list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
         return list_actions_with_c
 
-    def generate_decision_dict(self, dispatcher_action, decisions = {}): #Generate new agent_decision dictionary
+    #Generate new agent_decision dictionary
+    def generate_decision_dict(self, dispatcher_action, decisions = {}):
         step = self.current_step
         if not decisions:
             decisions = deepcopy(self.get_agent_decision())
@@ -140,8 +140,9 @@ class Gas_Network(object):
             i += 1
         return da_dec
 
+    #Calculate cumulative sum of c
     def get_cumulative_c(self, decision, i = 0):
-        global accumulated_cs
+        global accumulated_cs, cumulative_c
         i *= config['decision_freq']
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
@@ -151,13 +152,13 @@ class Gas_Network(object):
         c2 = accumulated_cs[pos][1]
 
         c = abs(c1)+abs(c2)
-
+        cumulative_c = c
         return c
 
     #Find the weight value for dispatcher agent
     def get_reward(self, acc_c = None):
-
-        if not acc_c: acc_c = config['winning_threshold']/2
+        if not acc_c:
+            acc_c = cumulative_c if cumulative_c else config['winning_threshold']/2
         #low penalty rewards high value
         if acc_c == 0:
             return 1
@@ -177,6 +178,8 @@ class Gas_Network(object):
             return  1 #Won
         else:
             return  0 #Draw
+
+    #Find the state after performing the chosen decision over decision frequency time steps
     def apply_action(self, decisions):
         solution = None
         for i in range(config['decision_freq']):

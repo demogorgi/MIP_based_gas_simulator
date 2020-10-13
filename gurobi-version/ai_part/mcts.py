@@ -36,7 +36,7 @@ class TreeNode(object):
             return True
 
         return False
-
+    #Select a child with high PUCT value
     def select_child(self):
 
         c_puct = configs.c_puct
@@ -60,12 +60,12 @@ class TreeNode(object):
             if move[0] is not [0]:
                 action = deepcopy(move[0])
                 self.add_child_node(parent = self, action = action, psa = psa_vector[idx])
-
+    #Add child to the tree
     def add_child_node(self, parent, action, psa = 0.0):
         child_node = TreeNode(parent = parent, action = action, psa = psa)
         self.children.append(child_node)
         return child_node
-
+    #Back propagate to update the parameters of all tree nodes
     def back_propagate(self, wsa, v):
         self.Nsa += 1
         self.Wsa = wsa + v

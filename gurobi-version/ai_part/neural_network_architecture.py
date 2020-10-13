@@ -153,6 +153,7 @@ class NeuralNetworkWrapper(object):
         self.net = NeuralNetwork(self.gas_network)
         self.sess = self.net.sess
 
+    #Predict the value of action probability and value
     def policy_value(self, state):
 
         state = state[np.newaxis, :]
@@ -198,7 +199,7 @@ class NeuralNetworkWrapper(object):
 
                     with open(file_path, 'a') as loss_file:
                         loss_file.write('%f|%f\n' % (pi_loss, v_loss))
-
+    #Save the model
     def save_model(self, filename = "current_model"):
         if not os.path.exists(configs.model_dir):
             os.mkdir(configs.model_dir)
@@ -206,7 +207,7 @@ class NeuralNetworkWrapper(object):
         file_path = configs.model_dir + filename
         #print("Saving model:", filename, "to", configs.model_dir)
         self.net.saver.save(self.sess, file_path)
-
+    #Load the model
     def load_model(self, filename = "current_model"):
         file_path = configs.model_dir + filename
         #print("Loading model:", filename, "from", configs.model_dir)

@@ -91,7 +91,6 @@ def get_agents_dict(step, agent_decisions):
     return agents_dict
 
 def get_boundary_q_p(solution):
-    #smoothed_flow
     x_p = {}
     for k, v in solution.items():
         if re.search('smoothed_special_pipe_flow_DA', k):
@@ -103,21 +102,6 @@ def get_boundary_q_p(solution):
     smoothed_flows = normalize_smoothed_flows(smoothed_flow.copy())
     boundary_p_q = {**smoothed_flows, **pressures}
     return boundary_p_q
-
-def get_smoothed_flow(solution):
-    smoothed_flow = {}
-    for k, v in solution.items():
-        if re.search('smoothed_special_pipe_flow_DA', k):
-            smoothed_flow[k] = v
-    return smoothed_flow
-
-def normalize_smoothed_flows(smoothed_flow):
-    for label, value in smoothed_flow.items():
-        if 'EH' in label:
-            smoothed_flow[label] = round((value - no.q_lb['EH'])/(no.q_ub['EH'] - no.q_lb['EH']),2)
-        if 'EN' in label:
-            smoothed_flow[label] = round((value - no.q_lb['EN'])/(no.q_ub['EN'] - no.q_lb['EN']),2)
-    return smoothed_flow
 
 def get_state(step, agent_decisions, solution):
     global trader_nom, dispatcher_dec
@@ -137,22 +121,25 @@ def get_state(step, agent_decisions, solution):
 
     return state
 
+def update_state(step, agent_decisions, state):
+    trader_nom = [v for k, v in normalize_trader_noms(get_trader_nom(step, agent_decisions)).items()]
+    state = list(state)
+    state[len(state)-len(trader_nom) : len(state)] = trader_nom
+    return np.array(state)
+
 def get_trader_nom(step, agent_decisions):
-    dec_dict = get_agents_dict(step,agent_decisions)
-    trader_noms = {k+'_1':v for k, v in dec_dict.items() if re.search('_TA',k)}
-    return trader_noms.copy()
+    trader_noms = {k+'_1':v for k, v in get_agents_dict(step,agent_decisions).items() if re.search('_TA',k)}
+    return deepcopy(trader_noms)
 
 def get_dispatcher_dec():
-    return dispatcher_dec.copy()
+    return deepcopy(dispatcher_dec)
 
 def set_dispatcher_dec(da_dec):
     global dispatcher_dec
     dispatcher_dec = da_dec
 
 def get_old_action():
-    old_action = list(v for k, v in get_dispatcher_dec().items())
-    return old_action
-
+    return list(v for k, v in get_dispatcher_dec().items())
 
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
@@ -178,6 +165,14 @@ def normalize_trader_noms(decisions):
         elif re.search('EN', key):
             decisions[label] = norm(value, no.q_lb['EN'], no.q_ub['EN'])
     return decisions
+
+def normalize_smoothed_flows(smoothed_flow):
+    for label, value in smoothed_flow.items():
+        if 'EH' in label:
+            smoothed_flow[label] = round((value - no.q_lb['EH'])/(no.q_ub['EH'] - no.q_lb['EH']),2)
+        if 'EN' in label:
+            smoothed_flow[label] = round((value - no.q_lb['EN'])/(no.q_ub['EN'] - no.q_lb['EN']),2)
+    return smoothed_flow
 
 def find_penalty(solution):
 
@@ -220,7 +215,7 @@ def find_penalty(solution):
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
-
+#Get the number of connection elements to place in the list in an order
 def get_con_pos():
     va, rs, cs = [0 for _ in range(3)]
     for k,v in get_dispatcher_dec().items():

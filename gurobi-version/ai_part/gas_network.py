@@ -97,7 +97,7 @@ class Gas_Network(object):
         list_actions = self.possible_nexts
         list_actions_with_c = []
         c1, c2, c = [0 for _ in range(3)]
-
+        pos = get_end_position(self.next_step)
         for action in list_actions:
             decision = self.generate_decision_dict(action)
             accumulated_cs = get_c(decision, self.num_steps, self.next_step)
@@ -147,7 +147,7 @@ class Gas_Network(object):
         c1, c2, c = [0 for _ in range(3)]
         step = self.next_step + i
         accumulated_cs = get_c(decision, self.num_steps-i, step)
-
+        pos = get_end_position(self.next_step)
         c1 = accumulated_cs[pos][0]
         c2 = accumulated_cs[pos][1]
 

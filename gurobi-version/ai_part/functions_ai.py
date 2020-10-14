@@ -47,6 +47,10 @@ for n in no.nodes:
 entry_q_ub = no.q_ub['EH']
 pr,dispatcher_dec, trader_nom, state_, smoothed_flow = ({} for i in range(5))
 
+def get_end_position(step):
+    if numSteps-step < config['nomination_freq']:
+        return numSteps-step-1
+    return pos
 def get_nom_q_diff(solution):
     nom_q_diff = {}
 

@@ -9,6 +9,7 @@ print "#########################################"
 set terminal qt 0 font "Sans,12"
 set datafile separator ","
 set grid
+if (!exists("threshold")) threshold=-1
 if (!exists("start")) start=0
 if (!exists("end")) {
    x=1
@@ -17,7 +18,11 @@ if (!exists("end")) {
 }
 if (!exists("filename")) filename='instances/da2/output/information.csv'
 f(x) = system(sprintf("wc -l %s | cut -f1 -d' '", x))
-title_t(threshold) = sprintf('threshold %.1f', threshold)
+if (threshold) > 0 {
+    title_t(threshold) = sprintf('threshold %.1f', threshold)
+} else {
+    title_t(threshold) = ""
+}
 while (1) {
     if (x) {end=f(filename)}
     if (end <= 280) {
@@ -40,23 +45,12 @@ while (1) {
     unset y2label
     unset y2tics
     #
-    #set key inside left top
-    #set xlabel "Time"
-    #set ylabel "Dispatcher penalty"
-    #set origin 0, 0.8
-    #set size 1, 0.2
-    #plot [start:end] filename every ::1 using :17 with lines title "Dispatcher penalty"
-    ##
     set key inside left top
     set xlabel "Time"
     set ylabel "Accumulated c values"
     set origin 0, 0.6
     set size 1, 0.2
-    if (!exists("threshold")) {
-	    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values"
-    } else {
-	    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values", threshold t title_t(threshold)
-    }
+    plot [start:end][0:*] filename every ::1 using :19 with steps title "Accumulated c values", threshold t title_t(threshold)
     #
     set key inside center bottom
     set xlabel "Time"

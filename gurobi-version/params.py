@@ -42,12 +42,12 @@ config = {
     # decisions are taken randomly (to generate bad labelled data)
     "random_decisions": False,
     # how often new trader nomination comes (number of timesteps)
-    "nomination_freq": 4,
+    "nomination_freq": 8,
     # Number of times interval halving to be taken
-    "num_halvings": 20,
+    "num_halvings": 15,
     # controlling random nomination values; here random value between 0 and 1100 which is a multiple of 50
     #"randrange": [1100,1101,50]
-    "randrange": [550,551,1]
+    "randrange": [650,651,1]
 }
 
 # read manual file with configs

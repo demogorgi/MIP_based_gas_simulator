@@ -31,7 +31,7 @@ for i in range(numSteps):
 
     # dirty hack to modify nominations
     if i > 0 and (i+1) % config['nomination_freq'] == 0 and (i+1) < numSteps:
-        a = random.randrange(0, 1100, 50) # random value between 0 and 1100 which is a multiple of 50
+        a = random.randrange(*config["randrange"])
         agent_decisions["entry_nom"]["S"]["EN_aux0^EN"][i+1] = a
         agent_decisions["entry_nom"]["S"]["EH_aux0^EH"][i+1] = 1100 - a
 

@@ -45,6 +45,9 @@ config = {
     "nomination_freq": 4,
     # Number of times interval halving to be taken
     "num_halvings": 20,
+    # controlling random nomination values; here random value between 0 and 1100 which is a multiple of 50
+    #"randrange": [1100,1101,50]
+    "randrange": [550,551,1]
 }
 
 # read manual file with configs

@@ -9,7 +9,7 @@ print "  (This file is used for the left plot)"
 print "- if i is set it will be used for the iteration number in the frist column of slope_evolution.csv"
 print "- if i threshold is set, a straight line at threshold is drawn in left plot"
 print "#########################################"
-set terminal qt 0 font "Sans,12"
+set terminal qt 0 font "Sans,16"
 set datafile separator ","
 set grid
 set title "Quality plot"
@@ -65,7 +65,7 @@ while (1) {
        set title "Quality plot"
        set ylabel "Mean value"
        set y2label "Regression line slope"
-       set y2range [-10:10]
+       set y2range [-100:100]
        plot "slope_evolution.csv" every ::1 using :2 with linespoints axes x1y2 t "Fitting parameter 'a' evolution", "slope_evolution.csv" every ::1 using :4 with linespoints axes x1y1 t "Mean value evolution"
        unset y2tics
        unset y2label

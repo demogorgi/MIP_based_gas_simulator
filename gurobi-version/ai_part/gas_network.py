@@ -64,10 +64,13 @@ class Gas_Network(object):
     def get_possible_nexts(self):
         va = 1
         list_actions= []
+        decision_pos = None
+        rs_pos,gas_pos,cs_pos = get_con_pos()
         if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
         if self.nom_EN > self.nom_XN:
             cs = 1
             gas = []
+            decision_pos = gas_pos
             while len(gas) < self.get_action_size():
                 x = round(random.uniform(args.gas_lb, args.gas_ub), 2)
                 if x not in gas:
@@ -77,6 +80,7 @@ class Gas_Network(object):
         else:
             cs = 0
             zeta = []
+            decision_pos = rs_pos
             while len(zeta) < self.get_action_size():
                 x = random.randint(args.zeta_lb, args.zeta_ub)
                 if x not in zeta:
@@ -84,8 +88,9 @@ class Gas_Network(object):
             for i in range(len(zeta)):
                 list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
+        list_actions.sort(key = lambda list_actions: abs(list_actions[decision_pos]))
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
-        random.shuffle(list_actions)
+        #random.shuffle(list_actions)
         pos_values = random.sample(range(0, len(list_actions)), self.get_action_size())
         list_actions = [list_actions[i] for i in pos_values]
 

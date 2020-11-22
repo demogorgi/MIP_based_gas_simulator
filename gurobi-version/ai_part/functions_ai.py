@@ -179,7 +179,6 @@ def normalize_smoothed_flows(smoothed_flow):
     return smoothed_flow
 
 def find_penalty(solution):
-
     pr_violations = 0 #Dispatcher pressure bound violations
     entry_flow_violations  = 0 #Dispatcher flow bound violations
     exit_flow_violations = 0
@@ -219,6 +218,7 @@ def find_penalty(solution):
     trader_penalty = trader_violations
 
     return [dispatcher_penalty, trader_penalty]
+
 #Get the number of connection elements to place in the list in an order
 def get_con_pos():
     va, rs, cs = [0 for _ in range(3)]
@@ -261,7 +261,6 @@ def remove_duplicate_decision(prev_agent_decisions, new_agent_decisions, step, l
 
 #Create csv to store agent decisions, boundary flows, pressures and agent penalty values
 def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [], bn_pr_flows = {}):
-
     extracted_ = {}
     extracted_['Time'] = timestamp
     for i, j in agent_decisions.items():
@@ -293,7 +292,6 @@ def create_dict_for_csv(agent_decisions, step = 0, timestamp = '', penalty = [],
 
     fieldnames = reordered_headers(list(extracted_.keys()))
     # fieldnames = list(extracted_.keys())
-
     return fieldnames, extracted_
 
 def reordered_headers(fieldnames):

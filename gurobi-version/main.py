@@ -80,11 +80,6 @@ for i in range(numSteps):
     #Write agent decisions in output folder
     f = open(path.join(data_path, "output/fixed_decisions.yml"), "w")
     yaml.dump(agent_decisions, f)
-    ################################### @Bitty ###################################
-    # Bitty, I think this is the place where the AI comes into play.
-    # The solution should contain all information you need to compute penalties.
-    # And you can adjust the agent_decisions-dictionary here.
-    ##############################################################################
 
 #Copying information regarding trader nominations, dispatcher decisions and penalties to another csv with new format
 with open(path.join(data_path, 'output/information.csv'), 'r+', newline='') as infile, open(path.join(data_path, 'output/information_de.csv'), 'w+', newline='') as outfile:

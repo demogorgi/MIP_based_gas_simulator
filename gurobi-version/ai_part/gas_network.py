@@ -89,7 +89,6 @@ class Gas_Network(object):
                 list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
-        #random.shuffle(list_actions)
         pos_values = random.sample(range(0, len(list_actions)), self.get_action_size())
         list_actions = [list_actions[i] for i in pos_values]
         list_actions.sort(key = lambda list_actions: abs(list_actions[decision_pos]))
@@ -110,8 +109,6 @@ class Gas_Network(object):
             c = abs(c1)+abs(c2)
 
             list_actions_with_c.append([action, c])
-
-        #list_actions_with_c.sort(key = lambda list_actions_with_c: abs(list_actions_with_c[1]))
         return list_actions_with_c
 
     #Generate new agent_decision dictionary
@@ -138,7 +135,6 @@ class Gas_Network(object):
     def decision_to_dict(self, da_action):
         i = 0
         da_dec = get_dispatcher_dec().copy()
-
         for k, v in da_dec.items():
             da_dec[k] = da_action[i]
             i += 1
@@ -154,7 +150,6 @@ class Gas_Network(object):
         pos = get_end_position(self.next_step)
         c1 = accumulated_cs[pos][0]
         c2 = accumulated_cs[pos][1]
-
         c = abs(c1)+abs(c2)
         cumulative_c = c
         return c

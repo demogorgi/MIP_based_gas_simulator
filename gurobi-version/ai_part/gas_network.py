@@ -88,12 +88,11 @@ class Gas_Network(object):
             for i in range(len(zeta)):
                 list_actions.append([va, va, zeta[i], args.gas_lb, cs])
 
-        list_actions.sort(key = lambda list_actions: abs(list_actions[decision_pos]))
         list_actions.append([va, va, args.zeta_ub, args.gas_lb, 0])
         #random.shuffle(list_actions)
         pos_values = random.sample(range(0, len(list_actions)), self.get_action_size())
         list_actions = [list_actions[i] for i in pos_values]
-
+        list_actions.sort(key = lambda list_actions: abs(list_actions[decision_pos]))
         return list_actions
 
     #Find accumulated c for all decisions in the pool

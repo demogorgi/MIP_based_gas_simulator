@@ -1,3 +1,4 @@
+#File contains global variables, values and functions
 import sys
 from os import path
 import os
@@ -65,6 +66,7 @@ with open(path.join(data_path, 'compressors.yml')) as file:
     compressors = yaml.load(file, Loader=yaml.FullLoader)
     #print(compressors)
 
+#Convert information csv file to German formats
 def csv2csv_de(infile, outfile):
     reader = csv.reader(infile, delimiter = ',')
     writer = csv.writer(outfile, delimiter = ';')

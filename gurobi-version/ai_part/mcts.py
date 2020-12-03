@@ -113,7 +113,7 @@ class MCTS(object):
                 node = node.parent
 
         return self.root.select_child()
-
+    #Update the probability with Dir(a)
     def add_dirichlet_noise(self, psa_vector):
 
         dirichlet_input = [configs.dirichlet_alpha for x in range(self.gas_network.get_action_size())]
@@ -126,7 +126,7 @@ class MCTS(object):
                 (1 - configs.epsilon) * psa + configs.epsilon * dirichlet_list[idx])
 
         return noisy_psa_vector
-
+    #Find the probability of decisions
     def possible_decision_probability(self, gas_network, possible_decisions, prob_vector):
         psa_vector = []
         for i, decision in enumerate(possible_decisions):

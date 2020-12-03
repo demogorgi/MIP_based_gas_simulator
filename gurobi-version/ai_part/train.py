@@ -47,6 +47,7 @@ class Train(object):
 
         return new_agent_decision
 
+    #Function for a self-play step
     def self_play(self, gas_network, training_data):
         self_play_data = []
         mcts = MCTS(self.net)
@@ -79,6 +80,7 @@ class Train(object):
             psa_vector = deepcopy(state_value[1])
             training_data.append([state, psa_vector, state_value[2]])
 
+    #Returns new decision using the updated best model
     def get_decision(self):
         mcts = MCTS(self.net)
         node = TreeNode()

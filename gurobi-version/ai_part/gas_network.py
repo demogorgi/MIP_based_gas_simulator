@@ -3,7 +3,7 @@ from .functions_ai import *
 mean_value = lambda l,u:((u - l)/2 + l)
 cumulative_c = None
 class Gas_Network(object):
-
+    #Class represents a lighter version of the gas network
     initial_state = None
     initial_decisions_dict = {}
     next_step = 0
@@ -20,37 +20,44 @@ class Gas_Network(object):
         self.possible_nexts = self.get_possible_nexts()
         self.save_nominations(self.nom_EH, self.nom_EN)
         self.reset()
-
+    #Reset to initial state and dispatcher decisions
+    #after self-plays and evaluation
     def reset(self):
         self.current_state = deepcopy(self.initial_state)
         self.current_decisions = deepcopy(self.initial_decisions_dict)
         self.current_step = self.next_step
 
+    #Function to get the action size
     def get_action_size(self):
         return self.row
 
+    #Function returns state vector dimensions
     def get_state_dimension(self):
         return (self.row, 1)
 
+    #Function returns current dispatcher decision
     def get_agent_decision(self):
         return deepcopy(self.current_decisions)
 
+    #Function returns the decision pool which created according to the nomination
     def get_possible_decisions(self):
         return self.possible_decisions
 
+    #Function set the decision pool to its variable
     def set_possible_decisions(self, new_set_decisions = []):
         if not new_set_decisions:
             new_set_decisions = self.get_valid_actions()
         self.possible_decisions = new_set_decisions
-
+    #Funcion to save the original nominations
     def save_nominations(self, old_EH, old_EN):
         self.ex_nom_EH = old_EH
         self.ex_nom_EN = old_EN
 
-
+    #Function returns saved trader nominations
     def get_saved_nominations(self):
         return self.ex_nom_EH, self.ex_nom_EN
 
+    #Function to set every nominations for evaluation process
     def set_nominations(self, new_EN):
         decisions = deepcopy(self.get_agent_decision())
         step = self.current_step
@@ -67,7 +74,7 @@ class Gas_Network(object):
         decision_pos = None
         rs_pos,gas_pos,cs_pos = get_con_pos()
         if not self.next_step%config['nomination_freq'] == 0: list_actions.append(get_old_action())
-        if self.nom_EN > self.nom_XN:
+        if self.nom_EN > self.nom_XN: #Compressor Path
             cs = 1
             gas = []
             decision_pos = gas_pos
@@ -77,7 +84,7 @@ class Gas_Network(object):
                     gas.append(x)
             for i in range(len(gas)):
                 list_actions.append([va, va, args.zeta_ub, gas[i], cs])
-        else:
+        else: #Resistor path
             cs = 0
             zeta = []
             decision_pos = rs_pos

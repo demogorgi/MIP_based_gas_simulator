@@ -51,6 +51,7 @@ def get_end_position(step):
     if numSteps-step < config['nomination_freq']:
         return numSteps-step-1
     return pos
+#Returns the entry slack values to find the flow deviation
 def get_nom_q_diff(solution):
     nom_q_diff = {}
 
@@ -63,7 +64,7 @@ def get_nom_q_diff(solution):
     nom_q_diff_EH, nom_q_diff_EN = [v for k,v in nom_q_diff.items()]
 
     return nom_q_diff_EH, nom_q_diff_EN
-
+#Calculate the flow deviation, as accumulated_c
 def get_c(decision, num_steps, start_step):
     end_step = start_step+num_steps
     global accumulated_cs
@@ -77,7 +78,7 @@ def get_c(decision, num_steps, start_step):
             accumulated_cs[i%config['nomination_freq']] = [c_eh, c_en]
 
     return accumulated_cs
-
+#Returns the new nominations from the agents dictionary
 def get_agents_dict(step, agent_decisions):
     agents_dict = {}
     for k1,v1 in agent_decisions.items():
@@ -93,7 +94,7 @@ def get_agents_dict(step, agent_decisions):
                 agents_dict[key] = v3[i]
 
     return agents_dict
-
+#Returns the flow and pressure values of boundary nodes
 def get_boundary_q_p(solution):
     x_p = {}
     for k, v in solution.items():
@@ -106,7 +107,7 @@ def get_boundary_q_p(solution):
     smoothed_flows = normalize_smoothed_flows(smoothed_flow.copy())
     boundary_p_q = {**smoothed_flows, **pressures}
     return boundary_p_q
-
+#Returns the state of the gas network
 def get_state(step, agent_decisions, solution):
     global trader_nom, dispatcher_dec
     pr_q = get_boundary_q_p(solution)
@@ -124,38 +125,38 @@ def get_state(step, agent_decisions, solution):
     state = np.array([value for key, value in state_.items()])
 
     return state
-
+#Update the current state
 def update_state(step, agent_decisions, state):
     trader_nom = [v for k, v in normalize_trader_noms(get_trader_nom(step, agent_decisions)).items()]
     state = list(state)
     state[len(state)-len(trader_nom) : len(state)] = trader_nom
     return np.array(state)
-
+#Get the trader nominations
 def get_trader_nom(step, agent_decisions):
     trader_noms = {k+'_1':v for k, v in get_agents_dict(step,agent_decisions).items() if re.search('_TA',k)}
     return deepcopy(trader_noms)
-
+#Returns the dispatcher decision
 def get_dispatcher_dec():
     return deepcopy(dispatcher_dec)
-
+#Set the dispatcher decision
 def set_dispatcher_dec(da_dec):
     global dispatcher_dec
     dispatcher_dec = da_dec
-
+#Function returns previous decision
 def get_old_action():
     return list(v for k, v in get_dispatcher_dec().items())
-
+#Normalize drag factor of Dispatcher decision set
 def normalize_dispatcher_dec(decisions):
     for label, value in decisions.items():
         if re.search('zeta_DA', label):
             decisions[label] = round((value-args.zeta_lb)/(args.zeta_ub-args.zeta_lb),2)
     return decisions
-
+#Normalize the pressure values
 def normalize_pressure(pressure_dict):
     for label, value in pressure_dict.items():
         pressure_dict[label] = round((value - no.pressure_limits_lower[label])/(no.pressure_limits_upper[label] - no.pressure_limits_lower[label]),2)
     return pressure_dict
-
+#Normalize the trader nominations
 def normalize_trader_noms(decisions):
     norm = lambda value, lb, ub: round((value - lb)/(ub - lb), 2)
     for label, value in decisions.items():
@@ -169,7 +170,7 @@ def normalize_trader_noms(decisions):
         elif re.search('EN', key):
             decisions[label] = norm(value, no.q_lb['EN'], no.q_ub['EN'])
     return decisions
-
+#Normalize the smoothed flows
 def normalize_smoothed_flows(smoothed_flow):
     for label, value in smoothed_flow.items():
         if 'EH' in label:
@@ -177,7 +178,7 @@ def normalize_smoothed_flows(smoothed_flow):
         if 'EN' in label:
             smoothed_flow[label] = round((value - no.q_lb['EN'])/(no.q_ub['EN'] - no.q_lb['EN']),2)
     return smoothed_flow
-
+#Claculate the agents' penalty
 def find_penalty(solution):
     pr_violations = 0 #Dispatcher pressure bound violations
     entry_flow_violations  = 0 #Dispatcher flow bound violations

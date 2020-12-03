@@ -3,7 +3,7 @@ from .utils import *
 configs = dotdict({
     'model_dir': "./ai_part/models/", #Directory to save models
     'load_model': True, #Flag value for loading a saved model
-    'record_loss': True,
+    'record_loss': False,
     'loss_file':"loss.txt",
 
     'c_puct': 1, #level of exploration (1-6) used in MCTS
@@ -13,8 +13,6 @@ configs = dotdict({
 
     'num_self_plays' : 10, #Number of self-play games
     'temperature': 1, #Temperature for MCTS search
-
-    'train_model': True,
 
     'nums_eval_plays':10, #Number of plays for the evaluation of the model
     'num_players':2, #Number of players for evaluation

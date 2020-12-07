@@ -5,7 +5,6 @@ from collections import deque
 import os
 import csv
 from params import *
-from .configs import *
 
 def get_decisions_from_ai(solution, agent_decisions, step, penalty):
 

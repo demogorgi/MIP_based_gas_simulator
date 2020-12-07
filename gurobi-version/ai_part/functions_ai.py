@@ -7,7 +7,6 @@ import random
 from urmel import *
 
 from .utils import *
-from .configs import penalties, c_values
 
 args = dotdict({
     #Weights to calculate penalty for both agents

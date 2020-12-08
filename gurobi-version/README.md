@@ -76,7 +76,10 @@
 
 # Software requirements
 
-####1. Gurobi licenced version
-####2. YAML
-####3. Python version 3.6.9
-####4. Tensor Flow 1.5
+#### 1. Gurobi licenced version
+
+#### 2. YAML
+
+#### 3. Python version 3.6.9
+
+#### 4. Tensor Flow 1.5

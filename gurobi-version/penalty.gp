@@ -66,7 +66,7 @@ while (1) {
        set ylabel "Mean value"
        set y2label "Regression line slope"
        set y2range [-100:100]
-       plot "slope_evolution.csv" every ::1 using :2 with linespoints axes x1y2 t "Fitting parameter 'a' evolution", "slope_evolution.csv" every ::1 using :4 with linespoints axes x1y1 t "Mean value evolution"
+       plot "slope_evolution.csv" every ::1 using :4 with linespoints axes x1y1 t "Mean value evolution", "slope_evolution.csv" every ::1 using :2 with linespoints axes x1y2 t "Fitting parameter 'a' evolution"
        unset y2tics
        unset y2label
        k = f(filename)
